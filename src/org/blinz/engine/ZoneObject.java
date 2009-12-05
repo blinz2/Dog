@@ -20,7 +20,7 @@ package org.blinz.engine;
  *
  * @author Blinz
  */
-public abstract class ZoneObject {
+abstract class ZoneObject {
 
     private static final class DataHolder {
 
