@@ -116,32 +116,32 @@ public abstract class Camera extends ZoneObject {
     }
 
     /**
-     * Returns the x location of this Camera
-     * @return
+     * 
+     * @return the x location of this Camera
      */
     public final int getX() {
         return bounds.getX();
     }
 
     /**
-     * Returns the y location of this Camera
-     * @return
+     * 
+     * @return the y location of this Camera
      */
     public final int getY() {
         return bounds.getY();
     }
 
     /**
-     * Returns the width of this Camera
-     * @return
+     * 
+     * @return the width of this Camera
      */
     public final int getWidth() {
         return bounds.getWidth();
     }
 
     /**
-     * Returns the height of this Camera
-     * @return
+     * 
+     * @return the height of this Camera
      */
     public final int getHeight() {
         return bounds.getHeight();

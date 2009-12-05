@@ -35,9 +35,9 @@ public final class Users {
     }
 
     /**
-     * Returns the User at that given index.
+     * 
      * @param index
-     * @return
+     * @return the User at that given index.
      */
     public final static User get(int index) {
         return users.get(index);

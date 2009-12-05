@@ -53,8 +53,7 @@ public abstract class BaseSprite extends ZoneObject {
     public abstract int getHeight();
 
     /**
-     * Returns a Position3D representing the position of this Sprite.
-     * @return
+     * @return a Position3D representing the position of this Sprite.
      */
     public abstract Position getPosition();
 
@@ -77,9 +76,9 @@ public abstract class BaseSprite extends ZoneObject {
     public abstract float getLayer();
 
     /**
-     * Returns an instance of Bounds representing the location and size of this
+     * 
+     * @return an instance of Bounds representing the location and size of this
      * sprite.
-     * @returns a new instance of Bounds
      */
     public abstract Bounds getBounds();
 
