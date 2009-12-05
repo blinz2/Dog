@@ -155,12 +155,12 @@ public abstract class Zone extends ZoneObject {
         public void run() {
             while (isRunning) {
                 trimLists();
-            }
-            
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
+
+                try {
+                    Thread.sleep(600000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }
