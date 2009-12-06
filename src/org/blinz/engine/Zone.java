@@ -167,6 +167,7 @@ public abstract class Zone extends ZoneObject {
     private Size size;
     private final ArrayList<Camera> cameras = new ArrayList<Camera>();
     private ZoneUpdateSchema updateSchema;
+    private String name = "Zone";
     private long initTime;
     private long pauseTime = 0;
     /**
@@ -181,6 +182,10 @@ public abstract class Zone extends ZoneObject {
     private static final Vector<Byte> recycledIDs = new Vector<Byte>();
     private static byte idIndex = 0;
 
+    public Zone(String name) {
+        this();
+    }
+
     public Zone() {
         try {
             zoneID = generateZoneID();
@@ -192,6 +197,15 @@ public abstract class Zone extends ZoneObject {
         getData().init(zoneID);
         size = getData().zoneSize;
         updateSchema = new TrivialSectorUpdateSchema(getData().sectors, zoneProcessor, cameras);
+    }
+
+    /**
+     * Returns the name of this Zone. "Zone" by default. This name will also be
+     * assigned to threads processing this Zone when created.
+     * @return the name of this Zone, "Zone" by default
+     */
+    public String getName() {
+        return name;
     }
 
     /**
@@ -247,11 +261,13 @@ public abstract class Zone extends ZoneObject {
 
     /**
      * Creates threads for processing this Zone.
+     * @param name the name assigned to the threads processing this Zone
      * @param threads number of threads dedicated to this Zone
      */
-    public final synchronized void start(int threads) {
+    public final synchronized void start(String name, int threads) {
         if (!isRunning) {
-            zoneProcessor = new TaskExecuter(threads);
+            this.name = name;
+            zoneProcessor = new TaskExecuter(name, threads);
             zoneProcessor.addTask(new Pause());
             zoneProcessor.addTask(new Barrier());
             zoneProcessor.addTask(new ManageTime());
