@@ -28,7 +28,7 @@ public abstract class Sprite extends BaseSprite {
 
     private int x = 0, y = 0;
     private float layer = 0;
-    private final Size size = new Size(1, 1);
+    private short width = 1, height = 1;
 
     //PUBLIC METHODS------------------------------------------------------------
     /**
@@ -47,7 +47,7 @@ public abstract class Sprite extends BaseSprite {
      */
     @Override
     public Size getSize() {
-        return size;
+        return new Size(width, height);
     }
 
     /**
@@ -56,7 +56,7 @@ public abstract class Sprite extends BaseSprite {
      */
     @Override
     public int getWidth() {
-        return size.width;
+        return width;
     }
 
     /**
@@ -65,7 +65,7 @@ public abstract class Sprite extends BaseSprite {
      */
     @Override
     public int getHeight() {
-        return size.height;
+        return height;
     }
 
     /**
@@ -106,11 +106,11 @@ public abstract class Sprite extends BaseSprite {
 
     @Override
     public Bounds getBounds() {
-        return new Bounds(x, y, size.width, size.height);
+        return new Bounds(x, y, width, height);
     }
 
     public void moveDown(int distance) {
-        if (y + size.height + distance > getData().zoneSize.height) {
+        if (y + height + distance > getData().zoneSize.height) {
             distance = getData().zoneSize.height - y;
         }
         updateY(y + distance);
@@ -127,7 +127,7 @@ public abstract class Sprite extends BaseSprite {
     }
 
     public void moveRight(int distance) {
-        if (x + size.width + distance > getData().zoneSize.width) {
+        if (x + width + distance > getData().zoneSize.width) {
             distance = getData().zoneSize.width - x;
         }
 
@@ -161,7 +161,7 @@ public abstract class Sprite extends BaseSprite {
             width = 1;
         }
         setWidth(width);
-        size.width = width;
+        this.width = (short) width;
     }
 
     @Override
@@ -170,7 +170,7 @@ public abstract class Sprite extends BaseSprite {
             height = 1;
         }
         updateHeight(height);
-        size.height = height;
+        this.height = (short) height;
     }
 
     @Override
@@ -182,7 +182,7 @@ public abstract class Sprite extends BaseSprite {
             height = 1;
         }
         updateSize(width, height);
-        size.setSize(width, height);
+        setSize(width, height);
     }
 
     @Override
@@ -253,7 +253,6 @@ public abstract class Sprite extends BaseSprite {
     //PRIVATE METHODS-----------------------------------------------------------
     //END OF PRIVATE METHODS////////////////////////////////////////////////////
     //ABSTRACT METHODS----------------------------------------------------------
-
     @Override
     protected abstract void initSprite();
 }
