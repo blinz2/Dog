@@ -196,6 +196,11 @@ public abstract class Sprite extends BaseSprite {
     }
 
     @Override
+    protected void updateLayer(float layer) {
+        this.layer = layer;
+    }
+
+    @Override
     protected void updatePosition(int x, int y) {
         this.x = x;
         this.y = y;
@@ -248,7 +253,6 @@ public abstract class Sprite extends BaseSprite {
     //PRIVATE METHODS-----------------------------------------------------------
     //END OF PRIVATE METHODS////////////////////////////////////////////////////
     //ABSTRACT METHODS----------------------------------------------------------
-    public abstract void updateSprite();
 
     @Override
     protected abstract void initSprite();
