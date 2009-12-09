@@ -174,18 +174,6 @@ public abstract class Sprite extends BaseSprite {
     }
 
     @Override
-    protected void updateSize(int width, int height) {
-        if (width < 1) {
-            width = 1;
-        }
-        if (height < 1) {
-            height = 1;
-        }
-        updateSize(width, height);
-        setSize(width, height);
-    }
-
-    @Override
     protected void updateX(int x) {
         this.x = x;
     }
@@ -198,12 +186,6 @@ public abstract class Sprite extends BaseSprite {
     @Override
     protected void updateLayer(float layer) {
         this.layer = layer;
-    }
-
-    @Override
-    protected void updatePosition(int x, int y) {
-        this.x = x;
-        this.y = y;
     }
 
     @Override

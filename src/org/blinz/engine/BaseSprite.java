@@ -234,7 +234,8 @@ public abstract class BaseSprite extends ZoneObject {
                 s2 = s2.rightNeighbor;
             }
         }
-        updateSize(width, height);
+        updateWidth(width);
+        updateHeight(height);
     }
 
     /**
@@ -577,13 +578,6 @@ public abstract class BaseSprite extends ZoneObject {
     protected abstract void updateHeight(int height);
 
     /**
-     * Updates the size of the sprite to that given.
-     * @param width
-     * @param height
-     */
-    protected abstract void updateSize(int width, int height);
-
-    /**
      * Updates the x of the sprite to that given.
      * @param x
      */
@@ -600,13 +594,6 @@ public abstract class BaseSprite extends ZoneObject {
      * @param layer
      */
     protected abstract void updateLayer(float layer);
-
-    /**
-     * Updates the position of this sprite to that given.
-     * @param x
-     * @param y
-     */
-    protected abstract void updatePosition(int x, int y);
 
     @Override
     void init() {
