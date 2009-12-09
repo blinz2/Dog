@@ -249,7 +249,7 @@ public abstract class Zone extends ZoneObject {
      */
     public final int getHeight() {
         return size.height;
-    }
+    }  
 
     /**
      * Adds the given sprite to this sprites zone.
