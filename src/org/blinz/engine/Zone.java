@@ -261,6 +261,14 @@ public abstract class Zone extends ZoneObject {
 
     /**
      * Creates threads for processing this Zone.
+     * @param threads number of threads dedicated to this Zone
+     */
+    public final synchronized void start(int threads) {
+        start(name, threads);
+    }
+
+    /**
+     * Creates threads for processing this Zone.
      * @param name the name assigned to the threads processing this Zone
      * @param threads number of threads dedicated to this Zone
      */
