@@ -182,10 +182,6 @@ public abstract class Zone extends ZoneObject {
     private static final Vector<Byte> recycledIDs = new Vector<Byte>();
     private static byte idIndex = 0;
 
-    public Zone(String name) {
-        this();
-    }
-
     public Zone() {
         try {
             zoneID = generateZoneID();
