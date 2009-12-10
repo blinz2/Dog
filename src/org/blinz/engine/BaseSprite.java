@@ -561,10 +561,6 @@ public abstract class BaseSprite extends ZoneObject {
 
     protected abstract void initSprite();
 
-    protected abstract void enableInputTriggers();
-
-    protected abstract void disableInputTriggers();
-
     /**
      * Updates the width of this sprite to that given.
      * @param width

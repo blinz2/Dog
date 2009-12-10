@@ -245,7 +245,7 @@ public abstract class Zone extends ZoneObject {
      */
     public final int getHeight() {
         return size.height;
-    }  
+    }
 
     /**
      * Adds the given sprite to this sprites zone.
@@ -429,10 +429,6 @@ public abstract class Zone extends ZoneObject {
         }
     }
 
-    final void setFocus(boolean hasFocus) {
-        getData().zoneHasFocus = hasFocus;
-    }
-
     /**
      * Trims excessively large lists.
      */
@@ -486,8 +482,8 @@ public abstract class Zone extends ZoneObject {
             return;
         }
 
-        if (size.width / getData().sectorSize.width + 1 <= getData().sectors.length ||
-                size.height / getData().sectorSize.width + 1 <= getData().sectors[0].length) {
+        if (size.width / getData().sectorSize.width + 1 <= getData().sectors.length
+                || size.height / getData().sectorSize.width + 1 <= getData().sectors[0].length) {
             return;
         }
 
@@ -512,17 +508,17 @@ public abstract class Zone extends ZoneObject {
             getData().registerZoneObject(sector);
         }
 
-        for (int i = 0; i <
-                sectors.length; i++) {
-            for (int n = 0; n <
-                    sectors[i].length; n++) {
+        for (int i = 0; i
+                < sectors.length; i++) {
+            for (int n = 0; n
+                    < sectors[i].length; n++) {
                 sectors[i][n].findNeighbors();
             }
 
         }
 
-        if ((zoneProcessor.getThreadCount() == 1) ||
-                (sectors.length == 1 && sectors[0].length == 1)) {
+        if ((zoneProcessor.getThreadCount() == 1)
+                || (sectors.length == 1 && sectors[0].length == 1)) {
             if (!(updateSchema instanceof TrivialSectorUpdateSchema)) {
                 updateSchema = new TrivialSectorUpdateSchema(sectors, zoneProcessor, cameras);
             }

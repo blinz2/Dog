@@ -36,7 +36,6 @@ class ZoneData {
     final ArrayList<BaseSprite> spritesToDelete = new ArrayList<BaseSprite>();
     long zoneTime = 0;
     long zoneCycles = 0;
-    boolean zoneHasFocus = false;
     byte id;
 
     /**
@@ -57,9 +56,6 @@ class ZoneData {
 
     protected void addSprite(BaseSprite sprite) {
         registerZoneObject(sprite);
-        if (zoneHasFocus) {
-            sprite.enableInputTriggers();
-        }
 
         Sector tl = getSectorOf(sprite.getX(), sprite.getY());
         Sector br = getSectorOf(sprite.getX() + sprite.getWidth(),
