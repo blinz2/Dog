@@ -380,10 +380,6 @@ public abstract class Zone extends ZoneObject {
      */
     protected abstract void update();
 
-    protected abstract void disableInputTriggers();
-
-    protected abstract void enableInputTriggers();
-
     /**
      * Adds the given Camera to this Zone, to moniter the sprites in its area.
      * @param observer
@@ -399,9 +395,6 @@ public abstract class Zone extends ZoneObject {
      */
     final void removeCamera(Camera observer) {
         cameras.remove(observer);
-        if (cameras.size() == 0) {
-            disableInputTriggers();
-        }
 
         for (int i = 0; i < getData().sectors.length; i++) {
             for (int n = 0; n < getData().sectors[i].length; n++) {
