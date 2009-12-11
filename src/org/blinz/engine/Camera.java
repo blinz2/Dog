@@ -82,16 +82,6 @@ public abstract class Camera extends ZoneObject {
     }
 
     /**
-     * Removes the Screen representation of this Camera from Display.
-     */
-    public final void removeFromDisplay() {
-        if (screen != null) {
-            ScreenManager.removeScreen(screen);
-            screen = null;
-        }
-    }
-
-    /**
      * Sets the zone of this Camera. In addition to setting the Zone it also
      * removes the old Zone.
      * @param zone
@@ -664,12 +654,6 @@ public abstract class Camera extends ZoneObject {
         }
 
         update();
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        removeFromDisplay();
-        super.finalize();
     }
 
     protected abstract void update();
