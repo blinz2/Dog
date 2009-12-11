@@ -65,12 +65,19 @@ public abstract class Camera extends ZoneObject {
     }
 
     /**
-     * Creates a Screen to display the Sprites currently visible from this Camera.
+     * Sets whether or not this Camera's contents are drawn.
+     * @param display if true this Camera will be drawn, otherwise it will not.
      */
-    public final void addToDisplay() {
-        if (screen == null) {
-            screen = new ZoneScreen();
-            ScreenManager.addScreen(screen);
+    public final void display(boolean display) {
+        if (display) {
+            if (screen == null) {
+                screen = new ZoneScreen();
+                screen.addMouseListener(spriteSelecter);
+                ScreenManager.addScreen(screen);
+            }
+        } else {
+            ScreenManager.removeScreen(screen);
+            screen = null;
         }
     }
 
@@ -256,8 +263,8 @@ public abstract class Camera extends ZoneObject {
         if (getData() == null) {
             return;
         }
-        if (((int) ((getX() + width) / getData().sectorSize.width)) ==
-                (((int) (getX() + getWidth()) / getData().sectorWidth()))) {
+        if (((int) ((getX() + width) / getData().sectorSize.width))
+                == (((int) (getX() + getWidth()) / getData().sectorWidth()))) {
             return;
         }
 
@@ -308,8 +315,8 @@ public abstract class Camera extends ZoneObject {
         if (getData() == null) {
             return;
         }
-        if (((int) ((getY() + height) / getData().sectorHeight())) ==
-                (((int) (getY() + getHeight()) / getData().sectorHeight()))) {
+        if (((int) ((getY() + height) / getData().sectorHeight()))
+                == (((int) (getY() + getHeight()) / getData().sectorHeight()))) {
             return;
         }
 
@@ -647,7 +654,7 @@ public abstract class Camera extends ZoneObject {
             setSize(screen.getWidth(), screen.getHeight());
         }
 
-        if (focusSprite != null) {
+        if (focusSprite != null && centeredOnFocusSprite) {
             setPosition((focusSprite.getX() - getWidth() / 2) + focusSprite.getWidth() / 2,
                     (focusSprite.getY() - getHeight() / 2) + focusSprite.getHeight() / 2);
         }
