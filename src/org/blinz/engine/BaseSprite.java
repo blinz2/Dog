@@ -241,7 +241,7 @@ public abstract class BaseSprite extends ZoneObject {
     /**
      * Sets the x location of this sprite to the given value.
      * @param x the new x coordinate of this sprite        //Method excessively large because of frequency of call and need for efficiency
-
+    
      */
     public final void setX(int x) {
         //Method excessively large because of frequency of call and need for efficiency
@@ -523,6 +523,32 @@ public abstract class BaseSprite extends ZoneObject {
             layer = 49;
         }
         updateLayer(layer);
+    }
+
+    /**
+     * Sends the given data over the network to any clients that might be
+     * Monitering this sprite.
+     * @param data
+     */
+    protected synchronized final void sendData(String data) {
+    }
+
+    /**
+     * Recieves data being streamed over the network.
+     * @param data
+     */
+    protected synchronized final void recieveData(String data) {
+    }
+
+    /**
+     * A stub method for listening to clicks. Implement as needed.
+     * @param User
+     * @param buttonNumber
+     * @param numberOfClicks
+     * @param cursorX
+     * @param cursorY
+     */
+    protected void buttonClick(User user, int buttonNumber, int numberOfClicks, int cursorX, int cursorY) {
     }
 
     /**

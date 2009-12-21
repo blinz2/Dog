@@ -36,6 +36,10 @@ import org.blinz.input.MouseWheelListener;
  */
 public abstract class Camera extends ZoneObject {
 
+    /**
+     * Determines whether or not this Camera represents a local user. True by default.
+     */
+    private boolean local = true;
     private boolean centeredOnFocusSprite = false;
     private ZoneScreen screen;
     private final Bounds bounds = new Bounds();
@@ -53,7 +57,7 @@ public abstract class Camera extends ZoneObject {
      * Constructer for Camera.
      */
     public Camera() {
-        user = new User();
+        this(new User());
     }
 
     /**
@@ -61,7 +65,17 @@ public abstract class Camera extends ZoneObject {
      * @param user
      */
     public Camera(User user) {
+        this(user, true);
+    }
+
+    /**
+     * Creates a new Camera.
+     * @param user User associated with this Camera.
+     * @param local Indicates whether or not this Camera represents a local user, true by default
+     */
+    Camera(User user, boolean local) {
         this.user = user;
+        this.local = local;
     }
 
     /**
@@ -799,7 +813,6 @@ public abstract class Camera extends ZoneObject {
 
         private class InputListener implements MouseListener, MouseWheelListener, KeyListener {
 
-            MouseListener spriteSelecter;
 
             @Override
             public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {

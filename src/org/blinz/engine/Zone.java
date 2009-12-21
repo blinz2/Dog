@@ -19,6 +19,7 @@ package org.blinz.engine;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Vector;
 import org.blinz.util.Size;
 import org.blinz.util.Bounds;
@@ -166,6 +167,7 @@ public abstract class Zone extends ZoneObject {
     }
     private Size size;
     private final ArrayList<Camera> cameras = new ArrayList<Camera>();
+    private final Hashtable<User, Vector<BaseSprite>> userListeners = new Hashtable<User, Vector<BaseSprite>>();
     private ZoneUpdateSchema updateSchema;
     private String name = "Zone";
     private long initTime;
@@ -298,6 +300,16 @@ public abstract class Zone extends ZoneObject {
         isRunning = false;
         zoneProcessor.stop();
         zoneProcessor = null;
+    }
+
+    public synchronized void addMouseListeningSprite(User user, BaseSprite sprite) {
+        if (userListeners.contains(user)) {
+            Vector<BaseSprite> sprites = new Vector<BaseSprite>();
+            userListeners.put(user, sprites);
+            sprites.add(sprite);
+        } else {
+            userListeners.get(user).add(sprite);
+        }
     }
 
     /**
