@@ -21,7 +21,6 @@ import org.blinz.graphics.Graphics;
 import org.blinz.graphics.Screen;
 import org.blinz.util.Bounds;
 import org.blinz.input.MouseListener;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -47,6 +46,7 @@ public abstract class Camera extends ZoneObject {
             new Hashtable<BaseSprite, CameraSprite>();
     private final Vector<CameraSprite> selectableSprites = new Vector<CameraSprite>();
     private final Vector<BaseSprite> spritesToRemove = new Vector<BaseSprite>();
+    private Vector<BaseSprite> listeningSprites;
     private final SpriteSelecter spriteSelecter = new SpriteSelecter(selectableSprites);
     private Sector sector1, sector2;
     private BaseSprite focusSprite;
@@ -82,7 +82,7 @@ public abstract class Camera extends ZoneObject {
      * Sets whether or not this Camera's contents are drawn.
      * @param display if true this Camera will be drawn, otherwise it will not.
      */
-    public final void display(boolean display) {
+    public final synchronized void display(boolean display) {
         if (display) {
             if (screen == null) {
                 screen = new ZoneScreen();
@@ -100,9 +100,13 @@ public abstract class Camera extends ZoneObject {
      * removes the old Zone.
      * @param zone
      */
-    public final void setZone(Zone zone) {
+    public final synchronized void setZone(Zone zone) {
         dropZone();
         this.zone = zone;
+        listeningSprites = zone.getSprites(user);
+        if (listeningSprites == null) {
+            listeningSprites = new Vector<BaseSprite>();
+        }
         zone.addCamera(this);
     }
 
@@ -813,11 +817,13 @@ public abstract class Camera extends ZoneObject {
 
         private class InputListener implements MouseListener, MouseWheelListener, KeyListener {
 
-
             @Override
             public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
                 if (spriteSelecter != null) {
                     spriteSelecter.buttonClick(buttonNumber, clickCount, cursorX, cursorY);
+                }
+                for (int i = 0; i < listeningSprites.size(); i++) {
+                    listeningSprites.get(i).buttonClick(user, buttonNumber, cursorY, cursorX, cursorY);
                 }
             }
 
