@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.blinz.engine;
+package org.blinz.world;
 
 import java.util.ArrayList;
 import org.blinz.util.Size;
