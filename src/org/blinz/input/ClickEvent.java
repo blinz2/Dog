@@ -19,26 +19,30 @@ package org.blinz.input;
 import org.blinz.util.User;
 
 /**
- * A super class for events generated for user input.
+ * An InputEvent generated with a mouse click.
  * @author Blinz
  */
-public abstract class InputEvent {
+public class ClickEvent extends MouseEvent {
 
-    private User user;
+    private int clickCount;
 
     /**
-     *
+     * Do I really have to explain what a constructor does?
      * @param user the User associated with this InputEvent
+     * @param buttonID the button operated
+     * @param cursorX the x coordinate of the cursor at the time of the event
+     * @param cursorY the y coordinate of the cursor at the time of the event
      */
-    protected InputEvent(User user) {
-        this.user = user;
+    public ClickEvent(User user, int buttonID, int cursorX, int cursorY, int clickCount) {
+        super(user, buttonID, cursorX, cursorY);
+        this.clickCount = clickCount;
     }
 
     /**
-     * Gets the User that generated this event.
-     * @return the User that generated this event.
+     *
+     * @return the number of clicks behind this event.
      */
-    public User getUser() {
-        return user;
+    public final int clickCount() {
+        return clickCount;
     }
 }

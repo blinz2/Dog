@@ -16,8 +16,8 @@
  */
 package org.blinz.world;
 
-import org.blinz.util.User;
 import org.blinz.graphics.Graphics;
+import org.blinz.input.ClickEvent;
 import org.blinz.util.Bounds;
 import org.blinz.util.Position;
 import org.blinz.util.Size;
@@ -549,7 +549,7 @@ public abstract class BaseSprite extends ZoneObject {
      * @param cursorX
      * @param cursorY
      */
-    protected void buttonClick(User user, int buttonNumber, int numberOfClicks, int cursorX, int cursorY) {
+    protected void buttonClick(ClickEvent event) {
     }
 
     /**
