@@ -614,9 +614,9 @@ public abstract class Camera extends ZoneObject {
      * this Camera.
      * @param sprites
      */
-    final void addSprites(Collection<BaseSprite> sprites) {
-        for (BaseSprite sprite : sprites) {
-            addSprite(sprite);
+    final void addSprites(Vector<BaseSprite> sprites) {
+        for (int i = 0; i < sprites.size(); i++) {
+            addSprite(sprites.get(i));
         }
     }
 
