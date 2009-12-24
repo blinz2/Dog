@@ -16,6 +16,7 @@
  */
 package org.blinz.engine;
 
+import org.blinz.util.User;
 import org.blinz.graphics.Graphics;
 import org.blinz.util.Bounds;
 import org.blinz.util.Position;

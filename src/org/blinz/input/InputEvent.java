@@ -14,27 +14,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.blinz.engine;
+package org.blinz.input;
 
 import org.blinz.util.User;
 
 /**
- * Used to allow ZoneObservers to denote selection when a Sprite is click on.
+ *
  * @author Blinz
  */
-public interface SelectibleSprite {
+public class InputEvent {
 
-    public abstract void drawSelectionIndicator();
-
-    /**
-     * Called when the sprite is selected from a ZoneObserver.
-     * @param user the User that selected this sprite
-     */
-    public void select(User user);
-
-    /**
-     * Called when the sprite loses selected status.
-     * @param user the User that deselected this sprite
-     */
-    public void deselect(User user);
+    private User user;
 }

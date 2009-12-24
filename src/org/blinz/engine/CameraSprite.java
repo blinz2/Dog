@@ -16,6 +16,7 @@
  */
 package org.blinz.engine;
 
+import org.blinz.util.User;
 import org.blinz.graphics.Graphics;
 import org.blinz.input.MouseListener;
 import org.blinz.util.Position;

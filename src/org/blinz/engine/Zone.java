@@ -16,6 +16,7 @@
  */
 package org.blinz.engine;
 
+import org.blinz.util.User;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
