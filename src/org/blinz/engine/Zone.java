@@ -443,6 +443,15 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
+     *
+     * @param user
+     * @return all sprites listening to input from the given user.
+     */
+    final Vector<BaseSprite> getSprites(User user) {
+        return userListeners.get(user);
+    }
+
+    /**
      * Generates a distinct zone id for a new Zone.
      * @return byte
      */
