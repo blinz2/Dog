@@ -19,26 +19,28 @@ package org.blinz.input;
 import org.blinz.util.User;
 
 /**
- * A super class for events generated for user input.
+ *
  * @author Blinz
  */
-public abstract class InputEvent {
+public class KeyEvent extends InputEvent {
 
-    private User user;
+    private int key;
 
     /**
-     *
-     * @param user the User associated with this InputEvent
+     * 
+     * @param user user that generated this event
+     * @param key key associated with this event
      */
-    protected InputEvent(User user) {
-        this.user = user;
+    public KeyEvent(User user, int key) {
+        super(user);
+        this.key = key;
     }
 
     /**
-     * Gets the User that generated this event.
-     * @return the User that generated this event.
+     *
+     * @return the key associated with this event
      */
-    public final User getUser() {
-        return user;
+    public final int key() {
+        return key;
     }
 }

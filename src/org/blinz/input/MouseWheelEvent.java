@@ -19,32 +19,33 @@ package org.blinz.input;
 import org.blinz.util.User;
 
 /**
- * An InputEvent generated with a mouse operation.
+ * An InputEvent generated with use of the mouse wheel.
  * @author Blinz
  */
-public class MouseEvent extends InputEvent {
+public class MouseWheelEvent extends InputEvent {
 
-    private int buttonID;
-    private int x, y;
+    private int ticks, cursorX, cursorY;
 
     /**
      *
-     * @param user the User associated with this InputEvent
-     * @param buttonID the button operated
-     * @param cursorX the x coordinate of the cursor at the time of the event
-     * @param cursorY the y coordinate of the cursor at the time of the event
+     * @param user the user that generated this event
+     * @param cursorX the x coordinate of the cursor at the time of this event
+     * @param cursorY the y coordinate of the cursor at the time of this event
+     * @param scrollTicks the number of ticks behind this event
      */
-    public MouseEvent(User user, int buttonID, int cursorX, int cursorY) {
+    public MouseWheelEvent(User user, int cursorX, int cursorY, int scrollTicks) {
         super(user);
-        this.buttonID = buttonID;
+        ticks = scrollTicks;
+        this.cursorX = cursorX;
+        this.cursorY = cursorY;
     }
 
     /**
-     * Returns the numerical identification of the mouse button.
-     * @return the button associated with this event.
+     *
+     * @return the number of scroll ticks in this event.
      */
-    public final int getButton() {
-        return buttonID;
+    public final int getScrollTicks() {
+        return ticks;
     }
 
     /**
@@ -52,7 +53,7 @@ public class MouseEvent extends InputEvent {
      * @return the x coordinate of the cursor at the time of this event
      */
     public final int cursorX() {
-        return x;
+        return cursorX;
     }
 
     /**
@@ -60,6 +61,6 @@ public class MouseEvent extends InputEvent {
      * @return the y coordinate of the cursor at the time of this event
      */
     public final int cursorY() {
-        return y;
+        return cursorY;
     }
 }

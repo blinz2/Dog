@@ -16,8 +16,11 @@
  */
 package org.blinz.world;
 
+import org.blinz.input.KeyEvent;
 import org.blinz.graphics.Graphics;
 import org.blinz.input.ClickEvent;
+import org.blinz.input.MouseEvent;
+import org.blinz.input.MouseWheelEvent;
 import org.blinz.util.Bounds;
 import org.blinz.util.Position;
 import org.blinz.util.Size;
@@ -543,13 +546,51 @@ public abstract class BaseSprite extends ZoneObject {
 
     /**
      * A stub method for listening to clicks. Implement as needed.
-     * @param User
-     * @param buttonNumber
-     * @param numberOfClicks
-     * @param cursorX
-     * @param cursorY
+     * @param event contains data about the input
      */
-    protected void buttonClick(ClickEvent event) {
+    protected void buttonClicked(ClickEvent event) {
+    }
+
+    /**
+     * A stub method for listening to mouse button presses. Implement as needed.
+     * @param event contains data about the input
+     */
+    protected void buttonPressed(MouseEvent event) {
+    }
+
+    /**
+     * A stub method for listening to mouse button releases. Implement as needed.
+     * @param event contains data about the input
+     */
+    protected void buttonReleased(MouseEvent event) {
+    }
+
+    /**
+     * A stub method for listening to the mouse wheel. Implement as needed.
+     * @param event contains data about the input
+     */
+    protected void mouseWheelScroll(MouseWheelEvent event) {
+    }
+
+    /**
+     * A stub method for listening to the keys pressed. Implement as needed.
+     * @param event contains data about the input
+     */
+    protected void keyPressed(KeyEvent event) {
+    }
+
+    /**
+     * A stub method for listening to the keys released. Implement as needed.
+     * @param event contains data about the input
+     */
+    protected void keyReleased(KeyEvent event) {
+    }
+
+    /**
+     * A stub method for listening to the key typed. Implement as needed.
+     * @param event contains data about the input
+     */
+    protected void keyTyped(KeyEvent event) {
     }
 
     /**
