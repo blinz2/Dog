@@ -110,38 +110,19 @@ public abstract class Sprite extends BaseSprite {
     }
 
     public void moveDown(int distance) {
-        if (y + height + distance > getData().zoneSize.height) {
-            distance = getData().zoneSize.height - y;
-        }
-        updateY(y + distance);
-        y += distance;
+        setY(y + distance);
     }
 
     public void moveUp(int distance) {
-        if (y - distance < 0) {
-            distance -= y - distance;
-        }
-
-        updateY(y - distance);
-        y -= distance;
+        setY(y - distance);
     }
 
     public void moveRight(int distance) {
-        if (x + width + distance > getData().zoneSize.width) {
-            distance = getData().zoneSize.width - x;
-        }
-
-        updateX(x + distance);
-        x += distance;
+        setX(x + distance);
     }
 
     public void moveLeft(int distance) {
-        if (x - distance < 0) {
-            distance -= x - distance;
-        }
-
-        updateX(x - distance);
-        x -= distance;
+        setX(x - distance);
     }
 
     //END OF PUBLIC METHODS/////////////////////////////////////////////////////
