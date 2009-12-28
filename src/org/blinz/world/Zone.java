@@ -303,7 +303,7 @@ public abstract class Zone extends ZoneObject {
         zoneProcessor = null;
     }
 
-    public synchronized void addMouseListeningSprite(User user, BaseSprite sprite) {
+    public synchronized void addUserListeningSprite(User user, BaseSprite sprite) {
         if (userListeners.contains(user)) {
             Vector<BaseSprite> sprites = new Vector<BaseSprite>();
             userListeners.put(user, sprites);
