@@ -304,7 +304,7 @@ public abstract class Zone extends ZoneObject {
     }
 
     public synchronized void addUserListeningSprite(User user, BaseSprite sprite) {
-        if (userListeners.contains(user)) {
+        if (!userListeners.contains(user)) {
             Vector<BaseSprite> sprites = new Vector<BaseSprite>();
             userListeners.put(user, sprites);
             sprites.add(sprite);
