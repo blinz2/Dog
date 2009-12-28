@@ -169,11 +169,6 @@ public abstract class Sprite extends BaseSprite {
         this.layer = layer;
     }
 
-    @Override
-    protected void init() {
-        init();
-    }
-
     //END OF PROTECTED METHODS//////////////////////////////////////////////////
 //DEFAULT ACCESS METHODS////////////////////////////////////////////////////
     void detectCollision(Sprite sprite) {
@@ -211,7 +206,6 @@ public abstract class Sprite extends BaseSprite {
 
         }
     }
-
     //END OF DEFAULT ACCESS METHODS/////////////////////////////////////////////
     //PRIVATE METHODS-----------------------------------------------------------
     //END OF PRIVATE METHODS////////////////////////////////////////////////////
