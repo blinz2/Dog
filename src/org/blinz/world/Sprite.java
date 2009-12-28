@@ -190,7 +190,7 @@ public abstract class Sprite extends BaseSprite {
 
     @Override
     protected void init() {
-        initSprite();
+        init();
     }
 
     //END OF PROTECTED METHODS//////////////////////////////////////////////////
@@ -235,6 +235,4 @@ public abstract class Sprite extends BaseSprite {
     //PRIVATE METHODS-----------------------------------------------------------
     //END OF PRIVATE METHODS////////////////////////////////////////////////////
     //ABSTRACT METHODS----------------------------------------------------------
-    @Override
-    protected abstract void initSprite();
 }

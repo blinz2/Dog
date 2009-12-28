@@ -627,7 +627,8 @@ public abstract class BaseSprite extends ZoneObject {
 
     protected abstract void draw(Graphics g, Position drawLocation, Size drawSize);
 
-    protected abstract void initSprite();
+    @Override
+    protected abstract void init();
 
     /**
      * Updates the width of this sprite to that given.
@@ -658,11 +659,6 @@ public abstract class BaseSprite extends ZoneObject {
      * @param layer
      */
     protected abstract void updateLayer(float layer);
-
-    @Override
-    void init() {
-        initSprite();
-    }
 
     /**
      * Returns the Sector in which the top left corner of this sprite resides.
