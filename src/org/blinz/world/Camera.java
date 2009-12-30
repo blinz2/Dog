@@ -84,6 +84,14 @@ public abstract class Camera extends ZoneObject {
     }
 
     /**
+     *
+     * @return the User that this Camera represents.
+     */
+    public final User getUser() {
+        return user;
+    }
+
+    /**
      * Sets whether or not this Camera's contents are drawn.
      * @param display if true this Camera will be drawn, otherwise it will not.
      */
