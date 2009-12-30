@@ -166,9 +166,22 @@ public abstract class Zone extends ZoneObject {
             }
         }
     }
+
+    private class UserListenerList {
+
+        private final Vector<BaseSprite> sprites = new Vector<BaseSprite>();
+        /**
+         * Count of how many Cameras accessing this UserListenerList.
+         */
+        private int cameraCount;
+
+        boolean dead() {
+            return cameraCount == 0 && sprites.isEmpty();
+        }
+    }
     private Size size;
     private final ArrayList<Camera> cameras = new ArrayList<Camera>();
-    private final Hashtable<User, Vector<BaseSprite>> userListeners = new Hashtable<User, Vector<BaseSprite>>();
+    private final Hashtable<User, UserListenerList> userListeners = new Hashtable<User, UserListenerList>();
     private ZoneUpdateSchema updateSchema;
     private String name = "Zone";
     private long initTime;
@@ -306,17 +319,17 @@ public abstract class Zone extends ZoneObject {
 
     public synchronized final void addUserListeningSprite(User user, BaseSprite sprite) {
         if (!userListeners.contains(user)) {
-            Vector<BaseSprite> sprites = new Vector<BaseSprite>();
-            userListeners.put(user, sprites);
-            sprites.add(sprite);
+            UserListenerList list = new UserListenerList();
+            userListeners.put(user, list);
+            list.sprites.add(sprite);
         } else {
-            userListeners.get(user).add(sprite);
+            userListeners.get(user).sprites.add(sprite);
         }
     }
 
     public synchronized final void removeUserListeningSprite(User user, BaseSprite sprite) {
-        userListeners.get(user).remove(sprite);
-        if (userListeners.get(user).size() == 0) {
+        userListeners.get(user).sprites.remove(sprite);
+        if (userListeners.get(user).sprites.size() == 0 && userListeners.get(user).cameraCount == 0) {
             userListeners.remove(user);
         }
     }
@@ -395,24 +408,35 @@ public abstract class Zone extends ZoneObject {
 
     /**
      * Adds the given Camera to this Zone, to moniter the sprites in its area.
-     * @param observer
+     * @param camera
      */
-    final void addCamera(Camera observer) {
-        cameras.add(observer);
-        getData().registerZoneObject(observer);
+    final void addCamera(Camera camera) {
+        cameras.add(camera);
+        if (userListeners.contains(camera)) {
+            userListeners.get(camera.getUser()).cameraCount++;
+        } else {
+            UserListenerList list = new UserListenerList();
+            list.cameraCount++;
+            userListeners.put(camera.getUser(), list);
+        }
+
+        getData().registerZoneObject(camera);
     }
 
     /**
      * Removes the given Camera from this Zone.
-     * @param observer
+     * @param camera
      */
-    final void removeCamera(Camera observer) {
-        cameras.remove(observer);
-
+    final void removeCamera(Camera camera) {
+        cameras.remove(camera);
+        userListeners.get(camera.getUser()).cameraCount--;
+        if (userListeners.get(camera.getUser()).dead()) {
+            userListeners.remove(camera.getUser());
+        }
         for (int i = 0; i < getData().sectors.length; i++) {
             for (int n = 0; n < getData().sectors[i].length; n++) {
-                if (getData().sectors[i][n].intersects(observer.getX(), observer.getY(), observer.getWidth(), observer.getHeight())) {
-                    getData().sectors[i][n].removeCamera(observer);
+                if (getData().sectors[i][n].intersects(camera.getX(), camera.getY(), camera.getWidth(), camera.getHeight())) {
+                    getData().sectors[i][n].removeCamera(camera);
                     i = getData().sectors.length;
                     break;
                 }
@@ -449,7 +473,7 @@ public abstract class Zone extends ZoneObject {
      * @return all sprites listening to input from the given user.
      */
     final Vector<BaseSprite> getSprites(User user) {
-        return userListeners.get(user);
+        return userListeners.get(user).sprites;
     }
 
     /**
