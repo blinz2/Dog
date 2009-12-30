@@ -288,6 +288,7 @@ public abstract class Zone extends ZoneObject {
             zoneProcessor.addTask(new Sleep());
             zoneProcessor.addTask(new Barrier());
             zoneProcessor.addTask(new Reset());
+            initTime = System.currentTimeMillis();
             init();
             zoneProcessor.start();
             listTrimmer.start();
@@ -365,10 +366,7 @@ public abstract class Zone extends ZoneObject {
     }
 
     @Override
-    protected final void init() {
-        initTime = System.currentTimeMillis();
-        initZone();
-    }
+    protected abstract void init();
 
     /**
      * Passes the given data to the Zone and its sprites so that an extra pointer
@@ -388,11 +386,6 @@ public abstract class Zone extends ZoneObject {
         setZoneData(zoneID, null);
         recycledIDs.add(zoneID);
     }
-
-    /**
-     * Abstract method for initializing the zone.
-     */
-    protected abstract void initZone();
 
     /**
      * Abstract method for updating the zone to be implemented by the developer.
