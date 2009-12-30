@@ -410,7 +410,7 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     * Removes the given sprite to this Zone.
+     * Removes the given Camera from this Zone.
      * @param observer
      */
     final void removeCamera(Camera observer) {
