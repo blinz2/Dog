@@ -180,7 +180,7 @@ public abstract class Zone extends ZoneObject {
         }
     }
     private Size size;
-    private final ArrayList<Camera> cameras = new ArrayList<Camera>();
+    private final Vector<Camera> cameras = new Vector<Camera>();
     private final Hashtable<User, UserListenerList> userListeners = new Hashtable<User, UserListenerList>();
     private ZoneUpdateSchema updateSchema;
     private String name = "Zone";
