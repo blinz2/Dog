@@ -25,7 +25,7 @@ import java.util.Vector;
 import org.blinz.util.Size;
 import org.blinz.util.Bounds;
 import org.blinz.util.concurrency.Barrier;
-import org.blinz.util.concurrency.OnePassTask;
+import org.blinz.util.concurrency.SynchronizedTask;
 import org.blinz.util.concurrency.Task;
 import org.blinz.util.concurrency.TaskExecuter;
 
@@ -51,7 +51,7 @@ public abstract class Zone extends ZoneObject {
         }
     }
 
-    private class ManageTime extends OnePassTask {
+    private class ManageTime extends SynchronizedTask {
 
         @Override
         protected void run() {
@@ -106,7 +106,7 @@ public abstract class Zone extends ZoneObject {
         }
     }
 
-    private class UpdateZone extends OnePassTask {
+    private class UpdateZone extends SynchronizedTask {
 
         @Override
         protected void run() {
@@ -128,7 +128,7 @@ public abstract class Zone extends ZoneObject {
         }
     }
 
-    private class Reset extends OnePassTask {
+    private class Reset extends SynchronizedTask {
 
         @Override
         protected void run() {
