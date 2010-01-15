@@ -19,13 +19,13 @@ package org.blinz.world;
 import java.util.Hashtable;
 import java.util.Vector;
 import org.blinz.util.User;
-import org.blinz.util.concurrency.Task;
+import org.blinz.util.concurrency.SynchronizedTask;
 
 /**
  * Contains lists sprites listening for input from specific Users.
  * @author Blinz
  */
-class UserListenerCatalog extends Task {
+class UserListenerCatalog extends SynchronizedTask {
 
     /**
      * Contains a list of sprites that listen to the input of a certain User.
@@ -51,21 +51,43 @@ class UserListenerCatalog extends Task {
             sprites.add(sprite);
         }
     }
+
+    /**
+     * Internal class of objects used for clean addition and removal of User:sprite pairs.
+     */
+    private class Pair {
+
+        User user;
+        BaseSprite sprite;
+
+        private Pair(User user, BaseSprite sprite) {
+            this.user = user;
+            this.sprite = sprite;
+        }
+    }
     private final Hashtable<User, UserListenerList> userListeners = new Hashtable<User, UserListenerList>();
+    private final Vector<Pair> toRemove = new Vector<Pair>();
+    private final Vector<Pair> toAdd = new Vector<Pair>();
 
     @Override
     protected void run() {
-    }
+        //remove old pairs
+        Pair current = null;
+        while ((current = nextToRemove()) != null) {
+            UserListenerList list = userListeners.get(current.user);
+            list.sprites.remove(current.sprite);
+            if (list.dead()) {
+                userListeners.remove(current.user);
+            }
+        }
 
-    /**
-     * Adds the given sprite to the list for the given User.
-     * @param user
-     * @param sprite
-     */
-    final void add(User user, BaseSprite sprite) {
-        final UserListenerList list = userListeners.get(user);
-        synchronized (list) {
-            list.sprites.add(sprite);
+        //block until finished
+
+        //add new pairs
+        while ((current = nextToRemove()) != null) {
+            UserListenerList list = userListeners.get(current.user);
+            list.sprites.add(current.sprite);
+
         }
     }
 
@@ -74,8 +96,17 @@ class UserListenerCatalog extends Task {
      * @param user
      * @param sprite
      */
+    final void add(User user, BaseSprite sprite) {
+        toAdd.add(new Pair(user, sprite));
+    }
+
+    /**
+     * Adds the given sprite to the list for the given User.
+     * @param user
+     * @param sprite
+     */
     final void remove(User user, BaseSprite sprite) {
-        editList((byte) 5, user, sprite);
+        toRemove.add(new Pair(user, sprite));
     }
 
     /**
@@ -94,6 +125,26 @@ class UserListenerCatalog extends Task {
      */
     final void decrementUsageCount(Camera camera) {
         editList((byte) 3, camera.getUser(), null);
+    }
+
+    /**
+     * @return the next sprite to remove
+     */
+    private final Pair nextToRemove() {
+        if (toRemove.isEmpty()) {
+            return null;
+        }
+        return toRemove.remove(0);
+    }
+
+    /**
+     * @return the next sprite to add
+     */
+    private final Pair nextToAdd() {
+        if (toAdd.isEmpty()) {
+            return null;
+        }
+        return toAdd.remove(0);
     }
 
     /**
