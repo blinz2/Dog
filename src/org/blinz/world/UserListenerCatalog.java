@@ -18,6 +18,13 @@ package org.blinz.world;
 
 import java.util.Hashtable;
 import java.util.Vector;
+import org.blinz.input.ClickEvent;
+import org.blinz.input.KeyEvent;
+import org.blinz.input.KeyListener;
+import org.blinz.input.MouseEvent;
+import org.blinz.input.MouseListener;
+import org.blinz.input.MouseWheelEvent;
+import org.blinz.input.MouseWheelListener;
 import org.blinz.util.User;
 import org.blinz.util.concurrency.SynchronizedTask;
 
@@ -31,13 +38,71 @@ class UserListenerCatalog extends SynchronizedTask {
      * Contains a list of sprites that listen to the input of a certain User.
      * @author Blinz
      */
-    private class UserListenerList {
+     class UserListenerList implements MouseListener, MouseWheelListener, KeyListener {
 
         private final Vector<BaseSprite> sprites = new Vector<BaseSprite>();
+        private User user = null;
         /**
          * Count of how many Cameras accessing this UserListenerList.
          */
         private int cameraCount;
+
+        @Override
+        public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
+            ClickEvent e = new ClickEvent(user, buttonNumber, cursorX, cursorY, clickCount);
+
+            for (int i = 0; i < sprites.size(); i++) {
+                sprites.get(i).buttonClicked(e);
+            }
+        }
+
+        @Override
+        public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
+            MouseEvent e = new MouseEvent(user, buttonNumber, cursorX, cursorY);
+            for (int i = 0; i < sprites.size(); i++) {
+                sprites.get(i).buttonPressed(e);
+            }
+        }
+
+        @Override
+        public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
+            MouseEvent e = new MouseEvent(user, buttonNumber, cursorX, cursorY);
+            for (int i = 0; i < sprites.size(); i++) {
+                sprites.get(i).buttonReleased(e);
+            }
+        }
+
+        @Override
+        public void keyPressed(int key) {
+            KeyEvent e = new KeyEvent(user, key);
+            for (int i = 0; i < sprites.size(); i++) {
+                sprites.get(i).keyPressed(e);
+            }
+        }
+
+        @Override
+        public void keyReleased(int key) {
+            KeyEvent e = new KeyEvent(user, key);
+            for (int i = 0; i < sprites.size(); i++) {
+                sprites.get(i).keyReleased(e);
+            }
+        }
+
+        @Override
+        public void keyTyped(int key) {
+            KeyEvent e = new KeyEvent(user, key);
+            for (int i = 0; i < sprites.size(); i++) {
+                sprites.get(i).keyTyped(e);
+            }
+        }
+
+        @Override
+        public void wheelScroll(int number, int cursorX, int cursorY) {
+            MouseWheelEvent e = new MouseWheelEvent(user, cursorX, cursorY, number);
+            for (int i = 0; i < sprites.size(); i++) {
+                sprites.get(i).mouseWheelScroll(e);
+            }
+        }
 
         /**
          *
@@ -50,12 +115,16 @@ class UserListenerCatalog extends SynchronizedTask {
         private final void add(BaseSprite sprite) {
             sprites.add(sprite);
         }
+
+        private final void remove(BaseSprite sprite) {
+            sprites.remove(sprite);
+        }
     }
 
     /**
      * Internal class of objects used for clean addition and removal of User:sprite pairs.
      */
-    private class Pair {
+    private final class Pair {
 
         User user;
         BaseSprite sprite;
@@ -75,20 +144,27 @@ class UserListenerCatalog extends SynchronizedTask {
         Pair current = null;
         while ((current = nextToRemove()) != null) {
             UserListenerList list = userListeners.get(current.user);
-            list.sprites.remove(current.sprite);
+            list.remove(current.sprite);
             if (list.dead()) {
                 userListeners.remove(current.user);
             }
         }
 
-        //block until finished
-
         //add new pairs
         while ((current = nextToRemove()) != null) {
             UserListenerList list = userListeners.get(current.user);
-            list.sprites.add(current.sprite);
+            list.add(current.sprite);
 
         }
+    }
+
+    /**
+     * 
+     * @param user
+     * @return the list of sprites listening to the given User
+     */
+    final UserListenerList get(User user) {
+        return userListeners.get(user);
     }
 
     /**
@@ -109,24 +185,23 @@ class UserListenerCatalog extends SynchronizedTask {
         toRemove.add(new Pair(user, sprite));
     }
 
-    /**
-     * Increments the usage counter for the list associated with the User of the
-     * given Camera.
-     * @param camera
-     */
-    final void incrementUsageCount(Camera camera) {
-        editList((byte) 2, camera.getUser(), null);
-    }
-
-    /**
-     * Decrements the usage counter for the list associated with the User of the
-     * given Camera.
-     * @param camera
-     */
-    final void decrementUsageCount(Camera camera) {
-        editList((byte) 3, camera.getUser(), null);
-    }
-
+//    /**
+//     * Increments the usage counter for the list associated with the User of the
+//     * given Camera.
+//     * @param camera
+//     */
+//    final void incrementUsageCount(Camera camera) {
+//        editList((byte) 2, camera.getUser(), null);
+//    }
+//
+//    /**
+//     * Decrements the usage counter for the list associated with the User of the
+//     * given Camera.
+//     * @param camera
+//     */
+//    final void decrementUsageCount(Camera camera) {
+//        editList((byte) 3, camera.getUser(), null);
+//    }
     /**
      * @return the next sprite to remove
      */
@@ -166,46 +241,6 @@ class UserListenerCatalog extends SynchronizedTask {
     private final void removeList(User user) {
         synchronized (userListeners) {
             userListeners.remove(user);
-        }
-    }
-
-    /**
-     * 0: add list for User
-     * 1: remove list for User
-     * 2: increment list
-     * 3: decrement list
-     * 4: add sprite
-     * 5: remove sprite
-     * @param operation
-     * @param user
-     */
-    private final synchronized void editList(byte operation, User user, BaseSprite sprite) {
-        switch (operation) {
-            case 0://add list for User
-                if (!userListeners.contains(user)) {
-                    userListeners.put(user, new UserListenerList());
-                }
-                break;
-            case 1://remove list for User
-                if (userListeners.get(user).dead()) {
-                    userListeners.remove(user);
-                }
-                break;
-            case 2://increment list
-                userListeners.get(user).cameraCount++;
-                break;
-            case 3://decrement list
-                userListeners.get(user).cameraCount--;
-                break;
-            case 4://add sprite
-                userListeners.get(user).sprites.add(sprite);
-                break;
-            case 5://remove sprites
-                UserListenerList l = userListeners.get(user);
-                l.sprites.remove(sprite);
-                if (l.dead()) {
-                    userListeners.remove(user);
-                }
         }
     }
 }

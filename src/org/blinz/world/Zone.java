@@ -20,7 +20,6 @@ import org.blinz.util.User;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Vector;
 import org.blinz.util.Size;
 import org.blinz.util.Bounds;
@@ -167,21 +166,8 @@ public abstract class Zone extends ZoneObject {
         }
     }
 
-    private class UserListenerList {
-
-        private final Vector<BaseSprite> sprites = new Vector<BaseSprite>();
-        /**
-         * Count of how many Cameras accessing this UserListenerList.
-         */
-        private int cameraCount;
-
-        boolean dead() {
-            return cameraCount == 0 && sprites.isEmpty();
-        }
-    }
     private Size size;
     private final Vector<Camera> cameras = new Vector<Camera>();
-    private final Hashtable<User, UserListenerList> userListeners = new Hashtable<User, UserListenerList>();
     private ZoneUpdateSchema updateSchema;
     private String name = "Zone";
     private long initTime;
@@ -194,6 +180,7 @@ public abstract class Zone extends ZoneObject {
     private Thread listTrimmer = new ListTrimmer();
     private boolean paused = false;
     private boolean isRunning = false;
+    private final UserListenerCatalog userListeners = new UserListenerCatalog();
     private TaskExecuter zoneProcessor;
     private static final Vector<Byte> recycledIDs = new Vector<Byte>();
     private static byte idIndex = 0;
@@ -317,21 +304,12 @@ public abstract class Zone extends ZoneObject {
         zoneProcessor = null;
     }
 
-    public synchronized final void addUserListeningSprite(User user, BaseSprite sprite) {
-        if (!userListeners.contains(user)) {
-            UserListenerList list = new UserListenerList();
-            userListeners.put(user, list);
-            list.sprites.add(sprite);
-        } else {
-            userListeners.get(user).sprites.add(sprite);
-        }
+    public final void addUserListeningSprite(User user, BaseSprite sprite) {
+
     }
 
-    public synchronized final void removeUserListeningSprite(User user, BaseSprite sprite) {
-        userListeners.get(user).sprites.remove(sprite);
-        if (userListeners.get(user).sprites.size() == 0 && userListeners.get(user).cameraCount == 0) {
-            userListeners.remove(user);
-        }
+    public final void removeUserListeningSprite(User user, BaseSprite sprite) {
+
     }
 
     /**
@@ -412,13 +390,6 @@ public abstract class Zone extends ZoneObject {
      */
     final void addCamera(Camera camera) {
         cameras.add(camera);
-        if (userListeners.contains(camera)) {
-            userListeners.get(camera.getUser()).cameraCount++;
-        } else {
-            UserListenerList list = new UserListenerList();
-            list.cameraCount++;
-            userListeners.put(camera.getUser(), list);
-        }
 
         getData().registerZoneObject(camera);
     }
@@ -429,10 +400,7 @@ public abstract class Zone extends ZoneObject {
      */
     final void removeCamera(Camera camera) {
         cameras.remove(camera);
-        userListeners.get(camera.getUser()).cameraCount--;
-        if (userListeners.get(camera.getUser()).dead()) {
-            userListeners.remove(camera.getUser());
-        }
+
         for (int i = 0; i < getData().sectors.length; i++) {
             for (int n = 0; n < getData().sectors[i].length; n++) {
                 if (getData().sectors[i][n].intersects(camera.getX(), camera.getY(), camera.getWidth(), camera.getHeight())) {
@@ -472,8 +440,8 @@ public abstract class Zone extends ZoneObject {
      * @param user
      * @return all sprites listening to input from the given user.
      */
-    final Vector<BaseSprite> getSprites(User user) {
-        return userListeners.get(user).sprites;
+    final UserListenerCatalog.UserListenerList getUserSprites(User user) {
+        return userListeners.get(user);
     }
 
     /**

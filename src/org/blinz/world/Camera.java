@@ -16,7 +16,6 @@
  */
 package org.blinz.world;
 
-import org.blinz.input.MouseEvent;
 import org.blinz.util.User;
 import org.blinz.graphics.ScreenManager;
 import org.blinz.graphics.Graphics;
@@ -26,11 +25,6 @@ import org.blinz.input.MouseListener;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
-import org.blinz.input.ClickEvent;
-import org.blinz.input.KeyEvent;
-import org.blinz.input.KeyListener;
-import org.blinz.input.MouseWheelEvent;
-import org.blinz.input.MouseWheelListener;
 
 /**
  * Camera acts as an interface between a the user, and the Zone.
@@ -51,8 +45,7 @@ public abstract class Camera extends ZoneObject {
             new Hashtable<BaseSprite, CameraSprite>();
     private final Vector<CameraSprite> selectableSprites = new Vector<CameraSprite>();
     private final Vector<BaseSprite> spritesToRemove = new Vector<BaseSprite>();
-    private Vector<BaseSprite> listeningSprites;
-    private final SpriteSelecter spriteSelecter = new SpriteSelecter(selectableSprites);
+    private final SpriteSelecter spriteSelecter = new SpriteSelecter();
     private Sector sector1, sector2;
     private BaseSprite focusSprite;
     private Zone zone;
@@ -115,10 +108,6 @@ public abstract class Camera extends ZoneObject {
     public final synchronized void setZone(Zone zone) {
         dropZone();
         this.zone = zone;
-        listeningSprites = zone.getSprites(user);
-        if (listeningSprites == null) {
-            listeningSprites = new Vector<BaseSprite>();
-        }
         zone.addCamera(this);
     }
 
@@ -129,7 +118,12 @@ public abstract class Camera extends ZoneObject {
     public final void dropZone() {
         if (zone != null) {
             zone.removeCamera(this);
+            screen.dropZone();
+            selectableSprites.clear();
             sprites.clear();
+            focusSprite = null;
+            spritesToRemove.clear();
+            zone = null;
         }
     }
 
@@ -787,106 +781,49 @@ public abstract class Camera extends ZoneObject {
         return getData().sectors[ix][iy];
     }
 
-    private class SpriteSelecter {
+    private class SpriteSelecter implements MouseListener {
 
-        Vector<CameraSprite> sprites;
         CameraSprite selected;
 
-        SpriteSelecter(Vector<CameraSprite> sprites) {
-            this.sprites = sprites;
-        }
-
-        public synchronized void buttonClick(ClickEvent event) {
+        @Override
+        public synchronized void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
             CameraSprite oldSelected = selected;
             if (selected != null) {
-                for (int i = 0; i < sprites.size(); i++) {
-                    if (sprites.get(i).getSprite() instanceof SelectibleSprite) {
-                        BaseSprite s = sprites.get(i).getSprite();
-                        if (Bounds.intersects(s.getX(), event.cursorX(), s.getY(), event.cursorY(), s.getWidth(), 1, s.getHeight(), 1)) {
-                            if (sprites.get(i) != oldSelected) {
+                for (int i = 0; i < selectableSprites.size(); i++) {
+                    if (selectableSprites.get(i).getSprite() instanceof SelectibleSprite) {
+                        BaseSprite s = selectableSprites.get(i).getSprite();
+                        if (Bounds.intersects(s.getX(), cursorX - getX(), s.getY(),
+                                cursorY - getY(), s.getWidth(), 1, s.getHeight(), 1)) {
+                            if (selectableSprites.get(i) != oldSelected) {
                                 if (oldSelected != null) {
                                     oldSelected.deselect(user);
                                 }
-                                sprites.get(i).select(user);
+                                selectableSprites.get(i).select(user);
                             }
                         }
                     }
                 }
             }
         }
+
+        @Override
+        public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
+        }
+
+        @Override
+        public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
+        }
     }
 
     private class ZoneScreen extends Screen {
 
-        private class InputListener implements MouseListener, MouseWheelListener, KeyListener {
-
-            @Override
-            public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
-                ClickEvent e = new ClickEvent(user, buttonNumber, cursorX, cursorY, clickCount);
-                spriteSelecter.buttonClick(e);
-
-                for (int i = 0; i < listeningSprites.size(); i++) {
-                    listeningSprites.get(i).buttonClicked(e);
-                }
-            }
-
-            @Override
-            public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
-                MouseEvent e = new MouseEvent(user, buttonNumber, cursorX, cursorY);
-                for (int i = 0; i < listeningSprites.size(); i++) {
-                    listeningSprites.get(i).buttonPressed(e);
-                }
-            }
-
-            @Override
-            public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
-                MouseEvent e = new MouseEvent(user, buttonNumber, cursorX, cursorY);
-                for (int i = 0; i < listeningSprites.size(); i++) {
-                    listeningSprites.get(i).buttonReleased(e);
-                }
-            }
-
-            @Override
-            public void keyPressed(int key) {
-                KeyEvent e = new KeyEvent(user, key);
-                for (int i = 0; i < listeningSprites.size(); i++) {
-                    listeningSprites.get(i).keyPressed(e);
-                }
-            }
-
-            @Override
-            public void keyReleased(int key) {
-                KeyEvent e = new KeyEvent(user, key);
-                for (int i = 0; i < listeningSprites.size(); i++) {
-                    listeningSprites.get(i).keyReleased(e);
-                }
-            }
-
-            @Override
-            public void keyTyped(int key) {
-                KeyEvent e = new KeyEvent(user, key);
-                for (int i = 0; i < listeningSprites.size(); i++) {
-                    listeningSprites.get(i).keyTyped(e);
-                }
-            }
-
-            @Override
-            public void wheelScroll(int number, int cursorX, int cursorY) {
-                MouseWheelEvent e = new MouseWheelEvent(user, cursorX, cursorY, number);
-                for (int i = 0; i < listeningSprites.size(); i++) {
-                    listeningSprites.get(i).mouseWheelScroll(e);
-                }
-            }
-        }
         Scene scene = new Scene();
         Scene swap1 = new Scene();
         Scene swap2 = new Scene();
-        private final InputListener inputListener = new InputListener();
 
         ZoneScreen() {
-            addKeyListener(inputListener);
-            addMouseListener(inputListener);
-            addMouseWheelListener(inputListener);
+            addMouseListener(spriteSelecter);
+            addMouseListener(zone.getUserSprites(user));
         }
 
         @Override
@@ -899,6 +836,10 @@ public abstract class Camera extends ZoneObject {
             s.draw(graphics);
 
             s.unLock();
+        }
+
+        final void dropZone() {
+            removeMouseListener(zone.getUserSprites(user));
         }
 
         final Scene getScene() {
