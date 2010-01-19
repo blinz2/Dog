@@ -25,6 +25,7 @@ import org.blinz.input.MouseListener;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+import org.blinz.world.UserListenerCatalog.UserListenerList;
 
 /**
  * Camera acts as an interface between a the user, and the Zone.
@@ -109,6 +110,10 @@ public abstract class Camera extends ZoneObject {
         dropZone();
         this.zone = zone;
         zone.addCamera(this);
+        ZoneScreen s;
+        if ((s = screen) != null) {
+            s.setZone(zone);
+        }
     }
 
     /**
@@ -118,7 +123,10 @@ public abstract class Camera extends ZoneObject {
     public final void dropZone() {
         if (zone != null) {
             zone.removeCamera(this);
-            screen.dropZone();
+            ZoneScreen s = screen;
+            if (s != null) {
+                screen.dropZone();
+            }
             selectableSprites.clear();
             sprites.clear();
             focusSprite = null;
@@ -817,13 +825,12 @@ public abstract class Camera extends ZoneObject {
 
     private class ZoneScreen extends Screen {
 
-        Scene scene = new Scene();
-        Scene swap1 = new Scene();
-        Scene swap2 = new Scene();
+        private Scene scene = new Scene();
+        private Scene swap1 = new Scene();
+        private Scene swap2 = new Scene();
 
         ZoneScreen() {
             addMouseListener(spriteSelecter);
-            addMouseListener(zone.getUserSprites(user));
         }
 
         @Override
@@ -839,7 +846,10 @@ public abstract class Camera extends ZoneObject {
         }
 
         final void dropZone() {
-            removeMouseListener(zone.getUserSprites(user));
+            UserListenerList l = zone.getUserSprites(user);
+            removeMouseListener(l);
+            removeKeyListener(l);
+            removeMouseWheelListener(l);
         }
 
         final Scene getScene() {
@@ -853,6 +863,13 @@ public abstract class Camera extends ZoneObject {
             }
             retval.size.setSize(getWidth(), getHeight());
             return retval;
+        }
+
+        private final void setZone(Zone zone) {
+            UserListenerList l = zone.getUserSprites(user);
+            addMouseListener(l);
+            addKeyListener(l);
+            addMouseWheelListener(l);
         }
     }
 }
