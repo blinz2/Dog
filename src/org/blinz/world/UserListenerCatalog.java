@@ -38,7 +38,7 @@ class UserListenerCatalog extends SynchronizedTask {
      * Contains a list of sprites that listen to the input of a certain User.
      * @author Blinz
      */
-     class UserListenerList implements MouseListener, MouseWheelListener, KeyListener {
+    class UserListenerList implements MouseListener, MouseWheelListener, KeyListener {
 
         private final Vector<BaseSprite> sprites = new Vector<BaseSprite>();
         private User user = null;
@@ -151,10 +151,12 @@ class UserListenerCatalog extends SynchronizedTask {
         }
 
         //add new pairs
-        while ((current = nextToRemove()) != null) {
+        while ((current = nextToAdd()) != null) {
             UserListenerList list = userListeners.get(current.user);
+            if (list == null) {
+                list = addList(current.user);
+            }
             list.add(current.sprite);
-
         }
     }
 
@@ -226,11 +228,13 @@ class UserListenerCatalog extends SynchronizedTask {
      * Adds a sprite list for the given User.
      * @param user
      */
-    private final void addList(User user) {
-        synchronized (userListeners) {
-            if (!userListeners.contains(user)) {
-                userListeners.put(user, new UserListenerList());
-            }
+    private final synchronized UserListenerList addList(User user) {
+        if (!userListeners.contains(user)) {
+            UserListenerList list = new UserListenerList();
+            userListeners.put(user, list);
+            return list;
+        } else {
+            return userListeners.get(user);
         }
     }
 

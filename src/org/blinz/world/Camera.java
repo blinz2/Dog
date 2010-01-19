@@ -94,6 +94,17 @@ public abstract class Camera extends ZoneObject {
             if (screen == null) {
                 screen = new ZoneScreen();
                 ScreenManager.addScreen(screen);
+                Zone z = zone;
+                if (z != null) {
+                    screen.setZone(z);
+                    //to prevent concurrency issues
+                    while (zone != z) {
+                        screen.dropZone();
+                        if ((z = zone) != null) {
+                            screen.setZone(zone);
+                        }
+                    }
+                }
             }
         } else {
             ScreenManager.removeScreen(screen);
@@ -839,17 +850,18 @@ public abstract class Camera extends ZoneObject {
             while (!s.lock()) {
                 s = scene;
             }
-
             s.draw(graphics);
-
             s.unLock();
         }
 
         final void dropZone() {
-            UserListenerList l = zone.getUserSprites(user);
-            removeMouseListener(l);
-            removeKeyListener(l);
-            removeMouseWheelListener(l);
+            Zone z = zone;
+            if (z != null) {
+                UserListenerList l = zone.getUserSprites(user);
+                removeMouseListener(l);
+                removeKeyListener(l);
+                removeMouseWheelListener(l);
+            }
         }
 
         final Scene getScene() {
@@ -866,6 +878,7 @@ public abstract class Camera extends ZoneObject {
         }
 
         private final void setZone(Zone zone) {
+            dropZone();
             UserListenerList l = zone.getUserSprites(user);
             addMouseListener(l);
             addKeyListener(l);

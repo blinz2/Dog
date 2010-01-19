@@ -165,7 +165,6 @@ public abstract class Zone extends ZoneObject {
             }
         }
     }
-
     private Size size;
     private final Vector<Camera> cameras = new Vector<Camera>();
     private ZoneUpdateSchema updateSchema;
@@ -275,6 +274,7 @@ public abstract class Zone extends ZoneObject {
         if (!isRunning) {
             this.name = name;
             zoneProcessor = new TaskExecuter(name, threads);
+            zoneProcessor.addTask(userListeners);
             zoneProcessor.addTask(new Pause());
             zoneProcessor.addTask(new Barrier());
             zoneProcessor.addTask(new ManageTime());
@@ -305,11 +305,11 @@ public abstract class Zone extends ZoneObject {
     }
 
     public final void addUserListeningSprite(User user, BaseSprite sprite) {
-
+        userListeners.add(user, sprite);
     }
 
     public final void removeUserListeningSprite(User user, BaseSprite sprite) {
-
+        userListeners.remove(user, sprite);
     }
 
     /**
