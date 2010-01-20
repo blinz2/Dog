@@ -202,7 +202,7 @@ public abstract class Zone extends ZoneObject {
      * assigned to threads processing this Zone when created.
      * @return the name of this Zone, "Zone" by default
      */
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
@@ -370,10 +370,6 @@ public abstract class Zone extends ZoneObject {
 
     @Override
     protected void finalize() {
-        for (Camera camera : cameras) {
-            camera.dropZone();
-        }
-
         setZoneData(zoneID, null);
         recycledIDs.add(zoneID);
     }

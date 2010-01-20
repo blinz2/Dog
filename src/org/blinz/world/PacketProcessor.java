@@ -26,7 +26,4 @@ public class PacketProcessor {
      * Change the Zone of focus for packet processor.
      */
     final static int CHANGE_ZONE = 0;
-
-    
-
 }
