@@ -40,7 +40,15 @@ class UserListenerCatalog extends SynchronizedTask {
      */
     class UserListenerList implements MouseListener, MouseWheelListener, KeyListener {
 
+        /**
+         * Used for when the Zone is paused.
+         */
+        private final Vector<BaseSprite> dummyList = new Vector<BaseSprite>();
+        /**
+         * The primary sprite list.
+         */
         private final Vector<BaseSprite> sprites = new Vector<BaseSprite>();
+        private Vector<BaseSprite> inputSprites;
         private User user = null;
         /**
          * Count of how many Cameras accessing this UserListenerList.
@@ -50,58 +58,61 @@ class UserListenerCatalog extends SynchronizedTask {
         @Override
         public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
             ClickEvent e = new ClickEvent(user, buttonNumber, cursorX, cursorY, clickCount);
-
-            for (int i = 0; i < sprites.size(); i++) {
-                sprites.get(i).buttonClicked(e);
+            for (int i = 0; i < inputSprites.size(); i++) {
+                inputSprites.get(i).buttonClicked(e);
             }
         }
 
         @Override
         public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
             MouseEvent e = new MouseEvent(user, buttonNumber, cursorX, cursorY);
-            for (int i = 0; i < sprites.size(); i++) {
-                sprites.get(i).buttonPressed(e);
+            for (int i = 0; i < inputSprites.size(); i++) {
+                inputSprites.get(i).buttonPressed(e);
             }
         }
 
         @Override
         public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
             MouseEvent e = new MouseEvent(user, buttonNumber, cursorX, cursorY);
-            for (int i = 0; i < sprites.size(); i++) {
-                sprites.get(i).buttonReleased(e);
+            for (int i = 0; i < inputSprites.size(); i++) {
+                inputSprites.get(i).buttonReleased(e);
             }
         }
 
         @Override
         public void keyPressed(int key) {
             KeyEvent e = new KeyEvent(user, key);
-            for (int i = 0; i < sprites.size(); i++) {
-                sprites.get(i).keyPressed(e);
+            for (int i = 0; i < inputSprites.size(); i++) {
+                inputSprites.get(i).keyPressed(e);
             }
         }
 
         @Override
         public void keyReleased(int key) {
             KeyEvent e = new KeyEvent(user, key);
-            for (int i = 0; i < sprites.size(); i++) {
-                sprites.get(i).keyReleased(e);
+            for (int i = 0; i < inputSprites.size(); i++) {
+                inputSprites.get(i).keyReleased(e);
             }
         }
 
         @Override
         public void keyTyped(int key) {
             KeyEvent e = new KeyEvent(user, key);
-            for (int i = 0; i < sprites.size(); i++) {
-                sprites.get(i).keyTyped(e);
+            for (int i = 0; i < inputSprites.size(); i++) {
+                inputSprites.get(i).keyTyped(e);
             }
         }
 
         @Override
         public void wheelScroll(int number, int cursorX, int cursorY) {
             MouseWheelEvent e = new MouseWheelEvent(user, cursorX, cursorY, number);
-            for (int i = 0; i < sprites.size(); i++) {
-                sprites.get(i).mouseWheelScroll(e);
+            for (int i = 0; i < inputSprites.size(); i++) {
+                inputSprites.get(i).mouseWheelScroll(e);
             }
+        }
+
+        private void init() {
+            inputSprites = paused ? dummyList : sprites;
         }
 
         /**
@@ -109,15 +120,15 @@ class UserListenerCatalog extends SynchronizedTask {
          * @return true if this list has no Cameras or sprites, false otherwise.
          */
         private final boolean dead() {
-            return cameraCount == 0 && sprites.isEmpty();
+            return cameraCount == 0 && inputSprites.isEmpty();
         }
 
         private final void add(BaseSprite sprite) {
-            sprites.add(sprite);
+            inputSprites.add(sprite);
         }
 
         private final void remove(BaseSprite sprite) {
-            sprites.remove(sprite);
+            inputSprites.remove(sprite);
         }
     }
 
@@ -126,14 +137,15 @@ class UserListenerCatalog extends SynchronizedTask {
      */
     private final class Pair {
 
-        User user;
-        BaseSprite sprite;
+        private User user;
+        private BaseSprite sprite;
 
         private Pair(User user, BaseSprite sprite) {
             this.user = user;
             this.sprite = sprite;
         }
     }
+    private boolean paused = false;
     private final Hashtable<User, UserListenerList> userListeners = new Hashtable<User, UserListenerList>();
     private final Vector<Pair> toRemove = new Vector<Pair>();
     private final Vector<Pair> toAdd = new Vector<Pair>();
@@ -189,6 +201,14 @@ class UserListenerCatalog extends SynchronizedTask {
             }
         } while (!userListeners.containsKey(user));
         return list;
+    }
+
+    /**
+     * Used by Zone to pause sprite recieving of user input while the Zone is paused.
+     * @param paused
+     */
+    final void paused(boolean paused) {
+        this.paused = paused;
     }
 
     /**
@@ -250,6 +270,7 @@ class UserListenerCatalog extends SynchronizedTask {
         if (!userListeners.contains(user)) {
             UserListenerList list = new UserListenerList();
             userListeners.put(user, list);
+            list.init();
             return list;
         } else {
             return userListeners.get(user);
