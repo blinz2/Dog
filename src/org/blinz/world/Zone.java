@@ -21,6 +21,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Vector;
+import org.blinz.input.ClickEvent;
+import org.blinz.input.KeyEvent;
+import org.blinz.input.MouseEvent;
+import org.blinz.input.MouseWheelEvent;
 import org.blinz.util.Size;
 import org.blinz.util.Bounds;
 import org.blinz.util.concurrency.Barrier;
@@ -210,7 +214,7 @@ public abstract class Zone extends ZoneObject {
      * 
      * Note: This pause is not meant for short pauses, it will take at least 250
      * milliseconds before the Zone resumes execution even if resume() is called
-     * immediately.
+     * immediately. Also pauses user input going to the sprites, but no the Zone.
      */
     public final void pause() {
         paused = true;
@@ -390,6 +394,55 @@ public abstract class Zone extends ZoneObject {
      * Note: This method is not called while the Zone is paused.
      */
     protected abstract void update();
+
+    /**
+     * A stub method for listening to clicks. Implement as needed.
+     * @param event contains data about the input
+     */
+    protected void buttonClicked(ClickEvent event) {
+    }
+
+    /**
+     * A stub method for listening to mouse button presses. Implement as needed.
+     * @param event contains data about the input
+     */
+    protected void buttonPressed(MouseEvent event) {
+    }
+
+    /**
+     * A stub method for listening to mouse button releases. Implement as needed.
+     * @param event contains data about the input
+     */
+    protected void buttonReleased(MouseEvent event) {
+    }
+
+    /**
+     * A stub method for listening to the mouse wheel. Implement as needed.
+     * @param event contains data about the input
+     */
+    protected void mouseWheelScroll(MouseWheelEvent event) {
+    }
+
+    /**
+     * A stub method for listening to the keys pressed. Implement as needed.
+     * @param event contains data about the input
+     */
+    protected void keyPressed(KeyEvent event) {
+    }
+
+    /**
+     * A stub method for listening to the keys released. Implement as needed.
+     * @param event contains data about the input
+     */
+    protected void keyReleased(KeyEvent event) {
+    }
+
+    /**
+     * A stub method for listening to the key typed. Implement as needed.
+     * @param event contains data about the input
+     */
+    protected void keyTyped(KeyEvent event) {
+    }
 
     /**
      * Adds the given Camera to this Zone, to moniter the sprites in its area.

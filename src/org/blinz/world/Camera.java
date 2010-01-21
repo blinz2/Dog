@@ -25,6 +25,11 @@ import org.blinz.input.MouseListener;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+import org.blinz.input.ClickEvent;
+import org.blinz.input.KeyEvent;
+import org.blinz.input.KeyListener;
+import org.blinz.input.MouseEvent;
+import org.blinz.input.MouseWheelEvent;
 import org.blinz.input.MouseWheelListener;
 import org.blinz.world.UserListenerCatalog.UserListenerList;
 
@@ -608,6 +613,10 @@ public abstract class Camera extends ZoneObject {
         }
     }
 
+    /**
+     * Finds the sprite currently on screen, gathers them, orders them by layer
+     * and sets it to the current scene.
+     */
     final void generateCurrentScene() {
         Scene scene = screen.getScene();
         scene.manageContainers();
@@ -837,32 +846,57 @@ public abstract class Camera extends ZoneObject {
 
     private class ZoneScreen extends Screen {
 
-        private class InputListener implements MouseListener, MouseWheelListener {
+        private class InputListener implements MouseListener, MouseWheelListener, KeyListener {
 
             private UserListenerList list;
+            private Zone zone;
 
-            public InputListener(UserListenerList list) {
+            public InputListener(UserListenerList list, Zone zone) {
                 this.list = list;
+                this.zone = zone;
             }
 
             @Override
             public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
-                list.buttonClick(buttonNumber, clickCount, cursorX + getX(), cursorY + getY());
+                ClickEvent e = new ClickEvent(user, buttonNumber,
+                        cursorX + getX(), cursorY + getY(), clickCount);
+                list.buttonClick(e);
             }
 
             @Override
             public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
-                list.buttonPress(buttonNumber, cursorX + getX(), cursorY + getY());
+                MouseEvent e = new MouseEvent(user, buttonNumber, cursorX + getX(), cursorY + getY());
+                list.buttonRelease(e);
             }
 
             @Override
             public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
-                list.buttonRelease(buttonNumber, cursorX + getX(), cursorY + getY());
+                MouseEvent e = new MouseEvent(user, buttonNumber, cursorX + getX(), cursorY + getY());
+                list.buttonRelease(e);
             }
 
             @Override
             public void wheelScroll(int number, int cursorX, int cursorY) {
-                list.wheelScroll(number, cursorX + getX(), cursorY + getY());
+                MouseWheelEvent e = new MouseWheelEvent(user, number, cursorX + getX(), cursorY + getY());
+                list.wheelScroll(e);
+            }
+
+            @Override
+            public void keyPressed(int key) {
+                KeyEvent e = new KeyEvent(user, key);
+                list.keyPressed(e);
+            }
+
+            @Override
+            public void keyReleased(int key) {
+                KeyEvent e = new KeyEvent(user, key);
+                list.keyReleased(e);
+            }
+
+            @Override
+            public void keyTyped(int key) {
+                KeyEvent e = new KeyEvent(user, key);
+                list.keyTyped(e);
             }
         }
         private Scene scene = new Scene();
@@ -888,9 +922,9 @@ public abstract class Camera extends ZoneObject {
             Zone z = zone;
             if (z != null) {
                 UserListenerList l = getData().userListeners.checkOut(user);
-                removeKeyListener(l);
                 removeMouseListener(listener);
                 removeMouseWheelListener(listener);
+                removeKeyListener(listener);
                 listener = null;
             }
             getData().userListeners.checkIn(user);
@@ -912,10 +946,10 @@ public abstract class Camera extends ZoneObject {
         private final void joinZone() {
             dropZone();
             UserListenerList l = getData().userListeners.checkOut(user);
-            addKeyListener(l);
-            listener = new InputListener(l);
+            listener = new InputListener(l, zone);
             addMouseListener(listener);
             addMouseWheelListener(listener);
+            addKeyListener(listener);
         }
     }
 }

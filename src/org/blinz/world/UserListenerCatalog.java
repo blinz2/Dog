@@ -21,11 +21,8 @@ import java.util.Hashtable;
 import java.util.Vector;
 import org.blinz.input.ClickEvent;
 import org.blinz.input.KeyEvent;
-import org.blinz.input.KeyListener;
 import org.blinz.input.MouseEvent;
-import org.blinz.input.MouseListener;
 import org.blinz.input.MouseWheelEvent;
-import org.blinz.input.MouseWheelListener;
 import org.blinz.util.User;
 import org.blinz.util.concurrency.SynchronizedTask;
 
@@ -39,7 +36,7 @@ class UserListenerCatalog extends SynchronizedTask {
      * Contains a list of sprites that listen to the input of a certain User.
      * @author Blinz
      */
-    class UserListenerList implements MouseListener, MouseWheelListener, KeyListener {
+    class UserListenerList {
 
         /**
          * Used for when the Zone is paused.
@@ -56,57 +53,43 @@ class UserListenerCatalog extends SynchronizedTask {
          */
         private int cameraCount;
 
-        @Override
-        public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
-            ClickEvent e = new ClickEvent(user, buttonNumber, cursorX, cursorY, clickCount);
+        public void buttonClick(ClickEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).buttonClicked(e);
             }
         }
 
-        @Override
-        public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
-            MouseEvent e = new MouseEvent(user, buttonNumber, cursorX, cursorY);
+        public void buttonPress(MouseEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).buttonPressed(e);
             }
         }
 
-        @Override
-        public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
-            MouseEvent e = new MouseEvent(user, buttonNumber, cursorX, cursorY);
+        public void buttonRelease(MouseEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).buttonReleased(e);
             }
         }
 
-        @Override
-        public void keyPressed(int key) {
-            KeyEvent e = new KeyEvent(user, key);
+        public void keyPressed(KeyEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).keyPressed(e);
             }
         }
 
-        @Override
-        public void keyReleased(int key) {
-            KeyEvent e = new KeyEvent(user, key);
+        public void keyReleased(KeyEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).keyReleased(e);
             }
         }
 
-        @Override
-        public void keyTyped(int key) {
-            KeyEvent e = new KeyEvent(user, key);
+        public void keyTyped(KeyEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).keyTyped(e);
             }
         }
 
-        @Override
-        public void wheelScroll(int number, int cursorX, int cursorY) {
-            MouseWheelEvent e = new MouseWheelEvent(user, cursorX, cursorY, number);
+        public void wheelScroll(MouseWheelEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).mouseWheelScroll(e);
             }
