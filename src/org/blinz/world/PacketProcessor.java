@@ -20,7 +20,7 @@ package org.blinz.world;
  * Processes incoming packets and sends them where they need to go.
  * @author Blinz
  */
-public class PacketProcessor {
+class PacketProcessor {
 
     /**
      * Change the Zone of focus for packet processor.
