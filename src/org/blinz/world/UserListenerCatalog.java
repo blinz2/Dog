@@ -16,6 +16,7 @@
  */
 package org.blinz.world;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 import org.blinz.input.ClickEvent;
@@ -113,6 +114,20 @@ class UserListenerCatalog extends SynchronizedTask {
 
         private void init() {
             inputSprites = paused ? dummyList : sprites;
+        }
+
+        /**
+         * Suspend reception of user input to the sprites.
+         */
+        private void pause() {
+            inputSprites = dummyList;
+        }
+
+        /**
+         * Resume reception of user input to the sprites.
+         */
+        private void unpause() {
+            inputSprites = sprites;
         }
 
         /**
@@ -214,11 +229,25 @@ class UserListenerCatalog extends SynchronizedTask {
     }
 
     /**
-     * Used by Zone to pause sprite recieving of user input while the Zone is paused.
-     * @param paused
+     * Used by Zone to pause sprites recieving of user input while the Zone is paused.
      */
-    final void paused(boolean paused) {
-        this.paused = paused;
+    final void pause() {
+        paused = true;
+        Enumeration<UserListenerList> list = userListeners.elements();
+        while (list.hasMoreElements()) {
+            list.nextElement().pause();
+        }
+    }
+
+    /**
+     * Used by Zone to unpause sprites recieving of user input while the Zone is paused.
+     */
+    final void unpause() {
+        paused = false;
+        Enumeration<UserListenerList> list = userListeners.elements();
+        while (list.hasMoreElements()) {
+            list.nextElement().unpause();
+        }
     }
 
     /**

@@ -214,7 +214,7 @@ public abstract class Zone extends ZoneObject {
      */
     public final void pause() {
         paused = true;
-        getData().userListeners.paused(true);
+        getData().userListeners.pause();
     }
 
     /**
@@ -223,7 +223,7 @@ public abstract class Zone extends ZoneObject {
     public final void unpause() {
         paused = false;
         pauseTime = System.currentTimeMillis() - getData().zoneTime;
-        getData().userListeners.paused(false);
+        getData().userListeners.unpause();
     }
 
     /**
