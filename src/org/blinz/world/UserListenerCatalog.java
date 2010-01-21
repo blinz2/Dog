@@ -123,10 +123,20 @@ class UserListenerCatalog extends SynchronizedTask {
             return cameraCount == 0 && inputSprites.isEmpty();
         }
 
+        /**
+         * Adds the given sprite to this list.
+         * For use by UserListenerCatalog.
+         * @param sprite
+         */
         private final void add(BaseSprite sprite) {
             inputSprites.add(sprite);
         }
 
+        /**
+         * Removes the given sprite from this list.
+         * For use by UserListenerCatalog.
+         * @param sprite
+         */
         private final void remove(BaseSprite sprite) {
             inputSprites.remove(sprite);
         }
