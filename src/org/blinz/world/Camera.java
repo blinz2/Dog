@@ -25,7 +25,6 @@ import org.blinz.input.MouseListener;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
-import org.blinz.input.KeyListener;
 import org.blinz.input.MouseWheelListener;
 import org.blinz.world.UserListenerCatalog.UserListenerList;
 
