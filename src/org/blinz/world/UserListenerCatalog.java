@@ -255,14 +255,4 @@ class UserListenerCatalog extends SynchronizedTask {
             return userListeners.get(user);
         }
     }
-
-    /**
-     * Removes the sprite list for the given User.
-     * @param user
-     */
-    private final void removeList(User user) {
-        synchronized (userListeners) {
-            userListeners.remove(user);
-        }
-    }
 }
