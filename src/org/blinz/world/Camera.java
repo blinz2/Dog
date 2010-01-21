@@ -25,6 +25,8 @@ import org.blinz.input.MouseListener;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+import org.blinz.input.KeyListener;
+import org.blinz.input.MouseWheelListener;
 import org.blinz.world.UserListenerCatalog.UserListenerList;
 
 /**
@@ -836,9 +838,38 @@ public abstract class Camera extends ZoneObject {
 
     private class ZoneScreen extends Screen {
 
+        private class InputListener implements MouseListener, MouseWheelListener {
+
+            private UserListenerList list;
+
+            public InputListener(UserListenerList list) {
+                this.list = list;
+            }
+
+            @Override
+            public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
+                list.buttonClick(buttonNumber, clickCount, cursorX + getX(), cursorY + getY());
+            }
+
+            @Override
+            public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
+                list.buttonPress(buttonNumber, cursorX + getX(), cursorY + getY());
+            }
+
+            @Override
+            public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
+                list.buttonRelease(buttonNumber, cursorX + getX(), cursorY + getY());
+            }
+
+            @Override
+            public void wheelScroll(int number, int cursorX, int cursorY) {
+                list.wheelScroll(number, cursorX + getX(), cursorY + getY());
+            }
+        }
         private Scene scene = new Scene();
         private Scene swap1 = new Scene();
         private Scene swap2 = new Scene();
+        private InputListener listener;
 
         private ZoneScreen() {
             addMouseListener(spriteSelecter);
@@ -858,9 +889,10 @@ public abstract class Camera extends ZoneObject {
             Zone z = zone;
             if (z != null) {
                 UserListenerList l = getData().userListeners.checkOut(user);
-                removeMouseListener(l);
                 removeKeyListener(l);
-                removeMouseWheelListener(l);
+                removeMouseListener(listener);
+                removeMouseWheelListener(listener);
+                listener = null;
             }
             getData().userListeners.checkIn(user);
         }
@@ -881,9 +913,10 @@ public abstract class Camera extends ZoneObject {
         private final void joinZone() {
             dropZone();
             UserListenerList l = getData().userListeners.checkOut(user);
-            addMouseListener(l);
             addKeyListener(l);
-            addMouseWheelListener(l);
+            listener = new InputListener(l);
+            addMouseListener(listener);
+            addMouseWheelListener(listener);
         }
     }
 }

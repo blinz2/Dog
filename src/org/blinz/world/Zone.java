@@ -303,10 +303,20 @@ public abstract class Zone extends ZoneObject {
         zoneProcessor = null;
     }
 
+    /**
+     * The given sprite will now recieve input given by the given User.
+     * @param user
+     * @param sprite
+     */
     public final void addUserListeningSprite(User user, BaseSprite sprite) {
         getData().userListeners.add(user, sprite);
     }
 
+    /**
+     * The given sprite will no longer recieve input given by the given User.
+     * @param user
+     * @param sprite
+     */
     public final void removeUserListeningSprite(User user, BaseSprite sprite) {
         getData().userListeners.remove(user, sprite);
     }
