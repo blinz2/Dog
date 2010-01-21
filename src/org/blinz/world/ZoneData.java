@@ -34,6 +34,7 @@ class ZoneData {
     final ArrayList<BaseSprite> updatingSprites = new ArrayList<BaseSprite>();
     final ArrayList<CollidableSprite> collidableObjects = new ArrayList<CollidableSprite>();
     final ArrayList<BaseSprite> spritesToDelete = new ArrayList<BaseSprite>();
+    final UserListenerCatalog userListeners = new UserListenerCatalog();
     long zoneTime = 0;
     long zoneCycles = 0;
     byte id;

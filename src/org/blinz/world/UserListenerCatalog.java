@@ -152,11 +152,14 @@ class UserListenerCatalog extends SynchronizedTask {
 
         //add new pairs
         while ((current = nextToAdd()) != null) {
-            UserListenerList list = userListeners.get(current.user);
-            if (list == null) {
-                list = addList(current.user);
-            }
-            list.add(current.sprite);
+            UserListenerList list;
+            do {
+                list = userListeners.get(current.user);
+                if (list == null) {
+                    list = fetchList(current.user);
+                }
+                list.add(current.sprite);
+            } while (!userListeners.contains(list));
         }
     }
 
@@ -167,6 +170,37 @@ class UserListenerCatalog extends SynchronizedTask {
      */
     final UserListenerList get(User user) {
         return userListeners.get(user);
+    }
+
+    /**
+     * Checks out the list associated with the given User.
+     * checkIn should be called when the list is no longer needed.
+     *
+     * @param user the User who's list is to be returned
+     * @return the sprite list associated with the given User
+     */
+    final UserListenerList checkOut(User user) {
+        UserListenerList list;
+        do {
+            list = get(user);
+            list.cameraCount++;
+            if (list == null) {
+                list = fetchList(user);
+            }
+        } while (!userListeners.containsKey(user));
+        return list;
+    }
+
+    /**
+     * Checks in UserListenerList for the given User.
+     * @param user
+     */
+    final void checkIn(User user) {
+        UserListenerList list = userListeners.get(user);
+        list.cameraCount--;
+        if (list.dead()) {
+            userListeners.remove(user);
+        }
     }
 
     /**
@@ -187,23 +221,6 @@ class UserListenerCatalog extends SynchronizedTask {
         toRemove.add(new Pair(user, sprite));
     }
 
-//    /**
-//     * Increments the usage counter for the list associated with the User of the
-//     * given Camera.
-//     * @param camera
-//     */
-//    final void incrementUsageCount(Camera camera) {
-//        editList((byte) 2, camera.getUser(), null);
-//    }
-//
-//    /**
-//     * Decrements the usage counter for the list associated with the User of the
-//     * given Camera.
-//     * @param camera
-//     */
-//    final void decrementUsageCount(Camera camera) {
-//        editList((byte) 3, camera.getUser(), null);
-//    }
     /**
      * @return the next sprite to remove
      */
@@ -225,10 +242,11 @@ class UserListenerCatalog extends SynchronizedTask {
     }
 
     /**
-     * Adds a sprite list for the given User.
+     * Adds a sprite list for the given User if it does not exist, returns the existing
+     * one if it does.
      * @param user
      */
-    private final synchronized UserListenerList addList(User user) {
+    private final synchronized UserListenerList fetchList(User user) {
         if (!userListeners.contains(user)) {
             UserListenerList list = new UserListenerList();
             userListeners.put(user, list);

@@ -96,12 +96,12 @@ public abstract class Camera extends ZoneObject {
                 ScreenManager.addScreen(screen);
                 Zone z = zone;
                 if (z != null) {
-                    screen.setZone(z);
+                    screen.joinZone();
                     //to prevent concurrency issues
                     while (zone != z) {
                         screen.dropZone();
                         if ((z = zone) != null) {
-                            screen.setZone(zone);
+                            screen.joinZone();
                         }
                     }
                 }
@@ -123,7 +123,7 @@ public abstract class Camera extends ZoneObject {
         zone.addCamera(this);
         ZoneScreen s;
         if ((s = screen) != null) {
-            s.setZone(zone);
+            s.joinZone();
         }
     }
 
@@ -133,11 +133,11 @@ public abstract class Camera extends ZoneObject {
      */
     public final void dropZone() {
         if (zone != null) {
-            zone.removeCamera(this);
             ZoneScreen s = screen;
             if (s != null) {
                 screen.dropZone();
             }
+            zone.removeCamera(this);
             selectableSprites.clear();
             sprites.clear();
             focusSprite = null;
@@ -802,7 +802,7 @@ public abstract class Camera extends ZoneObject {
 
     private class SpriteSelecter implements MouseListener {
 
-        CameraSprite selected;
+        private CameraSprite selected;
 
         @Override
         public synchronized void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
@@ -840,7 +840,7 @@ public abstract class Camera extends ZoneObject {
         private Scene swap1 = new Scene();
         private Scene swap2 = new Scene();
 
-        ZoneScreen() {
+        private ZoneScreen() {
             addMouseListener(spriteSelecter);
         }
 
@@ -854,17 +854,18 @@ public abstract class Camera extends ZoneObject {
             s.unLock();
         }
 
-        final void dropZone() {
+        private final void dropZone() {
             Zone z = zone;
             if (z != null) {
-                UserListenerList l = zone.getUserSprites(user);
+                UserListenerList l = getData().userListeners.checkOut(user);
                 removeMouseListener(l);
                 removeKeyListener(l);
                 removeMouseWheelListener(l);
             }
+            getData().userListeners.checkIn(user);
         }
 
-        final Scene getScene() {
+        private final Scene getScene() {
             Scene retval = null;
             while (retval == null) {
                 if (swap1.lock()) {
@@ -877,9 +878,9 @@ public abstract class Camera extends ZoneObject {
             return retval;
         }
 
-        private final void setZone(Zone zone) {
+        private final void joinZone() {
             dropZone();
-            UserListenerList l = zone.getUserSprites(user);
+            UserListenerList l = getData().userListeners.checkOut(user);
             addMouseListener(l);
             addKeyListener(l);
             addMouseWheelListener(l);

@@ -179,7 +179,6 @@ public abstract class Zone extends ZoneObject {
     private Thread listTrimmer = new ListTrimmer();
     private boolean paused = false;
     private boolean isRunning = false;
-    private final UserListenerCatalog userListeners = new UserListenerCatalog();
     private TaskExecuter zoneProcessor;
     private static final Vector<Byte> recycledIDs = new Vector<Byte>();
     private static byte idIndex = 0;
@@ -274,7 +273,7 @@ public abstract class Zone extends ZoneObject {
         if (!isRunning) {
             this.name = name;
             zoneProcessor = new TaskExecuter(name, threads);
-            zoneProcessor.addTask(userListeners);
+            zoneProcessor.addTask(getData().userListeners);
             zoneProcessor.addTask(new Pause());
             zoneProcessor.addTask(new Barrier());
             zoneProcessor.addTask(new ManageTime());
@@ -305,11 +304,11 @@ public abstract class Zone extends ZoneObject {
     }
 
     public final void addUserListeningSprite(User user, BaseSprite sprite) {
-        userListeners.add(user, sprite);
+        getData().userListeners.add(user, sprite);
     }
 
     public final void removeUserListeningSprite(User user, BaseSprite sprite) {
-        userListeners.remove(user, sprite);
+        getData().userListeners.remove(user, sprite);
     }
 
     /**
@@ -429,15 +428,6 @@ public abstract class Zone extends ZoneObject {
     final void trimLists() {
         getData().trimLists();
         cameras.trimToSize();
-    }
-
-    /**
-     *
-     * @param user
-     * @return all sprites listening to input from the given user.
-     */
-    final UserListenerCatalog.UserListenerList getUserSprites(User user) {
-        return userListeners.get(user);
     }
 
     /**
