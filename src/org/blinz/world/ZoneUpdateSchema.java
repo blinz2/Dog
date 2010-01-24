@@ -29,7 +29,7 @@ abstract class ZoneUpdateSchema {
     int xLength, yLength;
     Sector[][] sectors;
     private List<Camera> cameras;
-    private Position straightInterater = new Position();
+    private Position postSectorIndex = new Position();
     private int cameraIndex = 0;
     private int spriteDeletionIndex = 0;
 
@@ -49,15 +49,25 @@ abstract class ZoneUpdateSchema {
     }
 
     final synchronized Sector getNextPostUpdateSector() {
-        if (straightInterater.y < yLength - 1) {
-            straightInterater.y++;
-        } else if (straightInterater.x < xLength - 1) {
-            straightInterater.x++;
-            straightInterater.y = 0;
+        if (postSectorIndex.y < yLength - 1) {
+            postSectorIndex.y++;
+        } else if (postSectorIndex.x < xLength - 1) {
+            postSectorIndex.x++;
+            postSectorIndex.y = 0;
         } else {
             return null;
         }
-        return sectors[straightInterater.x][straightInterater.y];
+        return sectors[postSectorIndex.x][postSectorIndex.y];
+    }
+
+    /**
+     * For use by Zone.refactorSectors. Updates the Sector list of this update schema.
+     * @param sectors
+     */
+    final synchronized void updateSectors(Sector[][] sectors) {
+        this.sectors = sectors;
+        xLength = sectors.length;
+        yLength = sectors[0].length;
     }
 
     /**
@@ -72,7 +82,7 @@ abstract class ZoneUpdateSchema {
     }
 
     void reset() {
-        straightInterater.setPosition(0, -1);
+        postSectorIndex.setPosition(0, -1);
         cameraIndex = 0;
     }
 

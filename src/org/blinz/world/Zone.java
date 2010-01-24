@@ -562,8 +562,8 @@ public abstract class Zone extends ZoneObject {
 
         getData().sectors = sectors;
 
-        for (Sector sector : newSectors) {
-            getData().registerZoneObject(sector);
+        for (int i = 0; i < newSectors.size(); i++) {
+            getData().registerZoneObject(newSectors.get(i));
         }
 
         for (int i = 0; i
@@ -579,8 +579,9 @@ public abstract class Zone extends ZoneObject {
                 || (sectors.length == 1 && sectors[0].length == 1)) {
             if (!(updateSchema instanceof TrivialSectorUpdateSchema)) {
                 updateSchema = new TrivialSectorUpdateSchema(sectors, zoneProcessor, cameras);
+            } else {
+                updateSchema.updateSectors(sectors);
             }
-
         } else {
             updateSchema = new LargeSectorUpdateSchema(sectors, zoneProcessor, cameras);
         }
