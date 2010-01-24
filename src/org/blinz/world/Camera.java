@@ -571,9 +571,15 @@ public abstract class Camera extends ZoneObject {
         if (y < getY()) {
             fy1 = y / getData().sectorSize.height;
             fy2 = (getY() + getHeight()) / getData().sectorSize.height;
+            if (fy2 >= getData().sectors[0].length) {
+                fy2 = getData().sectors[0].length - 1;
+            }
         } else {
             fy1 = getY() / getData().sectorSize.height;
             fy2 = (y + getHeight()) / getData().sectorSize.height;
+            if (fy2 >= getData().sectors[0].length) {
+                fy2 = getData().sectors[0].length - 1;
+            }
         }
 
         int ox1 = getX() / getData().sectorSize.width;
