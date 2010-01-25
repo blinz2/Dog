@@ -1,6 +1,6 @@
 /*
  *  BlinzEngine - A library for large 2D world simultions and games.
- *  Copyright (C) 2009  Blinz <gtalent2@gmail.com>
+ *  Copyright (C) 2009-2010  Blinz <gtalent2@gmail.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 3 as
@@ -600,23 +600,7 @@ public abstract class BaseSprite extends ZoneObject {
     protected void addSpriteToZone(BaseSprite sprite) {
         getData().addSprite(sprite);
     }
-
-    protected Bounds createFrontBumper() {
-        return new Bounds(getX(), getY() - 1, getWidth(), 1);
-    }
-
-    protected Bounds createBackBumper() {
-        return new Bounds(getY(), getY() + getHeight(), getWidth(), 1);
-    }
-
-    protected Bounds createRightBumper() {
-        return new Bounds(getX() + getWidth(), getY(), 1, getHeight());
-    }
-
-    protected Bounds createLeftBumper() {
-        return new Bounds(getX(), getY() - 1, 1, getHeight());
-    }
-
+    
     /**
      *
      * @return the name assigned to this class as a String
