@@ -534,7 +534,7 @@ public abstract class BaseSprite extends ZoneObject {
      * Monitering this sprite.
      * @param data
      */
-    protected void sendMessage(String data) {
+    protected final void sendMessage(String data) {
     }
 
     /**
