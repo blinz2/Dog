@@ -534,14 +534,14 @@ public abstract class BaseSprite extends ZoneObject {
      * Monitering this sprite.
      * @param data
      */
-    protected final void sendMessage(String data) {
+    protected void sendMessage(String data) {
     }
 
     /**
      * Recieves data being streamed over the network.
      * @param data
      */
-    protected final void recieveMessage(String data) {
+    protected void recieveMessage(String data) {
     }
 
     /**
