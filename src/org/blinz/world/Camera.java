@@ -872,7 +872,7 @@ public abstract class Camera extends ZoneObject {
             @Override
             public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
                 MouseEvent e = new MouseEvent(user, buttonNumber, cursorX + getX(), cursorY + getY());
-                list.buttonRelease(e);
+                list.buttonPress(e);
             }
 
             @Override
