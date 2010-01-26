@@ -193,7 +193,7 @@ public abstract class Zone extends ZoneObject {
         } catch (Exception ex) {
             Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
         setZoneData(zoneID, new ZoneData());
         getData().init(zoneID);
         size = getData().zoneSize;
@@ -228,6 +228,15 @@ public abstract class Zone extends ZoneObject {
         paused = false;
         pauseTime = System.currentTimeMillis() - getData().zoneTime;
         getData().userListeners.unpause();
+    }
+
+    /**
+     * Sets the amount of time between cycles of execution for this Zone. Defaults
+     * to 5 milliseconds.
+     * @param interval the time between cycles of execution for this Zone in milliseconds
+     */
+    public final void setCycleInterval(long interval) {
+        cycleIntervalTime = interval;
     }
 
     /**
