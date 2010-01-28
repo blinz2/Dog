@@ -59,8 +59,7 @@ public abstract class Zone extends ZoneObject {
         @Override
         protected void run() {
             cycleStartTime = System.currentTimeMillis();
-            getData().zoneTime = System.currentTimeMillis() - initTime;
-            getData().zoneTime -= pauseTime;
+            getData().zoneTime = (System.currentTimeMillis() - initTime) - pauseTime;
         }
     }
 
