@@ -51,7 +51,7 @@ class UserListenerCatalog extends SynchronizedTask {
         /**
          * Count of how many Cameras accessing this UserListenerList.
          */
-        private int cameraCount;
+        private int cameraCount = 0;
 
         public void buttonClick(ClickEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
@@ -203,10 +203,10 @@ class UserListenerCatalog extends SynchronizedTask {
         UserListenerList list;
         do {
             list = get(user);
-            list.cameraCount++;
             if (list == null) {
                 list = fetchList(user);
             }
+            list.cameraCount++;
         } while (!userListeners.containsKey(user));
         return list;
     }
