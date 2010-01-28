@@ -472,6 +472,8 @@ public abstract class BaseSprite extends ZoneObject {
                     } else {//bottom Sector has not changed
                         otl.removeSprite(this);
                         ntl.addIntersectingSprite(this);
+                        ntr.addIntersectingSprite(this);
+                        ntl.addSprite(this);
                     }
                 } else {//if left equals right
                     if (otl != ntl) {//if the bottom Sector has changed
@@ -493,7 +495,7 @@ public abstract class BaseSprite extends ZoneObject {
                             }
                         }
                     } else {//bottom Sector has not changed
-                        otl.removeSprite(this);
+                        ntl.addSprite(this);
                         ntl.addIntersectingSprite(this);
                     }
                 }

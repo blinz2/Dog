@@ -193,7 +193,7 @@ public abstract class Zone extends ZoneObject {
         } catch (Exception ex) {
             Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         setZoneData(zoneID, new ZoneData());
         getData().init(zoneID);
         size = getData().zoneSize;
