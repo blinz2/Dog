@@ -43,14 +43,12 @@ public class Camera extends ZoneObject {
      * Determines whether or not this Camera represents a local user. True by default.
      */
     private boolean local = true;
-    private boolean centeredOnFocusSprite = false;
     private final Bounds bounds = new Bounds();
     private final Hashtable<BaseSprite, CameraSprite> sprites =
             new Hashtable<BaseSprite, CameraSprite>();
     private final Vector<CameraSprite> selectableSprites = new Vector<CameraSprite>();
     private final Vector<BaseSprite> spritesToRemove = new Vector<BaseSprite>();
     private Sector sector1, sector2;
-    private BaseSprite focusSprite;
     private Zone zone;
     private User user;
     private Scene scene = new Scene();
@@ -120,20 +118,10 @@ public class Camera extends ZoneObject {
             zone.removeCamera(this);
             selectableSprites.clear();
             sprites.clear();
-            focusSprite = null;
             spritesToRemove.clear();
             zone = null;
             inputListener = null;
         }
-    }
-
-    /**
-     * If set to true this Camera will remain centered on the focus sprite
-     * if there is one, if false it will not move unless instructed to.
-     * @param centerOnFocusSprite
-     */
-    public final void centerOnFocusSprite(boolean centerOnFocusSprite) {
-        this.centeredOnFocusSprite = centerOnFocusSprite;
     }
 
     /**
@@ -265,7 +253,6 @@ public class Camera extends ZoneObject {
      * @param sprite
      */
     public final void setFocusSprite(BaseSprite sprite) {
-        focusSprite = sprite;
     }
 
     /**
@@ -617,13 +604,7 @@ public class Camera extends ZoneObject {
         final Scene upcoming = getScene();
         upcoming.manageContainers();
 
-        BaseSprite sprite = focusSprite;
-        if (sprite != null) {
-            upcoming.translation.setPosition((sprite.getX() - upcoming.size.getWidth() / 2) + sprite.getWidth() / 2,
-                    (sprite.getY() - upcoming.size.getHeight() / 2) + sprite.getHeight() / 2);
-        } else {
-            upcoming.translation.setPosition(0, 0);
-        }
+        upcoming.translation.setPosition(getX(), getY());
 
         Bounds b = new Bounds();
         b.setPosition(upcoming.translation);
@@ -689,15 +670,8 @@ public class Camera extends ZoneObject {
      */
     void internalUpdate() {
         removeStaleSprites();
-
-        if (focusSprite != null && centeredOnFocusSprite) {
-            setPosition((focusSprite.getX() - getWidth() / 2) + focusSprite.getWidth() / 2,
-                    (focusSprite.getY() - getHeight() / 2) + focusSprite.getHeight() / 2);
-        }
-
-        generateCurrentScene();
-
         update();
+        generateCurrentScene();
     }
 
     /**
