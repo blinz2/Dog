@@ -17,9 +17,7 @@
 package org.blinz.world;
 
 import org.blinz.util.User;
-import org.blinz.graphics.ScreenManager;
 import org.blinz.graphics.Graphics;
-import org.blinz.graphics.Screen;
 import org.blinz.util.Bounds;
 import org.blinz.input.MouseListener;
 import java.util.Enumeration;
@@ -39,24 +37,26 @@ import org.blinz.world.UserListenerCatalog.UserListenerList;
  * the Zone.
  * @author Blinz
  */
-public abstract class Camera extends ZoneObject {
+public class Camera extends ZoneObject {
 
     /**
      * Determines whether or not this Camera represents a local user. True by default.
      */
     private boolean local = true;
     private boolean centeredOnFocusSprite = false;
-    private ZoneScreen screen;
     private final Bounds bounds = new Bounds();
     private final Hashtable<BaseSprite, CameraSprite> sprites =
             new Hashtable<BaseSprite, CameraSprite>();
     private final Vector<CameraSprite> selectableSprites = new Vector<CameraSprite>();
     private final Vector<BaseSprite> spritesToRemove = new Vector<BaseSprite>();
-    private final SpriteSelecter spriteSelecter = new SpriteSelecter();
     private Sector sector1, sector2;
     private BaseSprite focusSprite;
     private Zone zone;
     private User user;
+    private Scene scene = new Scene();
+    private Scene swap1 = new Scene();
+    private Scene swap2 = new Scene();
+    private InputListener inputListener;
 
     /**
      * Constructer for Camera.
@@ -92,30 +92,12 @@ public abstract class Camera extends ZoneObject {
     }
 
     /**
-     * Sets whether or not this Camera's contents are drawn.
-     * @param display if true this Camera will be drawn, otherwise it will not.
+     * Returns an input listener Used to direct input by the User owning this 
+     * Camera to sprites.
+     * @return an Mouse, MouseWheel, Key listener object
      */
-    public final synchronized void display(boolean display) {
-        if (display) {
-            if (screen == null) {
-                screen = new ZoneScreen();
-                ScreenManager.addScreen(screen);
-                Zone z = zone;
-                if (z != null) {
-                    screen.joinZone();
-                    //to prevent concurrency issues
-                    while (zone != z) {
-                        screen.dropZone();
-                        if ((z = zone) != null) {
-                            screen.joinZone();
-                        }
-                    }
-                }
-            }
-        } else {
-            ScreenManager.removeScreen(screen);
-            screen = null;
-        }
+    public final synchronized Object getInputListener() {
+        return inputListener == null ? inputListener = new InputListener() : inputListener;
     }
 
     /**
@@ -127,10 +109,6 @@ public abstract class Camera extends ZoneObject {
         dropZone();
         this.zone = zone;
         zone.addCamera(this);
-        ZoneScreen s;
-        if ((s = screen) != null) {
-            s.joinZone();
-        }
     }
 
     /**
@@ -139,16 +117,13 @@ public abstract class Camera extends ZoneObject {
      */
     public final void dropZone() {
         if (zone != null) {
-            ZoneScreen s = screen;
-            if (s != null) {
-                screen.dropZone();
-            }
             zone.removeCamera(this);
             selectableSprites.clear();
             sprites.clear();
             focusSprite = null;
             spritesToRemove.clear();
             zone = null;
+            inputListener = null;
         }
     }
 
@@ -291,6 +266,20 @@ public abstract class Camera extends ZoneObject {
      */
     public final void setFocusSprite(BaseSprite sprite) {
         focusSprite = sprite;
+    }
+
+    /**
+     * Draws this Camera. A single given Camera should only be drawn by one
+     * thread at a time, and thus by only one Screen.
+     * @param graphics
+     */
+    public synchronized final void draw(Graphics graphics) {
+        Scene s = scene;
+        while (!s.lock()) {
+            s = scene;
+        }
+        s.draw(graphics);
+        s.unLock();
     }
 
     /**
@@ -617,6 +606,7 @@ public abstract class Camera extends ZoneObject {
                 }
             }
         }
+        initCamera();
     }
 
     /**
@@ -624,34 +614,34 @@ public abstract class Camera extends ZoneObject {
      * and sets it to the current scene.
      */
     final void generateCurrentScene() {
-        Scene scene = screen.getScene();
-        scene.manageContainers();
+        final Scene upcoming = getScene();
+        upcoming.manageContainers();
 
         BaseSprite sprite = focusSprite;
         if (sprite != null) {
-            scene.translation.setPosition((sprite.getX() - scene.size.getWidth() / 2) + sprite.getWidth() / 2,
-                    (sprite.getY() - scene.size.getHeight() / 2) + sprite.getHeight() / 2);
+            upcoming.translation.setPosition((sprite.getX() - upcoming.size.getWidth() / 2) + sprite.getWidth() / 2,
+                    (sprite.getY() - upcoming.size.getHeight() / 2) + sprite.getHeight() / 2);
         } else {
-            scene.translation.setPosition(0, 0);
+            upcoming.translation.setPosition(0, 0);
         }
 
         Bounds b = new Bounds();
-        b.setPosition(scene.translation);
-        b.setSize(scene.size);
+        b.setPosition(upcoming.translation);
+        b.setSize(upcoming.size);
         Enumeration<CameraSprite> spriteList = sprites.elements();
         while (spriteList.hasMoreElements()) {
             CameraSprite s = spriteList.nextElement();
             if (b.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight())) {
-                scene.add(s);
+                upcoming.add(s);
             }
         }
 
-        scene.sortLayers();
+        upcoming.sortLayers();
 
         b = null;
 
-        scene.unLock();
-        screen.scene = scene;
+        upcoming.unLock();
+        scene = upcoming;
     }
 
     /**
@@ -699,25 +689,30 @@ public abstract class Camera extends ZoneObject {
      */
     void internalUpdate() {
         removeStaleSprites();
-        if (screen != null) {
-            setSize(screen.getWidth(), screen.getHeight());
-        }
 
         if (focusSprite != null && centeredOnFocusSprite) {
             setPosition((focusSprite.getX() - getWidth() / 2) + focusSprite.getWidth() / 2,
                     (focusSprite.getY() - getHeight() / 2) + focusSprite.getHeight() / 2);
         }
 
-        if (screen != null) {
-            generateCurrentScene();
-        }
+        generateCurrentScene();
 
         update();
     }
 
-    protected abstract void update();
+    /**
+     * Called after each cycle of this Camera's Zone. Does nothing, for implementing
+     * as needed.
+     */
+    protected void update() {
+    }
 
-    protected abstract void initCamera();
+    /**
+     * Called after the Camera recieves a Zone. Does nothing, for implementing
+     * as needed.
+     */
+    protected void initCamera() {
+    }
 
     /**
      * Sorts the given layer's sprites according the sub-layer data using quick
@@ -747,6 +742,19 @@ public abstract class Camera extends ZoneObject {
 
         sortByLayer(layer, low, pivotIndex - 1);
         sortByLayer(layer, pivotIndex + 1, high);
+    }
+
+    private final Scene getScene() {
+        Scene retval = null;
+        while (retval == null) {
+            if (swap1.lock()) {
+                retval = swap1;
+            } else if (swap2.lock()) {
+                retval = swap2;
+            }
+        }
+        retval.size.setSize(getWidth(), getHeight());
+        return retval;
     }
 
     /**
@@ -816,12 +824,21 @@ public abstract class Camera extends ZoneObject {
         return getData().sectors[ix][iy];
     }
 
-    private class SpriteSelecter implements MouseListener {
+    private class InputListener implements MouseListener, MouseWheelListener, KeyListener {
 
+        private UserListenerList list;
         private CameraSprite selected;
 
+        private InputListener() {
+            this.list = getData().userListeners.checkOut(user);
+        }
+
         @Override
-        public synchronized void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
+        public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
+            ClickEvent e = new ClickEvent(user, buttonNumber,
+                    cursorX + getX(), cursorY + getY(), clickCount);
+            list.buttonClick(e);
+
             CameraSprite oldSelected = selected;
             if (selected != null) {
                 for (int i = 0; i < selectableSprites.size(); i++) {
@@ -843,119 +860,43 @@ public abstract class Camera extends ZoneObject {
 
         @Override
         public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
+            MouseEvent e = new MouseEvent(user, buttonNumber, cursorX + getX(), cursorY + getY());
+            list.buttonPress(e);
         }
 
         @Override
         public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
-        }
-    }
-
-    private class ZoneScreen extends Screen {
-
-        private class InputListener implements MouseListener, MouseWheelListener, KeyListener {
-
-            private UserListenerList list;
-            private Zone zone;
-
-            public InputListener(UserListenerList list, Zone zone) {
-                this.list = list;
-                this.zone = zone;
-            }
-
-            @Override
-            public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
-                ClickEvent e = new ClickEvent(user, buttonNumber,
-                        cursorX + getX(), cursorY + getY(), clickCount);
-                list.buttonClick(e);
-            }
-
-            @Override
-            public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
-                MouseEvent e = new MouseEvent(user, buttonNumber, cursorX + getX(), cursorY + getY());
-                list.buttonPress(e);
-            }
-
-            @Override
-            public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
-                MouseEvent e = new MouseEvent(user, buttonNumber, cursorX + getX(), cursorY + getY());
-                list.buttonRelease(e);
-            }
-
-            @Override
-            public void wheelScroll(int number, int cursorX, int cursorY) {
-                MouseWheelEvent e = new MouseWheelEvent(user, number, cursorX + getX(), cursorY + getY());
-                list.wheelScroll(e);
-            }
-
-            @Override
-            public void keyPressed(int key) {
-                KeyEvent e = new KeyEvent(user, key);
-                list.keyPressed(e);
-            }
-
-            @Override
-            public void keyReleased(int key) {
-                KeyEvent e = new KeyEvent(user, key);
-                list.keyReleased(e);
-            }
-
-            @Override
-            public void keyTyped(int key) {
-                KeyEvent e = new KeyEvent(user, key);
-                list.keyTyped(e);
-            }
-        }
-        private Scene scene = new Scene();
-        private Scene swap1 = new Scene();
-        private Scene swap2 = new Scene();
-        private InputListener listener;
-
-        private ZoneScreen() {
-            addMouseListener(spriteSelecter);
+            MouseEvent e = new MouseEvent(user, buttonNumber, cursorX + getX(), cursorY + getY());
+            list.buttonRelease(e);
         }
 
         @Override
-        protected void draw(Graphics graphics) {
-            Scene s = scene;
-            while (!s.lock()) {
-                s = scene;
-            }
-            s.draw(graphics);
-            s.unLock();
+        public void wheelScroll(int number, int cursorX, int cursorY) {
+            MouseWheelEvent e = new MouseWheelEvent(user, number, cursorX + getX(), cursorY + getY());
+            list.wheelScroll(e);
         }
 
-        private final void dropZone() {
-            Zone z = zone;
-            if (z != null) {
-                UserListenerList l = getData().userListeners.checkOut(user);
-                removeMouseListener(listener);
-                removeMouseWheelListener(listener);
-                removeKeyListener(listener);
-                listener = null;
-            }
+        @Override
+        public void keyPressed(int key) {
+            KeyEvent e = new KeyEvent(user, key);
+            list.keyPressed(e);
+        }
+
+        @Override
+        public void keyReleased(int key) {
+            KeyEvent e = new KeyEvent(user, key);
+            list.keyReleased(e);
+        }
+
+        @Override
+        public void keyTyped(int key) {
+            KeyEvent e = new KeyEvent(user, key);
+            list.keyTyped(e);
+        }
+
+        @Override
+        protected void finalize() {
             getData().userListeners.checkIn(user);
-        }
-
-        private final Scene getScene() {
-            Scene retval = null;
-            while (retval == null) {
-                if (swap1.lock()) {
-                    retval = swap1;
-                } else if (swap2.lock()) {
-                    retval = swap2;
-                }
-            }
-            retval.size.setSize(getWidth(), getHeight());
-            return retval;
-        }
-
-        private final void joinZone() {
-            dropZone();
-            UserListenerList l = getData().userListeners.checkOut(user);
-            listener = new InputListener(l, zone);
-            addMouseListener(listener);
-            addMouseWheelListener(listener);
-            addKeyListener(listener);
         }
     }
 }
