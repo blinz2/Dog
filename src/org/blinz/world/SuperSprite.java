@@ -44,9 +44,6 @@ public abstract class SuperSprite extends Sprite {
     protected void addSubSprite(BaseSprite sprite) {
         getData().addSprite(sprite);
         subSprites.add(sprite);
-        if (sprite instanceof CollidableSprite) {
-            getData().collidableObjects.add((CollidableSprite) sprite);
-        }
     }
 
     /**
