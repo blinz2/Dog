@@ -18,6 +18,7 @@ package org.blinz.world;
 
 import java.util.ArrayList;
 import org.blinz.util.Size;
+import org.blinz.util.User;
 
 /**
  * ZoneData contains such items as a master list of Sectors, Sector size, zoneTime,
@@ -34,10 +35,12 @@ class ZoneData {
     final ArrayList<BaseSprite> updatingSprites = new ArrayList<BaseSprite>();
     final ArrayList<CollidableSprite> collidableObjects = new ArrayList<CollidableSprite>();
     final ArrayList<BaseSprite> spritesToDelete = new ArrayList<BaseSprite>();
-    final UserListenerCatalog userListeners = new UserListenerCatalog();
     long zoneTime = 0;
     long zoneCycles = 0;
     byte id;
+    final UserListenerCatalog userListeners = new UserListenerCatalog();
+    private String zoneName;
+    private boolean paused = false;
 
     /**
      * Initializes the ZoneData according to what it already stores.
@@ -55,7 +58,23 @@ class ZoneData {
         id = zoneID;
     }
 
-    protected void addSprite(BaseSprite sprite) {
+    /**
+     * Sets the name of the Zone this data represents to the name given.
+     * @param name the new Zone name
+     */
+    final void setName(String name) {
+        zoneName = name;
+    }
+
+    /**
+     *
+     * @return the name of the Zone this data represents
+     */
+    final String getName() {
+        return zoneName;
+    }
+
+    final void addSprite(BaseSprite sprite) {
         registerZoneObject(sprite);
 
         Sector tl = getSectorOf(sprite.getX(), sprite.getY());
@@ -77,6 +96,60 @@ class ZoneData {
                 getSectorOf(sprite.getX(), sprite.getY() + sprite.getHeight()).addIntersectingSprite(sprite);
             }
         }
+    }
+
+    /**
+     * Returns a reference to the sprites listening to input from users.
+     * @return a reference to the sprites listening to input from users.
+     */
+    final UserListenerCatalog getUserListeners() {
+        return userListeners;
+    }
+
+    /**
+     * The given sprite will now recieve input given by the given User.
+     * @param user
+     * @param sprite
+     */
+    final void addUserListener(User user, BaseSprite sprite) {
+        userListeners.add(user, sprite);
+    }
+
+    /**
+     * The given sprite will no longer recieve input given by the given User.
+     * @param user
+     * @param sprite
+     */
+    final void removeUserListener(User user, BaseSprite sprite) {
+        userListeners.remove(user, sprite);
+    }
+
+    /**
+     * Pauses the zone.
+     *
+     * Note: This pause is not meant for short pauses, it will take at least 250
+     * milliseconds before the Zone resumes execution even if resume() is called
+     * immediately. Also pauses user input going to the sprites, but no the Zone.
+     */
+    final void pause() {
+        paused = true;
+        userListeners.pause();
+    }
+
+    /**
+     * Unpauses the zone.
+     */
+    final void unpause() {
+        paused = false;
+        userListeners.unpause();
+    }
+
+    /**
+     * 
+     * @return true if the assocaiated Zone is paused, false otherwise
+     */
+    final boolean paused() {
+        return paused;
     }
 
     /**
@@ -152,6 +225,11 @@ class ZoneData {
         collidableObjects.trimToSize();
         sectorlessSprites.trimToSize();
         spritesToDelete.trimToSize();
+        for (int i = 0; i < sectors.length; i++) {
+            for (int n = 0; n < sectors[i].length; n++) {
+                sectors[i][n].trimLists();
+            }
+        }
     }
 
     /**

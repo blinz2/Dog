@@ -42,7 +42,7 @@ public abstract class Zone extends ZoneObject {
 
         @Override
         protected void run() {
-            if (paused) {
+            if (getData().paused()) {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException ex) {
@@ -180,7 +180,6 @@ public abstract class Zone extends ZoneObject {
     private long cycleIntervalTime = 5;
     private long cycleStartTime;
     private Thread listTrimmer = new ListTrimmer();
-    private boolean paused = false;
     private boolean isRunning = false;
     private TaskExecuter zoneProcessor;
     private static final Vector<Byte> recycledIDs = new Vector<Byte>();
@@ -216,17 +215,15 @@ public abstract class Zone extends ZoneObject {
      * immediately. Also pauses user input going to the sprites, but no the Zone.
      */
     public final void pause() {
-        paused = true;
-        getData().userListeners.pause();
+        getData().pause();
     }
 
     /**
      * Unpauses the zone.
      */
     public final void unpause() {
-        paused = false;
         pauseTime = System.currentTimeMillis() - getData().zoneTime;
-        getData().userListeners.unpause();
+        getData().unpause();
     }
 
     /**
@@ -275,7 +272,7 @@ public abstract class Zone extends ZoneObject {
      * @param threads number of threads dedicated to this Zone
      */
     public final synchronized void start(int threads) {
-        start(name, threads);
+        start("Zone", threads);
     }
 
     /**
@@ -285,7 +282,7 @@ public abstract class Zone extends ZoneObject {
      */
     public final synchronized void start(String name, int threads) {
         if (!isRunning) {
-            this.name = name;
+            getData().setName(name);
             zoneProcessor = new TaskExecuter(name, threads);
             zoneProcessor.addTask(getData().userListeners);
             zoneProcessor.addTask(new Pause());
@@ -323,7 +320,7 @@ public abstract class Zone extends ZoneObject {
      * @param sprite
      */
     public final void addUserListeningSprite(User user, BaseSprite sprite) {
-        getData().userListeners.add(user, sprite);
+        getData().addUserListener(user, sprite);
     }
 
     /**
@@ -332,7 +329,7 @@ public abstract class Zone extends ZoneObject {
      * @param sprite
      */
     public final void removeUserListeningSprite(User user, BaseSprite sprite) {
-        getData().userListeners.remove(user, sprite);
+        getData().removeUserListener(user, sprite);
     }
 
     /**
@@ -576,9 +573,30 @@ public abstract class Zone extends ZoneObject {
 
         for (int i = 0; i
                 < sectors.length; i++) {
-            for (int n = 0; n
-                    < sectors[i].length; n++) {
-                sectors[i][n].findNeighbors();
+            for (int n = 0; n < sectors[i].length; n++) {
+                int ix = sectors[i][n].getX() / getData().sectorSize.width;
+                int iy = sectors[i][n].getY() / getData().sectorSize.height;
+
+                if (ix > 0) {
+                    sectors[i][n].leftNeighbor = getData().sectors[ix - 1][iy];
+                } else {
+                    sectors[i][n].leftNeighbor = null;
+                }
+                if (iy > 0) {
+                    sectors[i][n].topNeighbor = getData().sectors[ix][iy - 1];
+                } else {
+                    sectors[i][n].topNeighbor = null;
+                }
+                if (ix < getData().sectors.length - 1) {
+                    sectors[i][n].rightNeighbor = getData().sectors[ix + 1][iy];
+                } else {
+                    sectors[i][n].rightNeighbor = null;
+                }
+                if (iy < getData().sectors[ix].length - 1) {
+                    sectors[i][n].bottomNeighbor = getData().sectors[ix][iy + 1];
+                } else {
+                    sectors[i][n].bottomNeighbor = null;
+                }
             }
 
         }
