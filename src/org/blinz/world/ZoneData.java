@@ -16,7 +16,7 @@
  */
 package org.blinz.world;
 
-import java.util.ArrayList;
+import java.util.Vector;
 import org.blinz.util.Size;
 import org.blinz.util.User;
 
@@ -31,10 +31,7 @@ class ZoneData {
     final Size sectorSize = new Size(2048, 2048);
     Sector[][] sectors = new Sector[1][1];
     final Size zoneSize = new Size();
-    final ArrayList<BaseSprite> sectorlessSprites = new ArrayList<BaseSprite>();
-    final ArrayList<BaseSprite> updatingSprites = new ArrayList<BaseSprite>();
-    final ArrayList<CollidableSprite> collidableObjects = new ArrayList<CollidableSprite>();
-    final ArrayList<BaseSprite> spritesToDelete = new ArrayList<BaseSprite>();
+    final Vector<BaseSprite> spritesToDelete = new Vector<BaseSprite>();
     long zoneTime = 0;
     long zoneCycles = 0;
     byte id;
@@ -221,9 +218,6 @@ class ZoneData {
      * Trims excessively large lists.
      */
     final void trimLists() {
-        updatingSprites.trimToSize();
-        collidableObjects.trimToSize();
-        sectorlessSprites.trimToSize();
         spritesToDelete.trimToSize();
         for (int i = 0; i < sectors.length; i++) {
             for (int n = 0; n < sectors[i].length; n++) {
