@@ -21,12 +21,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Vector;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 import org.blinz.input.ClickEvent;
 import org.blinz.input.KeyEvent;
 import org.blinz.input.MouseEvent;
 import org.blinz.input.MouseWheelEvent;
 import org.blinz.util.Size;
 import org.blinz.util.Bounds;
+import org.blinz.util.Position;
 import org.blinz.util.concurrency.Barrier;
 import org.blinz.util.concurrency.SynchronizedTask;
 import org.blinz.util.concurrency.Task;
@@ -37,6 +40,228 @@ import org.blinz.util.concurrency.TaskExecuter;
  * @author Blinz
  */
 public abstract class Zone extends ZoneObject {
+
+    /**
+     * Divides the task of processing a Zone up into as many practical units as the
+     * given thread count suggests, then creates and manages the threads used to process
+     * this Zone.
+     * @author Blinz
+     */
+    final class ZoneProcessor {
+
+        private class SynchronizedTaskManager {
+
+            private int stage;
+            private final int MANAGE_TIME = 0;
+            private final int ZONE_UPDATE = 1;
+
+            final void enter() {
+                switch (stage()) {
+                    case MANAGE_TIME:
+                        cycleStartTime = System.currentTimeMillis();
+                        getData().zoneTime = (System.currentTimeMillis() - initTime) - pauseTime;
+                        break;
+                    case ZONE_UPDATE:
+                        update();
+                        break;
+                }
+            }
+
+            private final synchronized int stage() {
+                return stage++;
+            }
+
+            /**
+             * Should contain only operations with trivial execution time. Resets
+             * this object to run again next iteration.
+             */
+            private final void reset() {
+                stage = 0;
+            }
+        }
+
+        /**
+         *
+         * @author Blinz
+         */
+        private class ZoneThread extends Thread {
+
+            private Sector[] sectors;
+
+            private ZoneThread(final ThreadGroup group) {
+                super(group, group.getName());
+            }
+
+            @Override
+            public void run() {
+
+                //pause if Zone is paused
+                if (getData().paused()) {
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+                syncTM.enter();
+
+                //cyclic barrier
+                try {
+                    barriers[0].await();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (BrokenBarrierException ex) {
+                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                syncTM.reset();
+
+                //update Sectors
+                for (int i = 0; i < sectors.length; i++) {
+                    sectors[i].update();
+                }
+
+                //cyclic barrier
+                try {
+                    barriers[1].await();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (BrokenBarrierException ex) {
+                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                //post update Sectors
+                for (int i = 0; i < sectors.length; i++) {
+                    sectors[i].postUpdate();
+                }
+
+                //cyclic barrier
+                try {
+                    barriers[2].await();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (BrokenBarrierException ex) {
+                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                //delete those sprites that have been marked for deletion
+                {
+                    for (BaseSprite s = getData().spritesToDelete.remove(0);
+                            s != null; s = getData().spritesToDelete.remove(0)) {
+                        deleteSprite(s);
+                    }
+                }
+
+                //cyclic barrier
+                try {
+                    barriers[3].await();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (BrokenBarrierException ex) {
+                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                //Update Cameras
+                Camera camera = nextCamera();
+                while (camera != null) {
+                    camera.internalUpdate();
+                    camera = updateSchema.nextCamera();
+                }
+
+                //sleep
+                {
+                    long sleepTime = (cycleStartTime + cycleIntervalTime) - System.currentTimeMillis();
+                    if (sleepTime > 0) {
+                        try {
+                            Thread.sleep(sleepTime);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+
+                //cyclic barrier
+                try {
+                    barriers[4].await();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (BrokenBarrierException ex) {
+                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                currentCamera = 0;
+            }
+
+            /**
+             * Sets the group of Sectors that this group is to contain.
+             * @param sectors
+             */
+            final void setSectors(Sector[] sectors) {
+                this.sectors = sectors;
+            }
+        }
+        private int currentCamera = 0;
+        private final SynchronizedTaskManager syncTM = new SynchronizedTaskManager();
+        private final CyclicBarrier[] barriers = new CyclicBarrier[5];
+        private ZoneThread[] threads;
+
+        /**
+         *
+         * @param zoneName the name of the Zone this thread group is for
+         * @param threadCount number of threads to be used in this group
+         */
+        ZoneProcessor(String zoneName, int threadCount) {
+            ThreadGroup group = new ThreadGroup(zoneName);
+
+            threads = new ZoneThread[threadCount];
+            for (int i = 0; i < threads.length; i++) {
+                threads[i] = new ZoneThread(group);
+            }
+
+            for (int i = 0; i < barriers.length; i++) {
+                barriers[i] = new CyclicBarrier(threadCount);
+            }
+        }
+
+        final void start() {
+            for (int i = 0; i < threads.length; i++) {
+                threads[i].start();
+            }
+        }
+
+        final void generateSectorGroups(Sector[][] sectors) {
+            final int sectorsPerThread = (sectors.length * sectors[0].length) / threads.length;
+            final Position index = new Position();
+
+            ArrayList<Sector> group = new ArrayList<Sector>();
+            int currentThread = 0;
+            while (index.x < sectors.length) {
+                while (index.y < sectors[index.x].length) {
+                    group.add(sectors[index.x][index.y]);
+                    if (group.size() == sectorsPerThread) {
+                        threads[currentThread].setSectors((Sector[]) group.toArray());
+                        group.clear();
+                        currentThread++;
+                    }
+                    index.y++;
+                }
+                index.x++;
+            }
+        }
+
+        /**
+         * Used to help concurrently update the Cameras.
+         * @return the next Camera to be updated
+         * @throws ArrayIndexOutOfBoundsException
+         */
+        private final synchronized Camera nextCamera() throws ArrayIndexOutOfBoundsException {
+            try {
+                return cameras.get(currentCamera++);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                return null;
+            }
+        }
+    }
 
     private class Pause extends Task {
 
@@ -121,10 +346,10 @@ public abstract class Zone extends ZoneObject {
 
         @Override
         protected void run() {
-            Camera observer = updateSchema.nextCamera();
-            while (observer != null) {
-                observer.internalUpdate();
-                observer = updateSchema.nextCamera();
+            Camera camera = updateSchema.nextCamera();
+            while (camera != null) {
+                camera.internalUpdate();
+                camera = updateSchema.nextCamera();
             }
             setMoveOn();
         }

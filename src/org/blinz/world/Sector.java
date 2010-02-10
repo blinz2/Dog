@@ -56,8 +56,11 @@ final class Sector extends ZoneObject {
         findNeighbors();
     }
 
+    /**
+     * Updates the sprites in this Sector.
+     */
     final void update() {
-        for (int i = getNextUpdatingSpriteIndex(); i < updatingSprites.size(); i = getNextUpdatingSpriteIndex()) {
+        for (int i = 0; i < updatingSprites.size(); i++) {
             updatingSprites.get(i).update();
         }
     }
