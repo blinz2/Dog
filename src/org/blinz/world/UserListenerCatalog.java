@@ -75,6 +75,7 @@ class UserListenerCatalog extends SynchronizedTask {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).keyPressed(e);
             }
+            System.out.println("UserListenerCatalog.keyPressed");
         }
 
         public void keyReleased(KeyEvent e) {

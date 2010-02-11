@@ -33,7 +33,7 @@ final class SpriteList {
      * @return the sprite at the given location
      */
     final BaseSprite get(int i) {
-            return sprites.get(i);
+        return sprites.get(i);
     }
 
     /**
@@ -53,8 +53,12 @@ final class SpriteList {
      * @return the sprite removed
      */
     final BaseSprite remove(int i) {
-        synchronized (sprites) {
-            return sprites.set(i, sprites.remove(sprites.size() - 1));
+        if (sprites.size() > 0) {
+            synchronized (sprites) {
+                return sprites.set(i, sprites.remove(sprites.size() - 1));
+            }
+        } else {
+            return null;
         }
     }
 

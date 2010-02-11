@@ -30,10 +30,6 @@ import org.blinz.input.MouseWheelEvent;
 import org.blinz.util.Size;
 import org.blinz.util.Bounds;
 import org.blinz.util.Position;
-import org.blinz.util.concurrency.Barrier;
-import org.blinz.util.concurrency.SynchronizedTask;
-import org.blinz.util.concurrency.Task;
-import org.blinz.util.concurrency.TaskExecuter;
 
 /**
  * Represents a realm for sprites to be processed and interact.
@@ -56,14 +52,17 @@ public abstract class Zone extends ZoneObject {
             private final int ZONE_UPDATE = 1;
 
             final void enter() {
-                switch (stage()) {
-                    case MANAGE_TIME:
-                        cycleStartTime = System.currentTimeMillis();
-                        getData().zoneTime = (System.currentTimeMillis() - initTime) - pauseTime;
-                        break;
-                    case ZONE_UPDATE:
-                        update();
-                        break;
+                while (stage < 2) {
+                    switch (stage()) {
+                        case MANAGE_TIME:
+                            cycleStartTime = System.currentTimeMillis();
+                            getData().zoneTime = (System.currentTimeMillis() - initTime) - pauseTime;
+                            break;
+                        case ZONE_UPDATE:
+                            getData().zoneCycles++;
+                            update();
+                            break;
+                    }
                 }
             }
 
@@ -94,102 +93,106 @@ public abstract class Zone extends ZoneObject {
 
             @Override
             public void run() {
-
-                //pause if Zone is paused
-                if (getData().paused()) {
-                    try {
-                        Thread.sleep(250);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-
-                syncTM.enter();
-
-                //cyclic barrier
-                try {
-                    barriers[0].await();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (BrokenBarrierException ex) {
-                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                syncTM.reset();
-
-                //update Sectors
-                for (int i = 0; i < sectors.length; i++) {
-                    sectors[i].update();
-                }
-
-                //cyclic barrier
-                try {
-                    barriers[1].await();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (BrokenBarrierException ex) {
-                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                //post update Sectors
-                for (int i = 0; i < sectors.length; i++) {
-                    sectors[i].postUpdate();
-                }
-
-                //cyclic barrier
-                try {
-                    barriers[2].await();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (BrokenBarrierException ex) {
-                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                //delete those sprites that have been marked for deletion
-                {
-                    for (BaseSprite s = getData().spritesToDelete.remove(0);
-                            s != null; s = getData().spritesToDelete.remove(0)) {
-                        deleteSprite(s);
-                    }
-                }
-
-                //cyclic barrier
-                try {
-                    barriers[3].await();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (BrokenBarrierException ex) {
-                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                //Update Cameras
-                Camera camera = nextCamera();
-                while (camera != null) {
-                    camera.internalUpdate();
-                    camera = updateSchema.nextCamera();
-                }
-
-                //sleep
-                {
-                    long sleepTime = (cycleStartTime + cycleIntervalTime) - System.currentTimeMillis();
-                    if (sleepTime > 0) {
+                while (isRunning) {
+                    System.out.println("Iteration of Zone loop. Cycle: " + cycles());
+                    //pause if Zone is paused
+                    if (getData().paused()) {
                         try {
-                            Thread.sleep(sleepTime);
+                            Thread.sleep(250);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                }
 
-                //cyclic barrier
-                try {
-                    barriers[4].await();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (BrokenBarrierException ex) {
-                    Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                    syncTM.enter();
+
+                    //cyclic barrier
+                    try {
+                        barriers[0].await();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (BrokenBarrierException ex) {
+                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    syncTM.reset();
+
+                    //update Sectors
+                    if (sectors != null) {
+                        for (int i = 0; i < sectors.length; i++) {
+                            sectors[i].update();
+                        }
+                    }
+
+                    //cyclic barrier
+                    try {
+                        barriers[1].await();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (BrokenBarrierException ex) {
+                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    //post update Sectors
+                    if (sectors != null) {
+                        for (int i = 0; i < sectors.length; i++) {
+                            sectors[i].postUpdate();
+                        }
+                    }
+
+                    //cyclic barrier
+                    try {
+                        barriers[2].await();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (BrokenBarrierException ex) {
+                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    //delete those sprites that have been marked for deletion
+                    {
+                        for (BaseSprite s = getData().spritesToDelete.remove(0);
+                                s != null; s = getData().spritesToDelete.remove(0)) {
+                            deleteSprite(s);
+                        }
+                    }
+
+                    //cyclic barrier
+                    try {
+                        barriers[3].await();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (BrokenBarrierException ex) {
+                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    //Update Cameras
+                    for (Camera camera = nextCamera(); camera != null; camera = nextCamera()) {
+                        camera.internalUpdate();
+                    }
+
+                    //sleep
+                    {
+                        long sleepTime = (cycleStartTime + cycleIntervalTime) - System.currentTimeMillis();
+                        if (sleepTime > 0) {
+                            try {
+                                Thread.sleep(sleepTime);
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+
+                    //cyclic barrier
+                    try {
+                        barriers[4].await();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (BrokenBarrierException ex) {
+                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    currentCamera = 0;
                 }
-                currentCamera = 0;
             }
 
             /**
@@ -223,6 +226,9 @@ public abstract class Zone extends ZoneObject {
             }
         }
 
+        /**
+         * Starts the thread(s) in this ZoneProcesser an thereby starts this Zone.
+         */
         final void start() {
             for (int i = 0; i < threads.length; i++) {
                 threads[i].start();
@@ -263,122 +269,11 @@ public abstract class Zone extends ZoneObject {
         }
     }
 
-    private class Pause extends Task {
-
-        @Override
-        protected void run() {
-            if (getData().paused()) {
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } else {
-                setMoveOn();
-            }
-        }
-    }
-
-    private class ManageTime extends SynchronizedTask {
-
-        @Override
-        protected void run() {
-            cycleStartTime = System.currentTimeMillis();
-            getData().zoneTime = (System.currentTimeMillis() - initTime) - pauseTime;
-        }
-    }
-
-    private class UpdateSectors extends Task {
-
-        @Override
-        protected void run() {
-            //Update sectors.
-            Sector s = updateSchema.getNextSector();
-            s.update();
-            int x = s.getXIndex();
-            for (int y = s.getYIndex(); y < getData().sectors[0].length; y++) {
-                while (x < getData().sectors.length) {
-                    getData().sectors[x++][y].update();
-                }
-                x = 0;
-            }
-            setMoveOn();
-        }
-    }
-
-    private class PostUpdate extends Task {
-
-        @Override
-        protected void run() {
-            //Post-update all the sectors.
-            Sector next = updateSchema.getNextPostUpdateSector();
-            while (next != null) {
-                next.postUpdate();
-                next = updateSchema.getNextPostUpdateSector();
-            }
-            setMoveOn();
-        }
-    }
-
-    private class DeleteSprites extends Task {
-
-        @Override
-        protected void run() {
-            //Post-update all the sectors.
-            int i = updateSchema.spriteToDelete();
-            while (i < getData().spritesToDelete.size()) {
-                deleteSprite(getData().spritesToDelete.get(idIndex));
-            }
-            setMoveOn();
-        }
-    }
-
-    private class UpdateZone extends SynchronizedTask {
-
-        @Override
-        protected void run() {
-            getData().zoneCycles++;
-            update();
-        }
-    }
-
-    private class UpdateObservers extends Task {
-
-        @Override
-        protected void run() {
-            Camera camera = updateSchema.nextCamera();
-            while (camera != null) {
-                camera.internalUpdate();
-                camera = updateSchema.nextCamera();
-            }
-            setMoveOn();
-        }
-    }
-
-    private class Reset extends SynchronizedTask {
-
-        @Override
-        protected void run() {
-            updateSchema.reset();
-        }
-    }
-
-    private class Sleep extends Task {
-
-        @Override
-        protected void run() {
-            long sleepTime = (cycleStartTime + cycleIntervalTime) - System.currentTimeMillis();
-            if (sleepTime > 0) {
-                try {
-                    Thread.sleep(sleepTime);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-
     private class ListTrimmer extends Thread {
+
+        public ListTrimmer() {
+            setDaemon(true);
+        }
 
         @Override
         public void run() {
@@ -395,7 +290,6 @@ public abstract class Zone extends ZoneObject {
     }
     private Size size;
     private final Vector<Camera> cameras = new Vector<Camera>();
-    private ZoneUpdateSchema updateSchema;
     private String name = "Zone";
     private long initTime;
     private long pauseTime = 0;
@@ -406,7 +300,7 @@ public abstract class Zone extends ZoneObject {
     private long cycleStartTime;
     private Thread listTrimmer = new ListTrimmer();
     private boolean isRunning = false;
-    private TaskExecuter zoneProcessor;
+    private ZoneProcessor zoneProcessor;
     private static final Vector<Byte> recycledIDs = new Vector<Byte>();
     private static byte idIndex = 0;
 
@@ -420,7 +314,6 @@ public abstract class Zone extends ZoneObject {
         setZoneData(zoneID, new ZoneData());
         getData().init(zoneID);
         size = getData().zoneSize;
-        updateSchema = new TrivialSectorUpdateSchema(getData().sectors, zoneProcessor, cameras);
     }
 
     /**
@@ -508,25 +401,13 @@ public abstract class Zone extends ZoneObject {
     public final synchronized void start(String name, int threads) {
         if (!isRunning) {
             getData().setName(name);
-            zoneProcessor = new TaskExecuter(name, threads);
-            zoneProcessor.addTask(getData().userListeners);
-            zoneProcessor.addTask(new Pause());
-            zoneProcessor.addTask(new Barrier());
-            zoneProcessor.addTask(new ManageTime());
-            zoneProcessor.addTask(new UpdateSectors());
-            zoneProcessor.addTask(new Barrier());
-            zoneProcessor.addTask(new PostUpdate());
-            zoneProcessor.addTask(new DeleteSprites());
-            zoneProcessor.addTask(new Barrier());
-            zoneProcessor.addTask(new UpdateZone());
-            zoneProcessor.addTask(new UpdateObservers());
-            zoneProcessor.addTask(new Sleep());
-            zoneProcessor.addTask(new Barrier());
-            zoneProcessor.addTask(new Reset());
             initTime = System.currentTimeMillis();
+            isRunning = true;
             init();
-            zoneProcessor.start();
+            zoneProcessor = new ZoneProcessor(name, threads);
+            zoneProcessor.generateSectorGroups(getData().sectors);
             listTrimmer.start();
+            zoneProcessor.start();
         }
     }
 
@@ -535,8 +416,6 @@ public abstract class Zone extends ZoneObject {
      */
     public final void stop() {
         isRunning = false;
-        zoneProcessor.stop();
-        zoneProcessor = null;
     }
 
     /**
@@ -825,16 +704,8 @@ public abstract class Zone extends ZoneObject {
             }
 
         }
-
-        if ((zoneProcessor.getThreadCount() == 1)
-                || (sectors.length == 1 && sectors[0].length == 1)) {
-            if (!(updateSchema instanceof TrivialSectorUpdateSchema)) {
-                updateSchema = new TrivialSectorUpdateSchema(sectors, zoneProcessor, cameras);
-            } else {
-                updateSchema.updateSectors(sectors);
-            }
-        } else {
-            updateSchema = new LargeSectorUpdateSchema(sectors, zoneProcessor, cameras);
+        if (zoneProcessor != null) {
+            zoneProcessor.generateSectorGroups(sectors);
         }
     }
 }

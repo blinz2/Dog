@@ -16,7 +16,6 @@
  */
 package org.blinz.world;
 
-import java.util.Vector;
 import org.blinz.util.Size;
 import org.blinz.util.User;
 
@@ -31,7 +30,7 @@ class ZoneData {
     final Size sectorSize = new Size(2048, 2048);
     Sector[][] sectors = new Sector[1][1];
     final Size zoneSize = new Size();
-    final Vector<BaseSprite> spritesToDelete = new Vector<BaseSprite>();
+    final SpriteList spritesToDelete = new SpriteList();
     long zoneTime = 0;
     long zoneCycles = 0;
     byte id;
