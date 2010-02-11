@@ -80,4 +80,11 @@ final class SpriteList {
     final int size() {
         return sprites.size();
     }
+
+    /**
+     * Moves the elements of this list to an array just big enough for them all.
+     */
+    final void trimToSize() {
+        sprites.trimToSize();
+    }
 }
