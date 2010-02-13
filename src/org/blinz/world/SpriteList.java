@@ -23,9 +23,9 @@ import java.util.ArrayList;
  * than a bare generic List would.
  * @author Blinz
  */
-final class SpriteList <E> {
+final class SpriteList<E> {
 
-    private final ArrayList<E> sprites = new ArrayList<E>();
+    private final ArrayList<E> elements = new ArrayList<E>();
 
     /**
      *
@@ -33,16 +33,16 @@ final class SpriteList <E> {
      * @return the sprite at the given location
      */
     final E get(int i) {
-        return sprites.get(i);
+        return elements.get(i);
     }
 
     /**
      * Adds the given sprite to this SpriteList.
-     * @param sprite added to this SpriteList
+     * @param element added to this SpriteList
      */
-    final void add(E sprite) {
-        synchronized (sprites) {
-            sprites.add(sprite);
+    final void add(E element) {
+        synchronized (elements) {
+            elements.add(element);
         }
     }
 
@@ -53,9 +53,11 @@ final class SpriteList <E> {
      * @return the sprite removed
      */
     final E remove(int i) {
-        if (sprites.size() > 0) {
-            synchronized (sprites) {
-                return sprites.set(i, sprites.remove(sprites.size() - 1));
+        if (elements.size() > i) {
+            synchronized (elements) {
+                final E e = elements.set(i, elements.get(i));
+                elements.remove(elements.size() - 1);
+                return e;
             }
         } else {
             return null;
@@ -64,12 +66,12 @@ final class SpriteList <E> {
 
     /**
      * Removes the given sprite from the list if present.
-     * @param sprite is removed from the list if present.
+     * @param element is removed from the list if present.
      */
-    final boolean remove(E sprite) {
-        synchronized (sprites) {
-            for (int i = 0; i < sprites.size(); i++) {
-                if (sprites.get(i) == sprite) {
+    final boolean remove(final E element) {
+        synchronized (elements) {
+            for (int i = 0; i < elements.size(); i++) {
+                if (elements.get(i) == element) {
                     remove(i);
                     return true;
                 }
@@ -83,13 +85,13 @@ final class SpriteList <E> {
      * @return the number of elements in this list.
      */
     final int size() {
-        return sprites.size();
+        return elements.size();
     }
 
     /**
      * Moves the elements of this list to an array just big enough for them all.
      */
     final void trimToSize() {
-        sprites.trimToSize();
+        elements.trimToSize();
     }
 }
