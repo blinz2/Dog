@@ -17,7 +17,6 @@
 package org.blinz.world;
 
 import org.blinz.util.Bounds;
-import java.util.ArrayList;
 import java.util.Vector;
 
 /**
@@ -29,7 +28,7 @@ final class Sector extends ZoneObject {
     Sector topNeighbor, bottomNeighbor, rightNeighbor, leftNeighbor;
     private final UnorderedList<UpdatingSprite> updatingSprites = new UnorderedList<UpdatingSprite>();
     private final Vector<UpdatingSprite> updatingSpritesToAdd = new Vector<UpdatingSprite>();
-    private final ArrayList<UpdatingSprite> updatingSpritesToRemove = new ArrayList<UpdatingSprite>();
+    private final Vector<UpdatingSprite> updatingSpritesToRemove = new Vector<UpdatingSprite>();
     /**
      * Sprites that intersect this Sector can be seen by observers viewing this
      * Sector from above.

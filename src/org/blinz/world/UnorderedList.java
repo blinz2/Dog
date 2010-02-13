@@ -19,8 +19,8 @@ package org.blinz.world;
 import java.util.ArrayList;
 
 /**
- * A sprite list with special optimizations for handling sprites more efficiently
- * than a bare generic List would.
+ * An unordered list with special optimizations for handling unordered items more
+ * efficiently than a bare generic List would.
  * @author Blinz
  */
 final class UnorderedList<E> {
