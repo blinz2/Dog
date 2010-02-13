@@ -35,8 +35,8 @@ final class Sector extends ZoneObject {
      */
     private final UnorderedList<BaseSprite> intersectingSprites = new UnorderedList<BaseSprite>();
     private final Vector<Camera> cameras = new Vector<Camera>();
+    private final Vector<Camera> camerasToAdd = new Vector<Camera>(), camerasToRemove = new Vector<Camera>();
     private final Bounds bounds = new Bounds();
-
 
     /**
      * Sector constructer.
@@ -65,8 +65,8 @@ final class Sector extends ZoneObject {
      * Takes care of modifications made during the update.
      */
     final void postUpdate() {
-        removeOldUpdatingSprites();
-        addNewUpdatingSprites();
+        manageUpdatingSprites();
+        manageCameras();
     }
 
     /**
@@ -122,10 +122,7 @@ final class Sector extends ZoneObject {
      * @param sprite
      */
     final void addCamera(Camera camera) {
-        cameras.add(camera);
-        for (int i = 0; i < intersectingSprites.size(); i++) {
-            camera.addSprite(intersectingSprites.get(i));
-        }
+        camerasToAdd.add(camera);
     }
 
     /**
@@ -133,10 +130,7 @@ final class Sector extends ZoneObject {
      * @param camera
      */
     final void removeCamera(Camera camera) {
-        cameras.remove(camera);
-        for (int i = 0; i < intersectingSprites.size(); i++) {
-            camera.decrementSpriteUsage(intersectingSprites.get(i));
-        }
+        camerasToRemove.add(camera);
     }
 
     /**
@@ -265,20 +259,36 @@ final class Sector extends ZoneObject {
     }
 
     /**
-     * Adds sprites on the spritesToAdd list.
+     * Manages sprites on the updating sprites list.
      */
-    private final void addNewUpdatingSprites() {
+    private final void manageUpdatingSprites() {
+        for (int i = updatingSpritesToRemove.size() - 1; i > -1; i--) {
+            updatingSprites.remove(updatingSpritesToRemove.remove(i));
+        }
         for (int i = updatingSpritesToAdd.size() - 1; i > -1; i--) {
             updatingSprites.add(updatingSpritesToAdd.remove(i));
         }
     }
 
     /**
-     * Removes sprites on the spritesToRemove list.
+     * Manages cameras on the Cameras list.
      */
-    private final void removeOldUpdatingSprites() {
-        for (int i = updatingSpritesToRemove.size() - 1; i > -1; i--) {
-            updatingSprites.remove(updatingSpritesToRemove.remove(i));
+    private final void manageCameras() {
+        //remove old Cameras
+        for (int i = camerasToRemove.size() - 1; i > -1; i--) {
+            Camera camera = camerasToRemove.remove(i);
+            cameras.remove(camera);
+            for (int n = 0; n < intersectingSprites.size(); n++) {
+                camera.decrementSpriteUsage(intersectingSprites.get(n));
+            }
+        }
+        //add new Cameras
+        for (int i = camerasToAdd.size() - 1; i > -1; i--) {
+            Camera camera = camerasToAdd.remove(i);
+            cameras.add(camera);
+            for (int n = 0; n < intersectingSprites.size(); n++) {
+                camera.addSprite(intersectingSprites.get(n));
+            }
         }
     }
 }
