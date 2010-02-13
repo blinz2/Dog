@@ -23,16 +23,16 @@ import java.util.ArrayList;
  * than a bare generic List would.
  * @author Blinz
  */
-final class SpriteList {
+final class SpriteList <E> {
 
-    private final ArrayList<BaseSprite> sprites = new ArrayList<BaseSprite>();
+    private final ArrayList<E> sprites = new ArrayList<E>();
 
     /**
      *
      * @param i the index of the sprite to be retrieved
      * @return the sprite at the given location
      */
-    final BaseSprite get(int i) {
+    final E get(int i) {
         return sprites.get(i);
     }
 
@@ -40,7 +40,7 @@ final class SpriteList {
      * Adds the given sprite to this SpriteList.
      * @param sprite added to this SpriteList
      */
-    final void add(BaseSprite sprite) {
+    final void add(E sprite) {
         synchronized (sprites) {
             sprites.add(sprite);
         }
@@ -52,7 +52,7 @@ final class SpriteList {
      * @param i the index of the sprite to be removed
      * @return the sprite removed
      */
-    final BaseSprite remove(int i) {
+    final E remove(int i) {
         if (sprites.size() > 0) {
             synchronized (sprites) {
                 return sprites.set(i, sprites.remove(sprites.size() - 1));
@@ -66,15 +66,16 @@ final class SpriteList {
      * Removes the given sprite from the list if present.
      * @param sprite is removed from the list if present.
      */
-    final void remove(BaseSprite sprite) {
+    final boolean remove(E sprite) {
         synchronized (sprites) {
             for (int i = 0; i < sprites.size(); i++) {
                 if (sprites.get(i) == sprite) {
                     remove(i);
-                    break;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     /**

@@ -34,7 +34,7 @@ final class Sector extends ZoneObject {
      * Sprites that intersect this Sector can be seen by observers viewing this
      * Sector from above.
      */
-    private final Vector<BaseSprite> intersectingSprites = new Vector<BaseSprite>();
+    private final SpriteList<BaseSprite> intersectingSprites = new SpriteList<BaseSprite>();
     private final Vector<Camera> observers = new Vector<Camera>();
     private final Bounds bounds = new Bounds();
     /**
@@ -126,9 +126,11 @@ final class Sector extends ZoneObject {
      * Adds given Camera to this Sector to recieve current and incoming sprites.
      * @param sprite
      */
-    final void addCamera(Camera observer) {
-        observers.add(observer);
-        observer.addSprites(intersectingSprites);
+    final void addCamera(Camera camera) {
+        observers.add(camera);
+        for (int i = 0; i < intersectingSprites.size(); i++) {
+            camera.addSprite(intersectingSprites.get(i));
+        }
     }
 
     /**
@@ -137,8 +139,8 @@ final class Sector extends ZoneObject {
      */
     final void removeCamera(Camera observer) {
         observers.remove(observer);
-        for (BaseSprite s : intersectingSprites) {
-            observer.decrementSpriteUsage(s);
+        for (int i = 0; i < intersectingSprites.size(); i++) {
+            observer.decrementSpriteUsage(intersectingSprites.get(i));
         }
     }
 

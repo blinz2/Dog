@@ -30,7 +30,7 @@ class ZoneData {
     final Size sectorSize = new Size(2048, 2048);
     Sector[][] sectors = new Sector[1][1];
     final Size zoneSize = new Size();
-    final SpriteList spritesToDelete = new SpriteList();
+    final SpriteList<BaseSprite> spritesToDelete = new SpriteList<BaseSprite>();
     long zoneTime = 0;
     long zoneCycles = 0;
     byte id;
