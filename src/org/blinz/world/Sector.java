@@ -37,10 +37,7 @@ final class Sector extends ZoneObject {
     private final SpriteList<BaseSprite> intersectingSprites = new SpriteList<BaseSprite>();
     private final Vector<Camera> cameras = new Vector<Camera>();
     private final Bounds bounds = new Bounds();
-    /**
-     * The index of the next sprite to update.
-     */
-    private int nextSprite = 0;
+
 
     /**
      * Sector constructer.
@@ -71,7 +68,6 @@ final class Sector extends ZoneObject {
     final void postUpdate() {
         removeOldUpdatingSprites();
         addNewUpdatingSprites();
-        nextSprite = 0;
     }
 
     /**
@@ -135,12 +131,12 @@ final class Sector extends ZoneObject {
 
     /**
      * Removes the given Camera from this Sector.
-     * @param observer
+     * @param camera
      */
-    final void removeCamera(Camera observer) {
-        cameras.remove(observer);
+    final void removeCamera(Camera camera) {
+        cameras.remove(camera);
         for (int i = 0; i < intersectingSprites.size(); i++) {
-            observer.decrementSpriteUsage(intersectingSprites.get(i));
+            camera.decrementSpriteUsage(intersectingSprites.get(i));
         }
     }
 
@@ -170,8 +166,8 @@ final class Sector extends ZoneObject {
      */
     final void addIntersectingSprite(BaseSprite sprite) {
         intersectingSprites.add(sprite);
-        for (Camera observer : cameras) {
-            observer.addSprite(sprite);
+        for (Camera camera : cameras) {
+            camera.addSprite(sprite);
         }
     }
 
@@ -285,9 +281,5 @@ final class Sector extends ZoneObject {
         for (int i = updatingSpritesToRemove.size() - 1; i > -1; i--) {
             updatingSprites.remove(updatingSpritesToRemove.remove(i));
         }
-    }
-
-    private final synchronized int getNextUpdatingSpriteIndex() {
-        return nextSprite++;
     }
 }
