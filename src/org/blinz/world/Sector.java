@@ -27,7 +27,7 @@ import java.util.Vector;
 final class Sector extends ZoneObject {
 
     Sector topNeighbor, bottomNeighbor, rightNeighbor, leftNeighbor;
-    private final Vector<UpdatingSprite> updatingSprites = new Vector<UpdatingSprite>();
+    private final SpriteList<UpdatingSprite> updatingSprites = new SpriteList<UpdatingSprite>();
     private final Vector<UpdatingSprite> updatingSpritesToAdd = new Vector<UpdatingSprite>();
     private final ArrayList<UpdatingSprite> updatingSpritesToRemove = new ArrayList<UpdatingSprite>();
     /**
