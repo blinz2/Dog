@@ -50,9 +50,10 @@ public abstract class Zone extends ZoneObject {
             private int stage;
             private final int MANAGE_TIME = 0;
             private final int ZONE_UPDATE = 1;
+            private final int USER_LISTENER_UPDATE = 2;
 
             final void enter() {
-                while (stage < 2) {
+                while (stage < 3) {
                     switch (stage()) {
                         case MANAGE_TIME:
                             cycleStartTime = System.currentTimeMillis();
@@ -61,6 +62,9 @@ public abstract class Zone extends ZoneObject {
                         case ZONE_UPDATE:
                             getData().zoneCycles++;
                             update();
+                            break;
+                        case USER_LISTENER_UPDATE:
+                            getData().userListeners.update();
                             break;
                     }
                 }
@@ -94,7 +98,6 @@ public abstract class Zone extends ZoneObject {
             @Override
             public void run() {
                 while (isRunning) {
-                    System.out.println("Iteration of Zone loop. Cycle: " + cycles());
                     //pause if Zone is paused
                     if (getData().paused()) {
                         try {
@@ -224,6 +227,8 @@ public abstract class Zone extends ZoneObject {
             for (int i = 0; i < barriers.length; i++) {
                 barriers[i] = new CyclicBarrier(threadCount);
             }
+
+            generateSectorGroups(getData().sectors);
         }
 
         /**
@@ -241,17 +246,32 @@ public abstract class Zone extends ZoneObject {
 
             ArrayList<Sector> group = new ArrayList<Sector>();
             int currentThread = 0;
+            System.out.println("generateSectorGroups");
             while (index.x < sectors.length) {
                 while (index.y < sectors[index.x].length) {
                     group.add(sectors[index.x][index.y]);
+                    System.out.println(group.size() + " vs " + sectorsPerThread);
                     if (group.size() == sectorsPerThread) {
-                        threads[currentThread].setSectors((Sector[]) group.toArray());
+                        Sector[] s = new Sector[group.size()];
+                        for (int i = 0; i < group.size(); i++) {
+                            s[i] = group.get(i);
+                        }
+                        threads[currentThread].setSectors(s);
                         group.clear();
                         currentThread++;
                     }
                     index.y++;
                 }
                 index.x++;
+            }
+            if (group.size() > 0) {
+                ZoneThread t = currentThread < threads.length - 1
+                        ? threads[currentThread + 1] : threads[currentThread];
+                Sector[] s = new Sector[group.size()];
+                for (int i = 0; i < group.size(); i++) {
+                    s[i] = group.get(i);
+                }
+                t.setSectors(s);
             }
         }
 

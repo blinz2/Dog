@@ -24,13 +24,12 @@ import org.blinz.input.KeyEvent;
 import org.blinz.input.MouseEvent;
 import org.blinz.input.MouseWheelEvent;
 import org.blinz.util.User;
-import org.blinz.util.concurrency.SynchronizedTask;
 
 /**
  * Contains lists sprites listening for input from specific Users.
  * @author Blinz
  */
-class UserListenerCatalog extends SynchronizedTask {
+class UserListenerCatalog {
 
     /**
      * Contains a list of sprites that listen to the input of a certain User.
@@ -75,7 +74,6 @@ class UserListenerCatalog extends SynchronizedTask {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).keyPressed(e);
             }
-            System.out.println("UserListenerCatalog.keyPressed");
         }
 
         public void keyReleased(KeyEvent e) {
@@ -159,8 +157,7 @@ class UserListenerCatalog extends SynchronizedTask {
     private final Vector<Pair> toRemove = new Vector<Pair>();
     private final Vector<Pair> toAdd = new Vector<Pair>();
 
-    @Override
-    protected void run() {
+    protected void update() {
         //remove old pairs
         Pair current = null;
         while ((current = nextToRemove()) != null) {
