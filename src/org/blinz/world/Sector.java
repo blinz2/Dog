@@ -35,7 +35,7 @@ final class Sector extends ZoneObject {
      * Sector from above.
      */
     private final SpriteList<BaseSprite> intersectingSprites = new SpriteList<BaseSprite>();
-    private final Vector<Camera> observers = new Vector<Camera>();
+    private final Vector<Camera> cameras = new Vector<Camera>();
     private final Bounds bounds = new Bounds();
     /**
      * The index of the next sprite to update.
@@ -127,7 +127,7 @@ final class Sector extends ZoneObject {
      * @param sprite
      */
     final void addCamera(Camera camera) {
-        observers.add(camera);
+        cameras.add(camera);
         for (int i = 0; i < intersectingSprites.size(); i++) {
             camera.addSprite(intersectingSprites.get(i));
         }
@@ -138,7 +138,7 @@ final class Sector extends ZoneObject {
      * @param observer
      */
     final void removeCamera(Camera observer) {
-        observers.remove(observer);
+        cameras.remove(observer);
         for (int i = 0; i < intersectingSprites.size(); i++) {
             observer.decrementSpriteUsage(intersectingSprites.get(i));
         }
@@ -170,7 +170,7 @@ final class Sector extends ZoneObject {
      */
     final void addIntersectingSprite(BaseSprite sprite) {
         intersectingSprites.add(sprite);
-        for (Camera observer : observers) {
+        for (Camera observer : cameras) {
             observer.addSprite(sprite);
         }
     }
@@ -181,8 +181,8 @@ final class Sector extends ZoneObject {
      */
     final void removeIntersectingSprite(BaseSprite sprite) {
         intersectingSprites.remove(sprite);
-        for (Camera observer : observers) {
-            observer.decrementSpriteUsage(sprite);
+        for (Camera camera : cameras) {
+            camera.decrementSpriteUsage(sprite);
         }
     }
 
@@ -266,7 +266,7 @@ final class Sector extends ZoneObject {
         updatingSpritesToAdd.trimToSize();
         updatingSpritesToRemove.trimToSize();
         intersectingSprites.trimToSize();
-        observers.trimToSize();
+        cameras.trimToSize();
     }
 
     /**
