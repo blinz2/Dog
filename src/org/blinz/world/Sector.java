@@ -27,14 +27,14 @@ import java.util.Vector;
 final class Sector extends ZoneObject {
 
     Sector topNeighbor, bottomNeighbor, rightNeighbor, leftNeighbor;
-    private final SpriteList<UpdatingSprite> updatingSprites = new SpriteList<UpdatingSprite>();
+    private final UnorderedList<UpdatingSprite> updatingSprites = new UnorderedList<UpdatingSprite>();
     private final Vector<UpdatingSprite> updatingSpritesToAdd = new Vector<UpdatingSprite>();
     private final ArrayList<UpdatingSprite> updatingSpritesToRemove = new ArrayList<UpdatingSprite>();
     /**
      * Sprites that intersect this Sector can be seen by observers viewing this
      * Sector from above.
      */
-    private final SpriteList<BaseSprite> intersectingSprites = new SpriteList<BaseSprite>();
+    private final UnorderedList<BaseSprite> intersectingSprites = new UnorderedList<BaseSprite>();
     private final Vector<Camera> cameras = new Vector<Camera>();
     private final Bounds bounds = new Bounds();
 

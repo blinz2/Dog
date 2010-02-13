@@ -23,7 +23,7 @@ import java.util.ArrayList;
  * than a bare generic List would.
  * @author Blinz
  */
-final class SpriteList<E> {
+final class UnorderedList<E> {
 
     private final ArrayList<E> elements = new ArrayList<E>();
 
