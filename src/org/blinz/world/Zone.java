@@ -246,11 +246,9 @@ public abstract class Zone extends ZoneObject {
 
             ArrayList<Sector> group = new ArrayList<Sector>();
             int currentThread = 0;
-            System.out.println("generateSectorGroups");
             while (index.x < sectors.length) {
                 while (index.y < sectors[index.x].length) {
                     group.add(sectors[index.x][index.y]);
-                    System.out.println(group.size() + " vs " + sectorsPerThread);
                     if (group.size() == sectorsPerThread) {
                         Sector[] s = new Sector[group.size()];
                         for (int i = 0; i < group.size(); i++) {
