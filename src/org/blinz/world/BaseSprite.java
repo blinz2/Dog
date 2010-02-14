@@ -532,21 +532,6 @@ public abstract class BaseSprite extends ZoneObject {
     }
 
     /**
-     * Sends the given data over the network to any clients that might be
-     * Monitering this sprite.
-     * @param data
-     */
-    protected final void sendMessage(String data) {
-    }
-
-    /**
-     * Recieves data being streamed over the network.
-     * @param data
-     */
-    protected void recieveMessage(String data) {
-    }
-
-    /**
      * A stub method for listening to clicks. Implement as needed.
      * @param event contains data about the input
      */

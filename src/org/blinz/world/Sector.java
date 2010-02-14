@@ -1,6 +1,6 @@
 /*
  *  BlinzEngine - A library for large 2D world simultions and games.
- *  Copyright (C) 2009  Blinz <gtalent2@gmail.com>
+ *  Copyright (C) 2009 - 2010  Blinz <gtalent2@gmail.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 3 as
@@ -37,7 +37,7 @@ final class Sector extends ZoneObject {
     private final Vector<Camera> cameras = new Vector<Camera>();
     private final Vector<Camera> camerasToAdd = new Vector<Camera>(), camerasToRemove = new Vector<Camera>();
     private final Bounds bounds = new Bounds();
-
+    
     /**
      * Sector constructer.
      * @param x x coordinate of this Sectoer
