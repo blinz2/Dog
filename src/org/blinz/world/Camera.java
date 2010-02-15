@@ -248,14 +248,6 @@ public class Camera extends ZoneObject {
     }
 
     /**
-     * Sets the focus sprite to the given BaseSprite, that is the sprite that
-     * the Camera will follow.
-     * @param sprite
-     */
-    public final void setFocusSprite(BaseSprite sprite) {
-    }
-
-    /**
      * Draws this Camera. A single given Camera should only be drawn by one
      * thread at a time, and thus by only one Screen.
      * @param graphics
