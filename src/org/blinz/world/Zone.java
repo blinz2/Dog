@@ -244,7 +244,7 @@ public abstract class Zone extends ZoneObject {
             final int sectorsPerThread = (sectors.length * sectors[0].length) / threads.length;
             final Position index = new Position();
 
-            ArrayList<Sector> group = new ArrayList<Sector>();
+            final ArrayList<Sector> group = new ArrayList<Sector>();
             int currentThread = 0;
             while (index.x < sectors.length) {
                 while (index.y < sectors[index.x].length) {
@@ -260,6 +260,7 @@ public abstract class Zone extends ZoneObject {
                     }
                     index.y++;
                 }
+                index.y = 0;
                 index.x++;
             }
             if (group.size() > 0) {
