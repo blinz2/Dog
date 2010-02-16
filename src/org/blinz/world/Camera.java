@@ -589,35 +589,6 @@ public class Camera extends ZoneObject {
     }
 
     /**
-     * Finds the sprite currently on screen, gathers them, orders them by layer
-     * and sets it to the current scene.
-     */
-    final void generateCurrentScene() {
-        final Scene upcoming = getScene();
-        upcoming.manageContainers();
-
-        upcoming.translation.setPosition(getX(), getY());
-
-        Bounds b = new Bounds();
-        b.setPosition(upcoming.translation);
-        b.setSize(upcoming.size);
-        Enumeration<CameraSprite> spriteList = sprites.elements();
-        while (spriteList.hasMoreElements()) {
-            CameraSprite s = spriteList.nextElement();
-            if (b.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight())) {
-                upcoming.add(s);
-            }
-        }
-
-        upcoming.sortLayers();
-
-        b = null;
-
-        upcoming.unLock();
-        scene = upcoming;
-    }
-
-    /**
      * Adds the sprites on this list to the specified Sector's representation in
      * this Camera.
      * @param sprites
@@ -660,7 +631,7 @@ public class Camera extends ZoneObject {
     /**
      * Updates the Camera.
      */
-    void internalUpdate() {
+    final void internalUpdate() {
         removeStaleSprites();
         update();
         generateCurrentScene();
@@ -678,6 +649,35 @@ public class Camera extends ZoneObject {
      * as needed.
      */
     protected void initCamera() {
+    }
+
+    /**
+     * Finds the sprite currently on screen, gathers them, orders them by layer
+     * and sets it to the current scene.
+     */
+    private final void generateCurrentScene() {
+        final Scene upcoming = getScene();
+        upcoming.manageContainers();
+
+        upcoming.translation.setPosition(getX(), getY());
+
+        Bounds b = new Bounds();
+        b.setPosition(upcoming.translation);
+        b.setSize(upcoming.size);
+        Enumeration<CameraSprite> spriteList = sprites.elements();
+        while (spriteList.hasMoreElements()) {
+            CameraSprite s = spriteList.nextElement();
+            if (b.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight())) {
+                upcoming.add(s);
+            }
+        }
+
+        upcoming.sortLayers();
+
+        b = null;
+
+        upcoming.unLock();
+        scene = upcoming;
     }
 
     /**
