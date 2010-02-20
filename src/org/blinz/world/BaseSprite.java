@@ -532,6 +532,15 @@ public abstract class BaseSprite extends ZoneObject {
     }
 
     /**
+     *
+     * @return the amount of time the Zone has been executing, not including the
+     * time before it started executing for time it was paused.
+     */
+    protected final long zoneTime() {
+        return getData().zoneTime;
+    }
+
+    /**
      * A stub method for listening to clicks. Implement as needed.
      * @param event contains data about the input
      */
@@ -587,7 +596,7 @@ public abstract class BaseSprite extends ZoneObject {
     protected void addSpriteToZone(BaseSprite sprite) {
         getData().addSprite(sprite);
     }
-    
+
     /**
      *
      * @return the name assigned to this class as a String

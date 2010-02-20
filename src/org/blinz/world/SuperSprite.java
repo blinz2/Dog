@@ -24,8 +24,13 @@ import java.util.ArrayList;
  */
 public abstract class SuperSprite extends Sprite {
 
-   private final ArrayList<BaseSprite> subSprites = new ArrayList<BaseSprite>();
+    private final ArrayList<BaseSprite> subSprites = new ArrayList<BaseSprite>();
 
+    /**
+     * Marks the Sprite for removal from its Zone. After removal from its Zone
+     * it will be unmarked for removal. If no other reference to it exists it
+     * will be deleted by the garbage colletor.
+     */
     @Override
     public void delete() {
         super.delete();
@@ -41,7 +46,7 @@ public abstract class SuperSprite extends Sprite {
      * and calls its initialization method.
      * @param sprite
      */
-    protected void addSubSprite(BaseSprite sprite) {
+    protected final void addSubSprite(BaseSprite sprite) {
         getData().addSprite(sprite);
         subSprites.add(sprite);
     }
@@ -50,7 +55,7 @@ public abstract class SuperSprite extends Sprite {
      * Removes the given sprite from this SuperSprite and the Zone.
      * @param sprite
      */
-    protected void removeSubSprite(BaseSprite sprite) {
+    protected final void removeSubSprite(BaseSprite sprite) {
         subSprites.remove(sprite);
         sprite.delete();
     }

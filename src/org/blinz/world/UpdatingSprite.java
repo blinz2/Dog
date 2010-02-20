@@ -17,7 +17,8 @@
 package org.blinz.world;
 
 /**
- *
+ * An interface to be implemented by sprites that need to be constantly updated
+ * every cycle.
  * @author Blinz
  */
 public interface UpdatingSprite {

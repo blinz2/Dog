@@ -109,35 +109,27 @@ public abstract class Sprite extends BaseSprite {
         return new Bounds(x, y, width, height);
     }
 
-    public void moveDown(int distance) {
+    public final void moveDown(int distance) {
         setY(y + distance);
     }
 
-    public void moveUp(int distance) {
+    public final void moveUp(int distance) {
         setY(y - distance);
     }
 
-    public void moveRight(int distance) {
+    public final void moveRight(int distance) {
         setX(x + distance);
     }
 
-    public void moveLeft(int distance) {
+    public final void moveLeft(int distance) {
         setX(x - distance);
     }
 
     //END OF PUBLIC METHODS/////////////////////////////////////////////////////
     //PROTECTED METHODS---------------------------------------------------------
-    /**
-     *
-     * @return the amount of time the Zone has been executing, not including the
-     * time before it started executing for time it was paused.
-     */
-    protected long zoneTime() {
-        return getData().zoneTime;
-    }
 
     @Override
-    protected void updateWidth(int width) {
+    protected final void updateWidth(int width) {
         if (width < 1) {
             width = 1;
         }
@@ -146,7 +138,7 @@ public abstract class Sprite extends BaseSprite {
     }
 
     @Override
-    protected void updateHeight(int height) {
+    protected final void updateHeight(int height) {
         if (height < 1) {
             height = 1;
         }
@@ -155,17 +147,17 @@ public abstract class Sprite extends BaseSprite {
     }
 
     @Override
-    protected void updateX(int x) {
+    protected final void updateX(int x) {
         this.x = x;
     }
 
     @Override
-    protected void updateY(int y) {
+    protected final void updateY(int y) {
         this.y = y;
     }
 
     @Override
-    protected void updateLayer(float layer) {
+    protected final void updateLayer(float layer) {
         this.layer = layer;
     }
 }
