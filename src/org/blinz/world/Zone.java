@@ -466,7 +466,7 @@ public abstract class Zone extends ZoneObject {
                 ((BaseSprite)sprite).getY() + ((BaseSprite)sprite).getHeight());
         tl.checkCollisions(sprite);
         if (sprite instanceof UpdatingSprite) {
-            tl.deleteUpdatingSprite((UpdatingSprite) sprite);
+            tl.checkCollisions(sprite);
         }
         if (tl != br) {
             br.checkCollisions(sprite);
