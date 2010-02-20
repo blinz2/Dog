@@ -22,5 +22,5 @@ package org.blinz.world;
  */
 public interface CollidibleSprite {
 
-    void collide(CollidibleSprite sprite);
+    void collide(BaseSprite sprite);
 }
