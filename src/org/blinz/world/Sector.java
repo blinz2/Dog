@@ -34,10 +34,11 @@ final class Sector extends ZoneObject {
      * Sector from above.
      */
     private final UnorderedList<BaseSprite> intersectingSprites = new UnorderedList<BaseSprite>();
+    private final UnorderedList<CollidibleSprite> collidibleSprites = new UnorderedList<CollidibleSprite>();
     private final Vector<Camera> cameras = new Vector<Camera>();
     private final Vector<Camera> camerasToAdd = new Vector<Camera>(), camerasToRemove = new Vector<Camera>();
     private final Bounds bounds = new Bounds();
-    
+
     /**
      * Sector constructer.
      * @param x x coordinate of this Sectoer
@@ -159,6 +160,11 @@ final class Sector extends ZoneObject {
      */
     final void addIntersectingSprite(BaseSprite sprite) {
         intersectingSprites.add(sprite);
+        if (sprite instanceof CollidibleSprite) {
+            synchronized (collidibleSprites) {
+                collidibleSprites.add((CollidibleSprite) sprite);
+            }
+        }
         for (Camera camera : cameras) {
             camera.addSprite(sprite);
         }
@@ -170,8 +176,28 @@ final class Sector extends ZoneObject {
      */
     final void removeIntersectingSprite(BaseSprite sprite) {
         intersectingSprites.remove(sprite);
+        if (sprite instanceof CollidibleSprite) {
+            synchronized (collidibleSprites) {
+                collidibleSprites.add((CollidibleSprite) sprite);
+            }
+        }
         for (Camera camera : cameras) {
             camera.decrementSpriteUsage(sprite);
+        }
+    }
+
+    final void checkCollisions(CollidibleSprite sprite) {
+        synchronized (collidibleSprites) {
+            for (int i = 0; i < collidibleSprites.size(); i++) {
+                BaseSprite s1 = (BaseSprite) sprite, s2 = (BaseSprite) collidibleSprites.get(i);
+                if (Bounds.intersects(s1.getX(), s1.getY(), s1.getWidth(), s1.getHeight(),
+                        s2.getX(), s2.getY(), s2.getWidth(), s2.getHeight())) {
+                    if (s1 != s2) {
+                        ((CollidibleSprite)s1).collide(collidibleSprites.get(i));
+                        ((CollidibleSprite)s2).collide(sprite);
+                    }
+                }
+            }
         }
     }
 
