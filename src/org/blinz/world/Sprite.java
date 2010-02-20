@@ -168,46 +168,4 @@ public abstract class Sprite extends BaseSprite {
     protected void updateLayer(float layer) {
         this.layer = layer;
     }
-
-    //END OF PROTECTED METHODS//////////////////////////////////////////////////
-//DEFAULT ACCESS METHODS////////////////////////////////////////////////////
-    void detectCollision(Sprite sprite) {
-        boolean wasHit = false;
-        if (this instanceof CollidableSprite && sprite instanceof CollidableSprite) {
-            CollidableSprite me = (CollidableSprite) this, him = (CollidableSprite) sprite;
-            if (me.frontBumper().intersects(him.backBumper())) {
-                me.topBumperCollisionReaction(sprite);
-                him.bottumBumperCollisionReaction(this);
-                wasHit = true;
-            }
-
-            if (me.backBumper().intersects(him.frontBumper())) {
-                me.bottumBumperCollisionReaction(sprite);
-                him.topBumperCollisionReaction(this);
-                wasHit = true;
-            }
-
-            if (me.leftBumper().intersects(him.rightBumper())) {
-                me.leftBumperCollisionReaction(sprite);
-                him.rightBumperCollisionReaction(this);
-                wasHit = true;
-            }
-
-            if (me.rightBumper().intersects(him.leftBumper())) {
-                me.rightBumperCollisionReaction(sprite);
-                him.leftBumperCollisionReaction(this);
-                wasHit = true;
-            }
-
-            if (wasHit) {
-                me.collisionReaction(sprite);
-                him.collisionReaction(this);
-            }
-
-        }
-    }
-    //END OF DEFAULT ACCESS METHODS/////////////////////////////////////////////
-    //PRIVATE METHODS-----------------------------------------------------------
-    //END OF PRIVATE METHODS////////////////////////////////////////////////////
-    //ABSTRACT METHODS----------------------------------------------------------
 }
