@@ -249,10 +249,8 @@ public abstract class BaseSprite extends ZoneObject {
      */
     public final void setX(int x) {
         //Method excessively large because of frequency of call and need for efficiency
-        if (getData() == null) {
-            return;
-        }
-        ZoneData zoneData = getData();
+        final ZoneData zoneData = getData();
+        
         //ensure the new location is within bounds
         if (x < 0) {
             x = 0;
@@ -378,11 +376,7 @@ public abstract class BaseSprite extends ZoneObject {
      */
     public final void setY(int y) {
         //Method excessively large because of frequency of call and need for efficiency
-        if (getData() == null) {
-            return;
-        }
-
-        ZoneData zoneData = getData();
+        final ZoneData zoneData = getData();
 
         //ensure the new location is within bounds
         if (y < 0) {

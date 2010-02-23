@@ -34,7 +34,7 @@ abstract class ZoneObject {
     }
     byte zoneID = 0;
 
-    protected final SharedZoneData getMyZoneData() {
+    protected final Object getMyZoneData() {
         return getData().data;
     }
 

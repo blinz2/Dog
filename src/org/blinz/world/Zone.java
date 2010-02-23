@@ -533,7 +533,7 @@ public abstract class Zone extends ZoneObject {
      * does not have to be assigned to each sprite to reduce memory consumption.
      * @param sharedData
      */
-    protected final void setSharedZoneData(SharedZoneData sharedData) {
+    protected final void setSharedZoneData(Object sharedData) {
         getData().data = sharedData;
     }
 

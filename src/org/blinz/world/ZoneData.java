@@ -26,7 +26,7 @@ import org.blinz.util.User;
  */
 class ZoneData {
 
-    SharedZoneData data;
+    Object data;
     final Size sectorSize = new Size(2048, 2048);
     Sector[][] sectors = new Sector[1][1];
     final Size zoneSize = new Size();
