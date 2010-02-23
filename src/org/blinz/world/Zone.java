@@ -28,7 +28,6 @@ import org.blinz.input.KeyEvent;
 import org.blinz.input.MouseEvent;
 import org.blinz.input.MouseWheelEvent;
 import org.blinz.util.Size;
-import org.blinz.util.Bounds;
 import org.blinz.util.Position;
 
 /**
