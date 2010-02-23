@@ -33,8 +33,8 @@ class ZoneData {
     final UnorderedList<BaseSprite> spritesToDelete = new UnorderedList<BaseSprite>();
     long zoneTime = 0;
     long zoneCycles = 0;
-    byte id;
     final UserListenerCatalog userListeners = new UserListenerCatalog();
+    private byte id;
     private String zoneName;
     private boolean paused = false;
 
