@@ -22,24 +22,17 @@ package org.blinz.world;
  */
 abstract class ZoneObject {
 
-    private static final class DataHolder {
+    private static ZoneData[] dataList = new ZoneData[128];
 
-        static ZoneData[] dataList = new ZoneData[128];
-
-        DataHolder() {
-            dataList[0] = new ZoneData();
-            dataList[0].zoneSize.setSize(dataList[0].sectorWidth(), dataList[0].sectorHeight());
-            dataList[0].init((byte) 0);
-        }
+    static {
+        dataList[0] = new ZoneData();
+        dataList[0].zoneSize.setSize(dataList[0].sectorWidth(), dataList[0].sectorHeight());
+        dataList[0].init((byte) 0);
     }
     byte zoneID = 0;
 
     protected final Object getMyZoneData() {
         return getData().data;
-    }
-
-    final void setZoneData(int zoneID, ZoneData zoneData) {
-        DataHolder.dataList[zoneID] = zoneData;
     }
 
     /**
@@ -51,7 +44,11 @@ abstract class ZoneObject {
      * @return ZoneData
      */
     final ZoneData getData() {
-        return DataHolder.dataList[zoneID];
+        return dataList[zoneID];
+    }
+
+    final static void setZoneData(int zoneID, ZoneData zoneData) {
+        dataList[zoneID] = zoneData;
     }
 
     abstract void init();
