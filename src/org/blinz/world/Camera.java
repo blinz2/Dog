@@ -42,7 +42,6 @@ public class Camera extends ZoneObject {
     /**
      * Determines whether or not this Camera represents a local user. True by default.
      */
-    private boolean local = true;
     private final Bounds bounds = new Bounds();
     private final Hashtable<BaseSprite, CameraSprite> sprites =
             new Hashtable<BaseSprite, CameraSprite>();
@@ -68,17 +67,7 @@ public class Camera extends ZoneObject {
      * @param user
      */
     public Camera(User user) {
-        this(user, true);
-    }
-
-    /**
-     * Creates a new Camera.
-     * @param user User associated with this Camera.
-     * @param local Indicates whether or not this Camera represents a local user, true by default
-     */
-    Camera(User user, boolean local) {
         this.user = user;
-        this.local = local;
     }
 
     /**
