@@ -20,6 +20,6 @@ package org.blinz.world;
  *
  * @author Blinz
  */
-public class SharedZoneData {
+public interface SharedZoneData {
 
 }
