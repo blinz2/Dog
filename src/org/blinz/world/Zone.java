@@ -627,21 +627,6 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     * Places Sectors intersecting with the given Bounds into the given ArrayList.
-     * @param bounds
-     * @param sectors
-     */
-    final void getIntersectingSectors(Bounds bounds, ArrayList<Sector> sectors) {
-        for (int i = 0; i < getData().sectors.length; i++) {
-            for (int n = 0; n < getData().sectors[i].length; n++) {
-                if (getData().sectors[i][n].intersects(bounds)) {
-                    sectors.add(getData().sectors[i][n]);
-                }
-            }
-        }
-    }
-
-    /**
      * Trims excessively large lists.
      */
     final void trimLists() {
