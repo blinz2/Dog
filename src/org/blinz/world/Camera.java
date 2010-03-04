@@ -47,7 +47,6 @@ public class Camera extends ZoneObject {
             new Hashtable<BaseSprite, CameraSprite>();
     private final Vector<CameraSprite> selectableSprites = new Vector<CameraSprite>();
     private final Vector<BaseSprite> spritesToRemove = new Vector<BaseSprite>();
-    private Sector sector1, sector2;
     private Zone zone;
     private User user;
     private Scene scene = new Scene();
@@ -118,7 +117,7 @@ public class Camera extends ZoneObject {
      * @return the x location of this Camera
      */
     public final int getX() {
-        return bounds.getX();
+        return bounds.x;
     }
 
     /**
@@ -126,7 +125,7 @@ public class Camera extends ZoneObject {
      * @return the y location of this Camera
      */
     public final int getY() {
-        return bounds.getY();
+        return bounds.y;
     }
 
     /**
@@ -134,7 +133,7 @@ public class Camera extends ZoneObject {
      * @return the width of this Camera
      */
     public final int getWidth() {
-        return bounds.getWidth();
+        return bounds.width;
     }
 
     /**
@@ -142,32 +141,76 @@ public class Camera extends ZoneObject {
      * @return the height of this Camera
      */
     public final int getHeight() {
-        return bounds.getHeight();
+        return bounds.height;
     }
 
-    public final void setSize(int width, int height) {
+    public final void setSize(final int width, final int height) {
+        setWidth(width);
+        setHeight(height);
+    }
+
+    /**
+     * Sets the width of this Camera to that given.
+     * @param width
+     */
+    public final void setWidth(final int width) {
         if (zone != null) {
-            updateSize(width, height);
+            if (getData().getSectorOfSafe(bounds.x2(), bounds.y)
+                    != getData().getSectorOfSafe(bounds.x + width, bounds.y)) {
+                if (width > bounds.width) {
+                    //Growing
+                    joinSectors(bounds.x2() + getData().sectorWidth, bounds.y, bounds.x + width, bounds.y2());
+                } else {
+                    //Shrinking
+                    leaveSectors(bounds.x + width + getData().sectorWidth, bounds.y, bounds.x2(), bounds.y2());
+                }
+            }
         }
-        bounds.setSize(width, height);
+        bounds.width = width;
+    }
+
+    /**
+     * Sets the height of this Camera to that given.
+     * @param height
+     */
+    public final void setHeight(final int height) {
+        if (zone != null) {
+            if (getData().getSectorOfSafe(bounds.x, bounds.y2())
+                    != getData().getSectorOfSafe(bounds.x, bounds.y + height)) {
+                if (height > bounds.height) {
+                    //Growing
+                    joinSectors(bounds.x, bounds.y + getData().sectorHeight, bounds.x2(), bounds.y + height);
+                } else {
+                    //Shrinking
+                    leaveSectors(bounds.x, bounds.y + height + getData().sectorHeight, bounds.x2(), bounds.y2());
+                }
+            }
+        }
+        bounds.height = height;
     }
 
     /**
      * Sets the x coordinate of this Camera to the given value.
      * @param x
      */
-    public final void setX(int x) {
-        updateX(x);
-        bounds.setX(x);
+    public final void setX(final int x) {
+        if (x < bounds.x) {
+            moveLeft(bounds.x - x);
+        } else {
+            moveRight(x - bounds.x);
+        }
     }
 
     /**
      * Sets the y coordinate of this Camera to the given value.
      * @param y
      */
-    public final void setY(int y) {
-        updateY(y);
-        bounds.setX(y);
+    public final void setY(final int y) {
+        if (y < bounds.y) {
+            moveUp(bounds.y - y);
+        } else {
+            moveDown(y - bounds.y);
+        }
     }
 
     /**
@@ -175,65 +218,128 @@ public class Camera extends ZoneObject {
      * @param x
      * @param y
      */
-    public final void setPosition(int x, int y) {
-        updatePosition(x, y);
-        bounds.setPosition(x, y);
+    public final void setPosition(final int x, final int y) {
+        setX(x);
+        setY(y);
     }
 
     /**
      * Moves this Camera up the specified distance.
      * @param distance
      */
-    public final void moveUp(int distance) {
+    public final void moveUp(final int distance) {
         if (distance < 0) {
+            moveDown(-distance);
             return;
         }
-        int newY = bounds.getY() - distance;
-        updateY(newY);
 
-        bounds.setY(newY);
+        final int newY = bounds.y - distance;
+
+        if (zone != null) {
+            //Leave old Sectors
+            if (sector2() != getData().getSectorOfSafe(bounds.x + bounds.width, bounds.height + newY)) {
+                final int y1 = newY + bounds.height < bounds.y ? bounds.y : newY + getData().sectorHeight();
+                leaveSectors(bounds.x, y1, bounds.x + bounds.width, bounds.y + bounds.height);
+            }
+
+            //Join new Sectors
+            if (sector1() != getData().getSectorOfSafe(bounds.x, newY)) {
+                final int y2 = newY + bounds.height < bounds.y ? bounds.y - getData().sectorHeight()
+                        : newY + bounds.height;
+                joinSectors(bounds.x, newY, bounds.x + bounds.width, y2);
+            }
+        }
+        bounds.y = newY;
     }
 
     /**
      * Moves this Camera down the specified distance.
      * @param distance
      */
-    public final void moveDown(int distance) {
-        if (distance > zone.getHeight()) {
+    public final void moveDown(final int distance) {
+        if (distance < 0) {
+            moveUp(-distance);
             return;
         }
-        int newY = bounds.getY() - distance;
-        updateY(newY);
 
-        bounds.setY(newY);
+        final int newY = bounds.y + distance;
+
+        if (zone != null) {
+            //Join new Sectors
+            if (sector2() != getData().getSectorOfSafe(bounds.x + bounds.width, bounds.height + newY)) {
+                final int y1 = newY > bounds.y + bounds.height ? newY : bounds.y + getData().sectorHeight();
+                joinSectors(bounds.x, y1, bounds.x + bounds.width, bounds.y + bounds.height);
+            }
+
+            //Leave old Sectors
+            if (sector1() != getData().getSectorOfSafe(bounds.x, newY)) {
+                final int y2 = newY < bounds.y + bounds.height ? newY - getData().sectorHeight()
+                        : bounds.y + bounds.height;
+                leaveSectors(bounds.x, newY, bounds.x + bounds.width, y2);
+            }
+        }
+
+        bounds.y = newY;
     }
 
     /**
      * Moves this Camera right the specified distance.
      * @param distance
      */
-    public final void moveRight(int distance) {
-        if (distance > zone.getWidth()) {
+    public final void moveRight(final int distance) {
+        if (distance < 0) {
+            moveLeft(-distance);
             return;
         }
-        int newX = bounds.getX() - distance;
-        updateX(newX);
 
-        bounds.setX(newX);
+        final int newX = bounds.x + distance;
+
+        if (zone != null) {
+            //Join new Sectors
+            if (sector2() != getData().getSectorOfSafe(bounds.width + newX, bounds.y + bounds.height)) {
+                final int x1 = newX > bounds.x + bounds.width ? newX : bounds.x + getData().sectorWidth();
+                joinSectors(x1, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height);
+            }
+
+            //Leave old Sectors
+            if (sector1() != getData().getSectorOfSafe(bounds.x, newX)) {
+                final int x2 = newX < bounds.x + bounds.width ? newX - getData().sectorWidth()
+                        : bounds.x + bounds.width;
+                leaveSectors(newX, bounds.y, x2, bounds.y + bounds.height);
+            }
+        }
+
+        bounds.x = newX;
     }
 
     /**
      * Moves this Camera left the specified distance.
      * @param distance
      */
-    public final void moveLeft(int distance) {
+    public final void moveLeft(final int distance) {
         if (distance < 0) {
+            moveRight(-distance);
             return;
         }
-        int newX = bounds.getX() - distance;
-        updateX(newX);
 
-        bounds.setX(newX);
+        final int newX = bounds.x - distance;
+
+        if (zone != null) {
+            //Leave old Sectors
+            if (sector2() != getData().getSectorOfSafe(newX + bounds.width, bounds.y + bounds.height)) {
+                final int x1 = newX + bounds.width < bounds.x ? bounds.x : newX + getData().sectorWidth();
+                leaveSectors(x1, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height);
+            }
+
+            //Join new Sectors
+            if (sector1() != getData().getSectorOfSafe(bounds.x, newX)) {
+                final int x2 = newX + bounds.width < bounds.x ? bounds.x - getData().sectorWidth()
+                        : newX + bounds.width;
+                joinSectors(newX, bounds.y, x2, bounds.y + bounds.height);
+            }
+        }
+
+        bounds.x = newX;
     }
 
     /**
@@ -241,7 +347,7 @@ public class Camera extends ZoneObject {
      * thread at a time, and thus by only one Screen.
      * @param graphics
      */
-    public synchronized final void draw(Graphics graphics) {
+    public synchronized final void draw(final Graphics graphics) {
         Scene s = scene;
         while (!s.lock()) {
             s = scene;
@@ -250,323 +356,8 @@ public class Camera extends ZoneObject {
         s.unLock();
     }
 
-    /**
-     * Informs the Zone of this BaseSprites new width. Use this or one of the other
-     * two size update methods prior manually editting the size of a BaseSprite.
-     * @param width
-     */
-    protected final void updateWidth(final int width) {
-        if (getData() == null) {
-            return;
-        }
-        if (((int) ((getX() + width) / getData().sectorSize.width))
-                == (((int) (getX() + getWidth()) / getData().sectorWidth()))) {
-            return;
-        }
-
-        if (width < getWidth()) {
-            final Sector goal = getData().getSectorOfSafe(getX() + width, getY() + getHeight());
-            this.sector2 = goal;
-            Sector s2 = sector2();
-            while (s2 != goal) {
-                s2.removeCamera(this);
-
-                Sector s = s2.topNeighbor;
-                Sector ts = getData().getSectorOf(s2.getX(), getY());
-
-                while (s != ts) {
-                    s.removeCamera(this);
-                    s = s.topNeighbor;
-                }
-
-                s2 = s2.leftNeighbor;
-            }
-        } else {
-            final Sector goal = getData().getSectorOfSafe(getX() + width, getY() + getHeight());
-            this.sector2 = goal;
-            Sector s2 = sector2();
-            while (s2 != goal) {
-                s2.addCamera(this);
-
-                Sector s = s2.topNeighbor;
-                Sector ts = getData().getSectorOf(s2.getX(), getY());
-
-                while (s != ts) {
-                    s.addCamera(this);
-                    s = s.topNeighbor;
-                }
-
-                s2 = s2.rightNeighbor;
-            }
-        }
-
-    }
-
-    /**
-     * Informs the Zone of this BaseSprites new height. Use this or one of the other
-     * two size update methods prior manually editting the size of a BaseSprite.
-     * @param height
-     */
-    protected final void updateHeight(final int height) {
-        if (getData() == null) {
-            return;
-        }
-        if (((int) ((getY() + height) / getData().sectorHeight()))
-                == (((int) (getY() + getHeight()) / getData().sectorHeight()))) {
-            return;
-        }
-
-        if (height < getHeight()) {
-            final Sector goal = getData().getSectorOfSafe(getX() + getWidth(), getY() + height);
-            this.sector2 = goal;
-            Sector s2 = sector2();
-            while (s2 != goal) {
-                s2.removeCamera(this);
-
-                Sector s = s2.rightNeighbor;
-                Sector ts = getData().getSectorOf(getX(), s2.getY());
-
-                while (s != ts) {
-                    s.removeCamera(this);
-                    s = s.rightNeighbor;
-                }
-
-                s2 = s2.leftNeighbor;
-            }
-        } else {
-            final Sector goal = getData().getSectorOfSafe(getX() + getWidth(), getY() + height);
-            this.sector2 = goal;
-            Sector s2 = sector2();
-            while (s2 != goal) {
-                s2.addCamera(this);
-
-                Sector s = s2.bottomNeighbor;
-                Sector ts = getData().getSectorOf(getX(), s2.getY());
-
-                while (s != ts) {
-                    s.addCamera(this);
-                    s = s.bottomNeighbor;
-                }
-
-                s2 = s2.rightNeighbor;
-            }
-        }
-
-    }
-
-    /**
-     * Informs the Zone of this BaseSprites new size. Use this or one of the other
-     * two size update methods prior manually editting the size of a BaseSprite.
-     * @param width
-     * @param height
-     */
-    protected final void updateSize(final int width, final int height) {
-        if (getData() == null) {
-            return;
-        }
-        if (sector2().contains(getX() + width, getY() + height)) {
-            return;
-        }
-
-        final int oldX2 = getX() + getWidth() >= getData().sectors.length ? getX() + getWidth() : getData().sectors.length - 1;
-        final int oldX2i = oldX2 / getData().sectorSize.width;
-        final int newX2 = getX() + width >= getData().sectors.length ? getX() + width : getData().sectors.length - 1;
-        final int newX2i = newX2 / getData().sectorSize.width;
-        final int oldY2 = getY() + getHeight() >= getData().sectors.length ? getY() + getHeight() : getData().sectors[0].length - 1;
-        final int oldY2i = oldY2 / getData().sectorSize.height;
-        final int newY2 = getY() + height >= getData().sectors.length ? getY() + height : getData().sectors[0].length - 1;
-        final int newY2i = newY2 / getData().sectorSize.height;
-
-        if (newX2i != oldX2i) {
-            updateWidth(width);
-        }
-        if (newY2i != oldY2i) {
-            updateHeight(height);
-        }
-    }
-
-    /**
-     * Informs the Zone that this sprite is moving. This or one of the other two
-     * coordinate modification methods should be called BEFORE manually editting
-     * the position of this BaseSprite.
-     *
-     * If you are using the position mutators of the Sprite class it will not be
-     * necessary to call this method.
-     *
-     * @param x the new x coordinate of this sprite
-     */
-    final void updateX(final int x) {
-        if (getData() == null) {
-            return;
-        }
-        if (sector1.contains(x, getY()) && sector2.contains(x + getWidth(), getY() + getHeight())) {
-            return;
-        }
-
-        sector1 = getData().getSectorOf(x, getY());
-        sector2 = getData().getSectorOf(x + getWidth(), getY());
-
-        int fx1, fx2;
-
-        if (x < getX()) {
-            fx1 = x / getData().sectorSize.width;
-            fx2 = (getX() + getWidth()) / getData().sectorSize.width;
-        } else {
-            fx1 = getX() / getData().sectorSize.width;
-            fx2 = (x + getWidth()) / getData().sectorSize.width;
-        }
-
-        int ox1 = getX() / getData().sectorSize.width;
-        int ox2 = (getX() + getWidth()) / getData().sectorSize.width;
-        int nx1 = x / getData().sectorSize.width;
-        int nx2 = (x + getWidth()) / getData().sectorSize.width;
-        int iy = getY() / getData().sectorSize.height;
-        int targetY = (getY() + getHeight()) / getData().sectorHeight();
-
-        for (int i = fx1; i <= fx2; i++) {
-            final boolean inOldRange = (ox1 <= i && ox2 > i);
-            final boolean inNewRange = (nx1 <= i && nx2 > i);
-            for (int n = iy; n < targetY; n++) {
-                if (inNewRange && !inOldRange) {
-                    getData().sectors[i][iy].addCamera(this);
-                } else if (inOldRange && !inNewRange) {
-                    getData().sectors[i][iy].removeCamera(this);
-                }
-            }
-        }
-
-    }
-
-    /**
-     * Informs the Zone that this sprite is moving. This or one of the other two
-     * coordinate modification methods should be called BEFORE manually editting
-     * the position of this BaseSprite.
-     *
-     * If you are using the position mutators of the Sprite class it will not be
-     * necessary to call this method.
-     *
-     * @param y the new y coordinate of this sprite
-     */
-    protected final void updateY(final int y) {
-        if (getData() == null) {
-            return;
-        }
-        if (sector1().contains(getX(), y) && sector2().contains(getX() + getWidth(), y + getHeight())) {
-            return;
-        }
-
-        sector1 = getData().getSectorOf(getX(), y);
-        sector2 = getData().getSectorOf(getX(), y + getHeight());
-
-        int fy1, fy2;
-
-        if (y < getX()) {
-            fy1 = y / getData().sectorSize.height;
-            fy2 = (getY() + getHeight()) / getData().sectorSize.height;
-        } else {
-            fy1 = getY() / getData().sectorSize.width;
-            fy2 = (y + getHeight()) / getData().sectorSize.width;
-        }
-
-        final int oy1 = getY() / getData().sectorSize.height;
-        final int oy2 = (getY() + getHeight()) / getData().sectorSize.height;
-        final int ny1 = y / getData().sectorSize.height;
-        final int ny2 = (y + getHeight()) / getData().sectorSize.height;
-        final int ix = getX() / getData().sectorSize.height;
-
-        for (int i = fy1; i <= fy2; i++) {
-            final boolean inOldRange = (oy1 <= i && oy2 > i);
-            final boolean inNewRange = (ny1 <= i && ny2 > i);
-
-            if (inNewRange && !inOldRange) {
-                getData().sectors[ix][i].addCamera(this);
-            } else if (inOldRange && !inNewRange) {
-                getData().sectors[ix][i].removeCamera(this);
-            }
-        }
-
-    }
-
-    /**
-     * Informs the Zone that this sprite is moving. This or one of the other two
-     * coordinate modification methods should be called BEFORE manually editting
-     * the position of this BaseSprite.
-     *
-     * If you are using the position mutators of the Sprite class it will not be
-     * necessary to call this method.
-     *
-     * @param x the new x coordinate of this sprite
-     * @param y the new y coordinate of this sprite
-     */
-    protected final void updatePosition(final int x, final int y) {
-        if (getData() == null) {
-            return;
-        }
-        if (sector1.contains(x, y) && sector2.contains(x + getWidth(), y + getHeight())) {
-            return;
-        }
-
-        sector1 = getData().getSectorOfSafe(x, y);
-        sector2 = getData().getSectorOfSafe(x + getHeight(), y + getHeight());
-
-        //get the full range of all relevent Sectors
-        int fx1, fy1, fx2, fy2;
-
-        if (x < getX()) {
-            fx1 = x / getData().sectorSize.width;
-            fx2 = (getX() + getWidth()) / getData().sectorSize.width;
-            if (fx2 >= getData().sectors.length) {
-                fx2 = getData().sectors.length - 1;
-            }
-        } else {
-            fx1 = getX() / getData().sectorSize.width;
-            fx2 = (x + getWidth()) / getData().sectorSize.width;
-            if (fx2 >= getData().sectors.length) {
-                fx2 = getData().sectors.length - 1;
-            }
-        }
-        if (y < getY()) {
-            fy1 = y / getData().sectorSize.height;
-            fy2 = (getY() + getHeight()) / getData().sectorSize.height;
-            if (fy2 >= getData().sectors[0].length) {
-                fy2 = getData().sectors[0].length - 1;
-            }
-        } else {
-            fy1 = getY() / getData().sectorSize.height;
-            fy2 = (y + getHeight()) / getData().sectorSize.height;
-            if (fy2 >= getData().sectors[0].length) {
-                fy2 = getData().sectors[0].length - 1;
-            }
-        }
-
-        int ox1 = getX() / getData().sectorSize.width;
-        int ox2 = (getX() + getWidth()) / getData().sectorSize.width;
-        int oy1 = getY() / getData().sectorSize.height;
-        int oy2 = (getY() + getHeight()) / getData().sectorSize.height;
-
-        int nx1 = x / getData().sectorSize.width;
-        int nx2 = (x + getWidth()) / getData().sectorSize.width;
-        int ny1 = y / getData().sectorSize.height;
-        int ny2 = (y + getHeight()) / getData().sectorSize.height;
-
-        for (int i = fx1; i <= fx2; i++) {
-            for (int n = fy1; n <= fy2; n++) {
-                final boolean inOldRange = (ox1 <= i && ox2 >= i && oy1 <= n && oy2 >= n);
-                final boolean inNewRange = (nx1 <= i && nx2 >= i && ny1 <= n && ny2 >= n);
-
-                if (inNewRange && !inOldRange) {
-                    getData().sectors[i][n].addCamera(this);
-                } else if (inOldRange && !inNewRange) {
-                    getData().sectors[i][n].removeCamera(this);
-                }
-            }
-        }
-    }
-
     @Override
     final void init() {
-        sector1 = sector1();
-        sector2 = sector2();
         for (int i = 0; i < getData().sectors.length; i++) {
             for (int n = 0; n < getData().sectors[i].length; n++) {
                 if (getData().sectors[i][n].intersects(bounds)) {
@@ -736,23 +527,7 @@ public class Camera extends ZoneObject {
      * @return Sector of the upper left hand corner of this Camera.
      */
     private final Sector sector1() {
-        int ix, iy;
-        if (bounds.getX() > zone.getWidth()) {
-            ix = getData().sectors.length - 1;
-        } else if (bounds.getX() < 0) {
-            ix = 0;
-        } else {
-            ix = getX() / getData().sectorSize.width;
-        }
-        if (bounds.getY() > zone.getHeight()) {
-            iy = getData().sectors[ix].length - 1;
-        } else if (bounds.getY() < 0) {
-            iy = 0;
-        } else {
-            iy = getY() / getData().sectorSize.height;
-        }
-
-        return getData().sectors[ix][iy];
+        return getData().getSectorOfSafe(bounds.x, bounds.y);
     }
 
     /**
@@ -760,23 +535,45 @@ public class Camera extends ZoneObject {
      * @return Sector of the lower right hand corner of this Camera.
      */
     private final Sector sector2() {
-        int ix, iy;
-        if (bounds.getX() + bounds.getWidth() > zone.getWidth()) {
-            ix = getData().sectors.length - 1;
-        } else if (bounds.getX() + bounds.getWidth() < 0) {
-            ix = 0;
-        } else {
-            ix = (getX() + getWidth()) / getData().sectorSize.width;
-        }
-        if (bounds.getY() + bounds.getHeight() > zone.getHeight()) {
-            iy = getData().sectors[ix].length - 1;
-        } else if (bounds.getY() + bounds.getHeight() < 0) {
-            iy = 0;
-        } else {
-            iy = (getY() + getHeight()) / getData().sectorSize.height;
-        }
+        return getData().getSectorOfSafe(bounds.x + bounds.width, bounds.y + bounds.height);
+    }
 
-        return getData().sectors[ix][iy];
+    /**
+     * Joins the Sectors of the given coordinates and all Sectors in between, inclusive.
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     */
+    private final void joinSectors(int x1, int y1, int x2, int y2) {
+        x1 /= getData().sectorWidth();
+        x2 /= getData().sectorWidth();
+        y1 /= getData().sectorHeight();
+        y2 /= getData().sectorHeight();
+        for (int x = x1; x <= x2; x++) {
+            for (int y = y1; y <= y2; y++) {
+                getData().sectors[x][y].removeCamera(this);
+            }
+        }
+    }
+
+    /**
+     * Joins the Sectors of the given coordinates and all Sectors in between, inclusive.
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     */
+    private final void leaveSectors(int x1, int y1, int x2, int y2) {
+        x1 /= getData().sectorWidth();
+        x2 /= getData().sectorWidth();
+        y1 /= getData().sectorHeight();
+        y2 /= getData().sectorHeight();
+        for (int x = x1; x <= x2; x++) {
+            for (int y = y1; y <= y2; y++) {
+                getData().sectors[x][y].removeCamera(this);
+            }
+        }
     }
 
     private class InputListener implements MouseListener, MouseWheelListener, KeyListener {

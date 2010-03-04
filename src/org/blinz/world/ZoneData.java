@@ -28,6 +28,7 @@ class ZoneData {
 
     Object data;
     final Size sectorSize = new Size(2048, 2048);
+    final short sectorWidth = 2048, sectorHeight = 2048;
     Sector[][] sectors = new Sector[1][1];
     final Size zoneSize = new Size();
     final UnorderedList<BaseSprite> spritesToDelete = new UnorderedList<BaseSprite>();
@@ -45,8 +46,8 @@ class ZoneData {
     final void init(final byte zoneID) {
         for (int i = 0; i < sectors.length; i++) {
             for (int n = 0; n < sectors[i].length; n++) {
-                sectors[i][n] = new Sector(i * sectorSize.width,
-                        n * sectorSize.height);
+                sectors[i][n] = new Sector(i * sectorWidth,
+                        n * sectorHeight);
                 sectors[i][n].zoneID = zoneID;
                 sectors[i][n].init();
             }
@@ -154,8 +155,8 @@ class ZoneData {
      * @param y
      * @return Sector of specified point
      */
-    final Sector getSectorOf(int x, int y) {
-        return sectors[x / sectorSize.width][y / sectorSize.height];
+    final Sector getSectorOf(final int x,final  int y) {
+        return sectors[x / sectorWidth][y / sectorSize.height];
     }
 
     /**
