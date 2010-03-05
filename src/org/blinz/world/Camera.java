@@ -267,14 +267,14 @@ public class Camera extends ZoneObject {
         if (zone != null) {
             //Join new Sectors
             if (sector2() != getData().getSectorOfSafe(bounds.x + bounds.width, bounds.height + newY)) {
-                final int y1 = newY > bounds.y + bounds.height ? newY : bounds.y + getData().sectorHeight();
-                joinSectors(bounds.x, y1, bounds.x + bounds.width, bounds.y + bounds.height);
+                final int y1 = newY > bounds.y2()
+                        ? newY : bounds.y + getData().sectorHeight();
+                joinSectors(bounds.x, y1, bounds.x2(), newY + bounds.height);
             }
 
             //Leave old Sectors
             if (sector1() != getData().getSectorOfSafe(bounds.x, newY)) {
-                final int y2 = newY < bounds.y + bounds.height ? newY - getData().sectorHeight()
-                        : bounds.y + bounds.height;
+                final int y2 = newY < bounds.y2() ? newY - getData().sectorHeight() : bounds.y2();
                 leaveSectors(bounds.x, newY, bounds.x + bounds.width, y2);
             }
         }
@@ -297,14 +297,14 @@ public class Camera extends ZoneObject {
         if (zone != null) {
             //Join new Sectors
             if (sector2() != getData().getSectorOfSafe(bounds.width + newX, bounds.y + bounds.height)) {
-                final int x1 = newX > bounds.x + bounds.width ? newX : bounds.x + getData().sectorWidth();
-                joinSectors(x1, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height);
+                final int x1 = newX > bounds.x2()
+                        ? newX : bounds.x + getData().sectorWidth();
+                joinSectors(x1, bounds.y, newX + bounds.width, bounds.y2());
             }
 
             //Leave old Sectors
             if (sector1() != getData().getSectorOfSafe(bounds.x, newX)) {
-                final int x2 = newX < bounds.x + bounds.width ? newX - getData().sectorWidth()
-                        : bounds.x + bounds.width;
+                final int x2 = newX < bounds.x2() ? newX - getData().sectorWidth() : bounds.x2();
                 leaveSectors(newX, bounds.y, x2, bounds.y + bounds.height);
             }
         }
@@ -328,14 +328,14 @@ public class Camera extends ZoneObject {
             //Leave old Sectors
             if (sector2() != getData().getSectorOfSafe(newX + bounds.width, bounds.y + bounds.height)) {
                 final int x1 = newX + bounds.width < bounds.x ? bounds.x : newX + getData().sectorWidth();
-                leaveSectors(x1, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height);
+                leaveSectors(x1, bounds.y, bounds.x2(), bounds.y2());
             }
 
             //Join new Sectors
             if (sector1() != getData().getSectorOfSafe(bounds.x, newX)) {
                 final int x2 = newX + bounds.width < bounds.x ? bounds.x - getData().sectorWidth()
                         : newX + bounds.width;
-                joinSectors(newX, bounds.y, x2, bounds.y + bounds.height);
+                joinSectors(newX, bounds.y, x2, bounds.y2());
             }
         }
 
@@ -384,13 +384,14 @@ public class Camera extends ZoneObject {
      * @param sprite
      */
     final void addSprite(BaseSprite sprite) {
-        if (sprites.containsKey(sprite)) {
-            sprites.get(sprite).incrementUseCount();
+        CameraSprite s = sprites.get(sprite);
+        if (s != null) {
+            s.incrementUseCount();
         } else {
-            CameraSprite zs = new CameraSprite(sprite);
-            sprites.put(sprite, zs);
+            s = new CameraSprite(sprite);
+            sprites.put(sprite, s);
             if (sprite instanceof SelectibleSprite) {
-                selectableSprites.add(zs);
+                selectableSprites.add(s);
                 sortByLayer(selectableSprites, 0, selectableSprites.size());
             }
         }
@@ -402,9 +403,11 @@ public class Camera extends ZoneObject {
      */
     final void decrementSpriteUsage(BaseSprite sprite) {
         CameraSprite w = sprites.get(sprite);
-        w.decrementUseCount();
-        if (w.getUsageCount() < 1) {
-            spritesToRemove.add(sprite);
+        if (w != null) {
+            w.decrementUseCount();
+            if (w.getUsageCount() < 1) {
+                spritesToRemove.add(sprite);
+            }
         }
     }
 
@@ -552,7 +555,7 @@ public class Camera extends ZoneObject {
         y2 /= getData().sectorHeight();
         for (int x = x1; x <= x2; x++) {
             for (int y = y1; y <= y2; y++) {
-                getData().sectors[x][y].removeCamera(this);
+                getData().sectors[x][y].addCamera(this);
             }
         }
     }
