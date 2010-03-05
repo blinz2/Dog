@@ -266,7 +266,7 @@ public class Camera extends ZoneObject {
 
         if (zone != null) {
             //Join new Sectors
-            if (sector2() != getData().getSectorOfSafe(bounds.x2(), bounds.height + newY)) {
+            if (sector2() != getData().getSectorOfSafe(bounds.x2(), newY + bounds.height)) {
                 final int y1 = newY > bounds.y2()
                         ? newY : bounds.y + getData().sectorHeight();
                 joinSectors(bounds.x, y1, bounds.x2(), newY + bounds.height);
@@ -296,14 +296,14 @@ public class Camera extends ZoneObject {
 
         if (zone != null) {
             //Join new Sectors
-            if (sector2() != getData().getSectorOfSafe(bounds.width + newX, bounds.y + bounds.height)) {
+            if (sector2() != getData().getSectorOfSafe(newX + bounds.width, bounds.y2())) {
                 final int x1 = newX > bounds.x2()
                         ? newX : bounds.x + getData().sectorWidth();
                 joinSectors(x1, bounds.y, newX + bounds.width, bounds.y2());
             }
 
             //Leave old Sectors
-            if (sector1() != getData().getSectorOfSafe(bounds.x, newX)) {
+            if (sector1() != getData().getSectorOfSafe(newX, bounds.y)) {
                 final int x2 = newX < bounds.x2() ? newX - getData().sectorWidth() : bounds.x2();
                 leaveSectors(newX, bounds.y, x2, bounds.y2());
             }
@@ -326,7 +326,7 @@ public class Camera extends ZoneObject {
 
         if (zone != null) {
             //Leave old Sectors
-            if (sector2() != getData().getSectorOfSafe(newX + bounds.width, bounds.y + bounds.height)) {
+            if (sector2() != getData().getSectorOfSafe(newX + bounds.width, bounds.y2())) {
                 final int x1 = newX + bounds.width < bounds.x ? bounds.x : newX + getData().sectorWidth();
                 leaveSectors(x1, bounds.y, bounds.x2(), bounds.y2());
             }
