@@ -23,6 +23,7 @@ import org.blinz.input.MouseEvent;
 import org.blinz.input.MouseWheelEvent;
 import org.blinz.util.Bounds;
 import org.blinz.util.Position;
+import org.blinz.util.Position3D;
 import org.blinz.util.Size;
 
 /**
@@ -36,8 +37,14 @@ public abstract class BaseSprite extends ZoneObject {
      * it will be unmarked for removal. If no other reference to it exists it
      * will be deleted by the garbage colletor.
      */
-    public void delete() {
+    public final void delete() {
         getData().spritesToDelete.add(this);
+    }
+
+    /**
+     * Stub method called when this sprite is deleted.
+     */
+    public void onDelete() {
     }
 
     /**
@@ -59,7 +66,7 @@ public abstract class BaseSprite extends ZoneObject {
     /**
      * @return a Position3D representing the position of this Sprite.
      */
-    public abstract Position getPosition();
+    public abstract Position3D getPosition();
 
     /**
      *
@@ -250,7 +257,7 @@ public abstract class BaseSprite extends ZoneObject {
     public final void setX(int x) {
         //Method excessively large because of frequency of call and need for efficiency
         final ZoneData zoneData = getData();
-        
+
         //ensure the new location is within bounds
         if (x < 0) {
             x = 0;

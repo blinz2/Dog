@@ -652,7 +652,7 @@ public abstract class Zone extends ZoneObject {
      * Deletes the given sprite from this Zone.
      * @param sprite
      */
-    private final void deleteSprite(BaseSprite sprite) {
+    private final void deleteSprite(final BaseSprite sprite) {
         Sector tl = getData().getSectorOf(sprite.getX(), sprite.getY());
         Sector br = getData().getSectorOf(sprite.getX() + sprite.getWidth(), sprite.getY() + sprite.getHeight());
         tl.deleteIntersectingSprite(sprite);
@@ -666,8 +666,8 @@ public abstract class Zone extends ZoneObject {
                 getData().getSectorOf(sprite.getX(), sprite.getY() + sprite.getHeight()).deleteIntersectingSprite(sprite);
                 tr.deleteIntersectingSprite(sprite);
             }
-
         }
+        sprite.onDelete();
     }
 
     /**

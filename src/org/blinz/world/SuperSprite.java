@@ -27,13 +27,11 @@ public abstract class SuperSprite extends Sprite {
     private final ArrayList<BaseSprite> subSprites = new ArrayList<BaseSprite>();
 
     /**
-     * Marks the Sprite for removal from its Zone. After removal from its Zone
-     * it will be unmarked for removal. If no other reference to it exists it
-     * will be deleted by the garbage colletor.
+     * Removes the sub-sprites from the Zone. If this method is overridden be
+     * sure its super is called.
      */
     @Override
-    public void delete() {
-        super.delete();
+    public void onDelete() {
         if (subSprites != null) {
             for (int i = 0; i < subSprites.size(); i++) {
                 subSprites.get(i).delete();
@@ -46,7 +44,7 @@ public abstract class SuperSprite extends Sprite {
      * and calls its initialization method.
      * @param sprite
      */
-    protected final void addSubSprite(BaseSprite sprite) {
+    protected final void addSubSprite(final BaseSprite sprite) {
         getData().addSprite(sprite);
         subSprites.add(sprite);
     }
@@ -55,7 +53,7 @@ public abstract class SuperSprite extends Sprite {
      * Removes the given sprite from this SuperSprite and the Zone.
      * @param sprite
      */
-    protected final void removeSubSprite(BaseSprite sprite) {
+    protected final void removeSubSprite(final BaseSprite sprite) {
         subSprites.remove(sprite);
         sprite.delete();
     }

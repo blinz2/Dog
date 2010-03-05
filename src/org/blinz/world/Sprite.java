@@ -17,7 +17,7 @@
 package org.blinz.world;
 
 import org.blinz.util.Bounds;
-import org.blinz.util.Position;
+import org.blinz.util.Position3D;
 import org.blinz.util.Size;
 
 /**
@@ -31,16 +31,6 @@ public abstract class Sprite extends BaseSprite {
     private short width = 1, height = 1;
 
     //PUBLIC METHODS------------------------------------------------------------
-    /**
-     * Marks the Sprite for removal from its Zone. After removal from its Zone
-     * it will be unmarked for removal. If no other reference to it exists it
-     * will be deleted by the garbage colletor.
-     */
-    @Override
-    public void delete() {
-        super.delete();
-    }
-
     /**
      *
      * @return Size object representing the Sprite's size.
@@ -73,8 +63,8 @@ public abstract class Sprite extends BaseSprite {
      * @return Location object representing the Sprite's location.
      */
     @Override
-    public Position getPosition() {
-        return new Position(x, y);
+    public Position3D getPosition() {
+        return new Position3D(x, y);
     }
 
     /**
