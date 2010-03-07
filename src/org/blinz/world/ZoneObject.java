@@ -31,6 +31,31 @@ abstract class ZoneObject {
     }
     byte zoneID = 0;
 
+    /**
+     * Runs the given CollidibleSprite against other CollidibleSprites to check
+     * for collisions.
+     * @param sprite
+     */
+    public final void checkCollisions(CollidibleSprite sprite) {
+        Sector tl = getData().getSectorOf(((BaseSprite) sprite).getX(), ((BaseSprite) sprite).getY());
+        Sector br = getData().getSectorOf(((BaseSprite) sprite).getX() + ((BaseSprite) sprite).getWidth(),
+                ((BaseSprite) sprite).getY() + ((BaseSprite) sprite).getHeight());
+        tl.checkCollisionsFor(sprite);
+        if (sprite instanceof UpdatingSprite) {
+            tl.checkCollisionsFor(sprite);
+        }
+        if (tl != br) {
+            br.checkCollisionsFor(sprite);
+            Sector tr = getData().getSectorOf(((BaseSprite) sprite).getX() + ((BaseSprite) sprite).getWidth(),
+                    ((BaseSprite) sprite).getY());
+            if (tr != br && tl != tr) {
+                getData().getSectorOf(((BaseSprite) sprite).getX(),
+                        ((BaseSprite) sprite).getY() + ((BaseSprite) sprite).getHeight()).checkCollisionsFor(sprite);
+                tr.checkCollisionsFor(sprite);
+            }
+        }
+    }
+
     protected final Object getMyZoneData() {
         return getData().data;
     }

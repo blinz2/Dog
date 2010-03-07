@@ -455,32 +455,6 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     * Runs the given CollidibleSprite against other CollidibleSprites to check
-     * for collisions.
-     * @param sprite
-     */
-    public final void checkCollisions(CollidibleSprite sprite) {
-        Sector tl = getData().getSectorOf(((BaseSprite)sprite).getX(), ((BaseSprite)sprite).getY());
-        Sector br = getData().getSectorOf(((BaseSprite)sprite).getX() + ((BaseSprite)sprite).getWidth(),
-                ((BaseSprite)sprite).getY() + ((BaseSprite)sprite).getHeight());
-        tl.checkCollisions(sprite);
-        if (sprite instanceof UpdatingSprite) {
-            tl.checkCollisions(sprite);
-        }
-        if (tl != br) {
-            br.checkCollisions(sprite);
-            Sector tr = getData().getSectorOf(((BaseSprite)sprite).getX() + ((BaseSprite)sprite).getWidth(),
-                    ((BaseSprite)sprite).getY());
-            if (tr != br && tl != tr) {
-                getData().getSectorOf(((BaseSprite)sprite).getX(),
-                        ((BaseSprite)sprite).getY() + ((BaseSprite)sprite).getHeight()).checkCollisions(sprite);
-                tr.checkCollisions(sprite);
-            }
-
-        }
-    }
-
-    /**
      * Sets the width of this Zone to the given value.
      * @param width
      */

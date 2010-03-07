@@ -186,7 +186,7 @@ final class Sector extends ZoneObject {
         }
     }
 
-    final void checkCollisions(CollidibleSprite sprite) {
+    final void checkCollisionsFor(CollidibleSprite sprite) {
         synchronized (collidibleSprites) {
             for (int i = 0; i < collidibleSprites.size(); i++) {
                 BaseSprite s1 = (BaseSprite) sprite, s2 = (BaseSprite) collidibleSprites.get(i);
