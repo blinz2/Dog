@@ -36,7 +36,7 @@ abstract class ZoneObject {
      * for collisions.
      * @param sprite
      */
-    public final void checkCollisions(CollidibleSprite sprite) {
+    public final void checkCollisions(final CollidibleSprite sprite) {
         Sector tl = getData().getSectorOf(((BaseSprite) sprite).getX(), ((BaseSprite) sprite).getY());
         Sector br = getData().getSectorOf(((BaseSprite) sprite).getX() + ((BaseSprite) sprite).getWidth(),
                 ((BaseSprite) sprite).getY() + ((BaseSprite) sprite).getHeight());
@@ -72,8 +72,12 @@ abstract class ZoneObject {
         return dataList[zoneID];
     }
 
-    final static void setZoneData(int zoneID, ZoneData zoneData) {
+    final static void setZoneData(final int zoneID, ZoneData zoneData) {
         dataList[zoneID] = zoneData;
+    }
+
+    void internalInit() {
+        init();
     }
 
     abstract void init();

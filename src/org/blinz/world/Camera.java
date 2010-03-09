@@ -356,8 +356,24 @@ public class Camera extends ZoneObject {
         s.unLock();
     }
 
+    /**
+     * Called after each cycle of this Camera's Zone. Does nothing, for implementing
+     * as needed.
+     */
+    protected void update() {
+    }
+
+    /**
+     * Called after the Camera recieves a Zone. Does nothing, for implementing
+     * as needed.
+     */
     @Override
-    final void init() {
+    protected void init() {
+    }
+
+    @Override
+    final void internalInit() {
+        super.internalInit();
         for (int i = 0; i < getData().sectors.length; i++) {
             for (int n = 0; n < getData().sectors[i].length; n++) {
                 if (getData().sectors[i][n].intersects(bounds)) {
@@ -365,7 +381,6 @@ public class Camera extends ZoneObject {
                 }
             }
         }
-        initCamera();
     }
 
     /**
@@ -418,20 +433,6 @@ public class Camera extends ZoneObject {
         removeStaleSprites();
         update();
         generateCurrentScene();
-    }
-
-    /**
-     * Called after each cycle of this Camera's Zone. Does nothing, for implementing
-     * as needed.
-     */
-    protected void update() {
-    }
-
-    /**
-     * Called after the Camera recieves a Zone. Does nothing, for implementing
-     * as needed.
-     */
-    protected void initCamera() {
     }
 
     /**

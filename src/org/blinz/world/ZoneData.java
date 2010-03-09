@@ -59,7 +59,7 @@ class ZoneData {
      * Sets the name of the Zone this data represents to the name given.
      * @param name the new Zone name
      */
-    final void setName(String name) {
+    final void setName(final String name) {
         zoneName = name;
     }
 
@@ -71,7 +71,7 @@ class ZoneData {
         return zoneName;
     }
 
-    final void addSprite(BaseSprite sprite) {
+    final void addSprite(final BaseSprite sprite) {
         registerZoneObject(sprite);
 
         Sector tl = getSectorOf(sprite.getX(), sprite.getY());
@@ -108,7 +108,7 @@ class ZoneData {
      * @param user
      * @param sprite
      */
-    final void addUserListener(User user, BaseSprite sprite) {
+    final void addUserListener(final User user, final BaseSprite sprite) {
         userListeners.add(user, sprite);
     }
 
@@ -117,7 +117,7 @@ class ZoneData {
      * @param user
      * @param sprite
      */
-    final void removeUserListener(User user, BaseSprite sprite) {
+    final void removeUserListener(final User user, final BaseSprite sprite) {
         userListeners.remove(user, sprite);
     }
 
@@ -231,8 +231,8 @@ class ZoneData {
      * A ZoneObject can only be a member of one Zone at a time.
      * @param object
      */
-    final void registerZoneObject(ZoneObject object) {
+    final void registerZoneObject(final ZoneObject object) {
         object.zoneID = id;
-        object.init();
+        object.internalInit();
     }
 }
