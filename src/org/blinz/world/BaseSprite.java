@@ -22,7 +22,6 @@ import org.blinz.input.ClickEvent;
 import org.blinz.input.MouseEvent;
 import org.blinz.input.MouseWheelEvent;
 import org.blinz.util.Bounds;
-import org.blinz.util.Position;
 import org.blinz.util.Position3D;
 import org.blinz.util.Size;
 
@@ -124,7 +123,7 @@ public abstract class BaseSprite extends ZoneObject {
                 }
             }
         }
-        updateWidth(width);
+        updateWidth((short) width);
     }
 
     /**
@@ -157,7 +156,7 @@ public abstract class BaseSprite extends ZoneObject {
                 }
             }
         }
-        updateHeight(height);
+        updateHeight((short) height);
     }
 
     /**
@@ -175,6 +174,8 @@ public abstract class BaseSprite extends ZoneObject {
         }
 
         if (getData() == null || (sector2().contains(getX() + getWidth(), getY() + height))) {
+            updateWidth((short) width);
+            updateHeight((short) height);
             return;
         }
 
@@ -245,8 +246,8 @@ public abstract class BaseSprite extends ZoneObject {
                 s2 = s2.rightNeighbor;
             }
         }
-        updateWidth(width);
-        updateHeight(height);
+        updateWidth((short) width);
+        updateHeight((short) height);
     }
 
     /**
@@ -606,7 +607,7 @@ public abstract class BaseSprite extends ZoneObject {
         return "BaseSprite";
     }
 
-    protected abstract void draw(Graphics g, Position drawLocation, Size drawSize);
+    protected abstract void draw(final Graphics g, final Bounds bounds);
 
     @Override
     protected abstract void init();
@@ -615,13 +616,13 @@ public abstract class BaseSprite extends ZoneObject {
      * Updates the width of this sprite to that given.
      * @param width
      */
-    protected abstract void updateWidth(int width);
+    protected abstract void updateWidth(short width);
 
     /**
      * Updates the height of this sprite to that given.
      * @param height
      */
-    protected abstract void updateHeight(int height);
+    protected abstract void updateHeight(short height);
 
     /**
      * Updates the x of the sprite to that given.
@@ -640,14 +641,6 @@ public abstract class BaseSprite extends ZoneObject {
      * @param layer
      */
     protected abstract void updateLayer(float layer);
-
-    /**
-     * Returns the Sector in which the top left corner of this sprite resides.
-     * @return Sector
-     */
-    private final Sector sector1() {
-        return getData().sectors[getX() / getData().sectorSize.width][getY() / getData().sectorSize.height];
-    }
 
     /**
      * Returns the Sector in which the lower right corner of this sprite resides.

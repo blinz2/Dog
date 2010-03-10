@@ -23,6 +23,7 @@ import org.blinz.util.Size;
 import java.util.Stack;
 import java.util.Vector;
 import org.blinz.graphics.Graphics;
+import org.blinz.util.Bounds;
 
 /**
  *
@@ -78,21 +79,20 @@ final class Scene {
      * @param graphics
      */
     final void draw(Graphics graphics) {
-        Position spriteLoc = new Position();
-        Size spriteSize = new Size();
+        Bounds bounds = new Bounds();
 
         for (ArrayList<SpriteContainer> layer : layers) {
             for (SpriteContainer sprite : layer) {
-                spriteLoc.setPosition(sprite.loc.x - translation.x,
+                bounds.setPosition(sprite.loc.x - translation.x,
                         sprite.loc.y - translation.y);
-                spriteSize.setSize(sprite.sprite.getWidth(), sprite.sprite.getHeight());
-                sprite.sprite.draw(graphics, spriteLoc, spriteSize);
+                bounds.setSize(sprite.sprite.getWidth(), sprite.sprite.getHeight());
+                sprite.sprite.draw(graphics, bounds);
                 containers.add(sprite);
             }
         }
 
-        spriteLoc = null;
-        spriteSize = null;
+        bounds = null;
+        bounds = null;
     }
 
     /**

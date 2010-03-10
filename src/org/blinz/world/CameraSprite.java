@@ -19,8 +19,7 @@ package org.blinz.world;
 import org.blinz.util.User;
 import org.blinz.graphics.Graphics;
 import org.blinz.input.MouseListener;
-import org.blinz.util.Position;
-import org.blinz.util.Size;
+import org.blinz.util.Bounds;
 
 /**
  *
@@ -109,8 +108,8 @@ class CameraSprite implements MouseListener {
         return sprite.getHeight();
     }
 
-    void draw(Graphics graphics, Position drawLoc, Size drawSize) {
-        sprite.draw(graphics, drawLoc, drawSize);
+    final void draw(Graphics graphics, final Bounds bounds) {
+        sprite.draw(graphics, bounds);
     }
 
     boolean isMouseListener() {

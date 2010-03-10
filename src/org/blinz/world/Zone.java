@@ -577,7 +577,7 @@ public abstract class Zone extends ZoneObject {
      */
     final void addCamera(Camera camera) {
         cameras.add(camera);
-
+        
         getData().registerZoneObject(camera);
     }
 
