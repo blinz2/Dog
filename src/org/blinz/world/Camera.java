@@ -600,8 +600,8 @@ public class Camera extends ZoneObject {
                 for (int i = 0; i < selectableSprites.size(); i++) {
                     if (selectableSprites.get(i).getSprite() instanceof SelectibleSprite) {
                         BaseSprite s = selectableSprites.get(i).getSprite();
-                        if (Bounds.intersects(s.getX(), cursorX - getX(), s.getY(),
-                                cursorY - getY(), s.getWidth(), 1, s.getHeight(), 1)) {
+                        if (Bounds.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight(),
+                                cursorX - getX(), cursorY - getY(), 1, 1)) {
                             if (selectableSprites.get(i) != oldSelected) {
                                 if (oldSelected != null) {
                                     oldSelected.deselect(user);

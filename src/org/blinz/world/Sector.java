@@ -194,8 +194,8 @@ final class Sector extends ZoneObject {
                         Bounds.intersects(s1.getX(), s1.getY(), s1.getWidth(), s1.getHeight(),
                         s2.getX(), s2.getY(), s2.getWidth(), s2.getHeight())) {
                     if (s1 != s2) {
-                        ((CollidibleSprite) s1).collide(s1);
-                        ((CollidibleSprite) s2).collide(s2);
+                        ((CollidibleSprite) s1).collide(s2);
+                        ((CollidibleSprite) s2).collide(s1);
                     }
                 }
             }

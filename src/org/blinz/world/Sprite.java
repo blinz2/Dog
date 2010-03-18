@@ -55,7 +55,7 @@ public abstract class Sprite extends BaseSprite {
      */
     @Override
     public int getHeight() {
-        return height;
+        return height; 
     }
 
     /**
