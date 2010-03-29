@@ -3,6 +3,7 @@
 \.chg\..*$
 \.rej$
 \.conflict\~$
+\target\$
 ^src/org/blinz/engine/PacketProcessor\.java$
 ^src/org/blinz/engine/NetworkCamera\.java$
 ^src/org/blinz/engine/NetworkZone\.java$

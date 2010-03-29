@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.blinz</groupId>
+  <artifactId>BlinzEngine</artifactId>
+  <packaging>jar</packaging>
+  <version>0.9.0</version>
+  <name>BlinzEngine</name>
+  <url>None</url>
+
+  <build>
+   <plugins>
+    <plugin>
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-compiler-plugin</artifactId>
+     <configuration>
+      <source>1.6</source>
+      <target>1.6</target>
+     </configuration>
+    </plugin>
+   </plugins>
+  </build>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.blinz</groupId>
+      <artifactId>BlinzCore</artifactId>
+      <version>0.5.0</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>Talnet</id>
+      <url>http://68.234.174.40/blinz/dependencies/repo</url>
+    </repository>
+
+    <repository>
+      <id>Blinz</id>
+      <url>http://68.234.174.40/blinz/dependencies/repo</url>
+    </repository>
+  </repositories>
+
+  <distributionManagement>
+    <repository>
+      <id>Blinz</id>
+      <url>scp://68.234.174.40/var/www/localhost/htdocs/blinz/repo</url>
+    </repository>
+  </distributionManagement>
+</project>
