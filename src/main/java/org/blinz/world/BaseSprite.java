@@ -43,7 +43,7 @@ public abstract class BaseSprite extends ZoneObject {
     /**
      * Stub method called when this sprite is deleted.
      */
-    public void onDelete() {
+    protected void onDelete() {
     }
 
     /**
