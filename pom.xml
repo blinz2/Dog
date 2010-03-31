@@ -36,11 +36,6 @@
 
   <repositories>
     <repository>
-      <id>Talnet</id>
-      <url>http://68.234.174.40/blinz/dependencies/repo</url>
-    </repository>
-
-    <repository>
       <id>Blinz</id>
       <url>http://68.234.174.40/blinz/repo</url>
     </repository>
