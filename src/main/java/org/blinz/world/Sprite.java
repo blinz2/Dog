@@ -36,7 +36,7 @@ public abstract class Sprite extends BaseSprite {
      * @return Size object representing the Sprite's size.
      */
     @Override
-    public Size getSize() {
+    public final Size getSize() {
         return new Size(width, height);
     }
 
@@ -45,7 +45,7 @@ public abstract class Sprite extends BaseSprite {
      * @return Width of Sprite.
      */
     @Override
-    public int getWidth() {
+    public final int getWidth() {
         return width;
     }
 
@@ -54,16 +54,16 @@ public abstract class Sprite extends BaseSprite {
      * @return Height of Sprite
      */
     @Override
-    public int getHeight() {
+    public final int getHeight() {
         return height; 
     }
 
     /**
      * 
-     * @return Location object representing the Sprite's location.
+     * @return A Location object representing the Sprite's location.
      */
     @Override
-    public Position3D getPosition() {
+    public final Position3D getPosition() {
         return new Position3D(x, y);
     }
 
@@ -72,7 +72,7 @@ public abstract class Sprite extends BaseSprite {
      * @return The x coordinate of the Sprite.
      */
     @Override
-    public int getX() {
+    public final int getX() {
         return x;
     }
 
@@ -81,7 +81,7 @@ public abstract class Sprite extends BaseSprite {
      * @return The y coordinate of the Sprite.
      */
     @Override
-    public int getY() {
+    public final int getY() {
         return y;
     }
 
@@ -90,7 +90,7 @@ public abstract class Sprite extends BaseSprite {
      * @return The z coordinate of the Sprite.
      */
     @Override
-    public float getLayer() {
+    public final float getLayer() {
         return layer;
     }
 
@@ -99,19 +99,19 @@ public abstract class Sprite extends BaseSprite {
         return new Bounds(x, y, width, height);
     }
 
-    public final void moveDown(int distance) {
+    public final void moveDown(final int distance) {
         setY(y + distance);
     }
 
-    public final void moveUp(int distance) {
+    public final void moveUp(final int distance) {
         setY(y - distance);
     }
 
-    public final void moveRight(int distance) {
+    public final void moveRight(final int distance) {
         setX(x + distance);
     }
 
-    public final void moveLeft(int distance) {
+    public final void moveLeft(final int distance) {
         setX(x - distance);
     }
 
