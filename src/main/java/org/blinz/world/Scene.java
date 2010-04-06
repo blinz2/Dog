@@ -1,6 +1,6 @@
 /*
  *  BlinzEngine - A library for large 2D world simultions and games.
- *  Copyright (C) 2009  Blinz <gtalent2@gmail.com>
+ *  Copyright (C) 2009-2010  Blinz <gtalent2@gmail.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 3 as
@@ -45,14 +45,14 @@ final class Scene {
         }
     }
 
-    final void add(CameraSprite sprite) {
+    final void add(final CameraSprite sprite) {
         if (!contains(sprite, (int) sprite.getLayer())) {
             layers[(int) sprite.getLayer()].add(fetchContainer(sprite));
             spriteCount++;
         }
     }
 
-    final void addAll(Vector<CameraSprite> sprites) {
+    final void addAll(final Vector<CameraSprite> sprites) {
         for (CameraSprite sprite : sprites) {
             add(sprite);
         }
@@ -78,7 +78,7 @@ final class Scene {
      * Draws this Scene to the screen.
      * @param graphics
      */
-    final void draw(Graphics graphics) {
+    final void draw(final Graphics graphics) {
         Bounds bounds = new Bounds();
 
         for (ArrayList<SpriteContainer> layer : layers) {
@@ -157,7 +157,7 @@ final class Scene {
      * @param lock
      * @return boolean - old lock status prior to this call
      */
-    private final synchronized boolean setLock(boolean lock) {
+    private final synchronized boolean setLock(final boolean lock) {
         boolean retval = isLocked;
         isLocked = lock;
         return retval;
@@ -168,7 +168,7 @@ final class Scene {
      * @param sprite
      * @return returns whether or not this Scene contains the given sprite
      */
-    private final boolean contains(CameraSprite sprite, int layer) {
+    private final boolean contains(final CameraSprite sprite, final int layer) {
         for (SpriteContainer s : layers[layer]) {
             if (sprite == s.sprite) {
                 return true;

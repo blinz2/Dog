@@ -65,7 +65,7 @@ public class Camera extends ZoneObject {
      * Creates a new Camera with the given User as this Camera's User.
      * @param user
      */
-    public Camera(User user) {
+    public Camera(final User user) {
         this.user = user;
     }
 
@@ -91,7 +91,7 @@ public class Camera extends ZoneObject {
      * removes the old Zone.
      * @param zone
      */
-    public final synchronized void setZone(Zone zone) {
+    public final synchronized void setZone(final Zone zone) {
         dropZone();
         this.zone = zone;
         zone.addCamera(this);
@@ -388,7 +388,7 @@ public class Camera extends ZoneObject {
      * this Camera.
      * @param sprites
      */
-    final void addSprites(Vector<BaseSprite> sprites) {
+    final void addSprites(final Vector<BaseSprite> sprites) {
         for (int i = 0; i < sprites.size(); i++) {
             addSprite(sprites.get(i));
         }
@@ -398,7 +398,7 @@ public class Camera extends ZoneObject {
      * Adds a Sprite to the Camera. The Sprite is stored in a CameraSprite.
      * @param sprite
      */
-    final void addSprite(BaseSprite sprite) {
+    final void addSprite(final BaseSprite sprite) {
         CameraSprite s = sprites.get(sprite);
         if (s != null) {
             s.incrementUseCount();
@@ -416,7 +416,7 @@ public class Camera extends ZoneObject {
      * Decrements the usage count for the Sprite's CameraSprite.
      * @param sprite
      */
-    final void decrementSpriteUsage(BaseSprite sprite) {
+    final void decrementSpriteUsage(final BaseSprite sprite) {
         CameraSprite w = sprites.get(sprite);
         if (w != null) {
             w.decrementUseCount();

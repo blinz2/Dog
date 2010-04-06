@@ -97,13 +97,16 @@ public abstract class BaseSprite extends ZoneObject {
      * @param width
      */
     public final void setWidth(int width) {
-        if (width > getData().sectorWidth()) {
-            width = getData().sectorWidth();
-        }
-
-        if (width + getX() > getData().getZoneWidth()) {
-            width = getData().getZoneWidth() - getX();
-        }
+        if (width < 1)
+	    width = 1;
+	else {
+            if (width > getData().sectorWidth()) {
+                width = getData().sectorWidth();
+            }
+            if (width + getX() > getData().getZoneWidth()) {
+                width = getData().getZoneWidth() - getX();
+            }
+	}
 
         Sector otr = getData().getSectorOf(getX() + getWidth(), getY());
         Sector ntr = getData().getSectorOf(getX() + width, getY());
@@ -131,12 +134,16 @@ public abstract class BaseSprite extends ZoneObject {
      * @param height
      */
     public final void setHeight(int height) {
-        if (getY() + height > getData().getZoneHeight()) {
-            height = getData().getZoneHeight() - getY();
-        }
-        if (height > getData().sectorHeight()) {
-            height = getData().sectorHeight() - getY();
-        }
+    	if (height < 1) 
+	    height = 1;
+	else {
+            if (getY() + height > getData().getZoneHeight()) {
+                height = getData().getZoneHeight() - getY();
+            }
+            if (height > getData().sectorHeight()) {
+                height = getData().sectorHeight() - getY();
+            }
+	}
 
         Sector nbl = getData().getSectorOf(getX(), getY() + height);
         Sector obl = getData().getSectorOf(getX(), getY() + getHeight());
@@ -595,7 +602,7 @@ public abstract class BaseSprite extends ZoneObject {
      * Adds the given sprite to this sprites zone.
      * @param sprite
      */
-    protected void addSpriteToZone(BaseSprite sprite) {
+    protected final void addSpriteToZone(final BaseSprite sprite) {
         getData().addSprite(sprite);
     }
 

@@ -52,63 +52,63 @@ class UserListenerCatalog {
          */
         private int cameraCount = 0;
 
-        public void buttonClick(ClickEvent e) {
+        public final void buttonClick(final ClickEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).buttonClicked(e);
             }
         }
 
-        public void buttonPress(MouseEvent e) {
+        public final void buttonPress(final MouseEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).buttonPressed(e);
             }
         }
 
-        public void buttonRelease(MouseEvent e) {
+        public final void buttonRelease(final MouseEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).buttonReleased(e);
             }
         }
 
-        public void keyPressed(KeyEvent e) {
+        public final void keyPressed(final KeyEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).keyPressed(e);
             }
         }
 
-        public void keyReleased(KeyEvent e) {
+        public final void keyReleased(final KeyEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).keyReleased(e);
             }
         }
 
-        public void keyTyped(KeyEvent e) {
+        public final void keyTyped(final KeyEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).keyTyped(e);
             }
         }
 
-        public void wheelScroll(MouseWheelEvent e) {
+        public final void wheelScroll(final MouseWheelEvent e) {
             for (int i = 0; i < inputSprites.size(); i++) {
                 inputSprites.get(i).mouseWheelScroll(e);
             }
         }
 
-        private void init() {
+        private final void init() {
             inputSprites = paused ? dummyList : sprites;
         }
 
         /**
          * Suspend reception of user input to the sprites.
          */
-        private void pause() {
+        private final void pause() {
             inputSprites = dummyList;
         }
 
         /**
          * Resume reception of user input to the sprites.
          */
-        private void unpause() {
+        private final void unpause() {
             inputSprites = sprites;
         }
 
@@ -125,7 +125,7 @@ class UserListenerCatalog {
          * For use by UserListenerCatalog.
          * @param sprite
          */
-        private final void add(BaseSprite sprite) {
+        private final void add(final BaseSprite sprite) {
             inputSprites.add(sprite);
         }
 
@@ -134,7 +134,7 @@ class UserListenerCatalog {
          * For use by UserListenerCatalog.
          * @param sprite
          */
-        private final void remove(BaseSprite sprite) {
+        private final void remove(final BaseSprite sprite) {
             inputSprites.remove(sprite);
         }
     }
@@ -157,7 +157,7 @@ class UserListenerCatalog {
     private final Vector<Pair> toRemove = new Vector<Pair>();
     private final Vector<Pair> toAdd = new Vector<Pair>();
 
-    protected void update() {
+    protected final void update() {
         //remove old pairs
         Pair current = null;
         while ((current = nextToRemove()) != null) {
@@ -186,7 +186,7 @@ class UserListenerCatalog {
      * @param user
      * @return the list of sprites listening to the given User
      */
-    final UserListenerList get(User user) {
+    final UserListenerList get(final User user) {
         return userListeners.get(user);
     }
 
@@ -197,7 +197,7 @@ class UserListenerCatalog {
      * @param user the User who's list is to be returned
      * @return the sprite list associated with the given User
      */
-    final UserListenerList checkOut(User user) {
+    final UserListenerList checkOut(final User user) {
         UserListenerList list;
         do {
             list = get(user);

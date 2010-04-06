@@ -1,6 +1,6 @@
 /*
  *  BlinzEngine - A library for large 2D world simultions and games.
- *  Copyright (C) 2009  Blinz <gtalent2@gmail.com>
+ *  Copyright (C) 2009-2010  Blinz <gtalent2@gmail.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 3 as
@@ -31,7 +31,7 @@ class CameraSprite implements MouseListener {
     private BaseSprite sprite;
     private boolean isSelected = false;
 
-    CameraSprite(BaseSprite sprite) {
+    CameraSprite(final BaseSprite sprite) {
         this.sprite = sprite;
     }
 
@@ -108,7 +108,7 @@ class CameraSprite implements MouseListener {
         return sprite.getHeight();
     }
 
-    final void draw(Graphics graphics, final Bounds bounds) {
+    final void draw(final Graphics graphics, final Bounds bounds) {
         sprite.draw(graphics, bounds);
     }
 
@@ -120,7 +120,7 @@ class CameraSprite implements MouseListener {
      * If the sprite this represents is a SelectibleSprite this calls select.
      * @param user the User that selected this sprite
      */
-    final void select(User user) {
+    final void select(final User user) {
         if (sprite instanceof SelectibleSprite) {
             ((SelectibleSprite) sprite).select(user);
             isSelected = true;
@@ -131,7 +131,7 @@ class CameraSprite implements MouseListener {
      * If the sprite this represents is a SelectibleSprite this calls deselect.
      * @param user the User that deselected this sprite
      */
-    final void deselect(User user) {
+    final void deselect(final User user) {
         if (sprite instanceof SelectibleSprite) {
             ((SelectibleSprite) sprite).deselect(user);
             isSelected = false;
