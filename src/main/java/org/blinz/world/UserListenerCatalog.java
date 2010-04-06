@@ -235,7 +235,7 @@ class UserListenerCatalog {
      * Checks in UserListenerList for the given User.
      * @param user
      */
-    final void checkIn(User user) {
+    final void checkIn(final User user) {
         UserListenerList list = userListeners.get(user);
         list.cameraCount--;
         if (list.dead()) {
@@ -248,7 +248,7 @@ class UserListenerCatalog {
      * @param user
      * @param sprite
      */
-    final void add(User user, BaseSprite sprite) {
+    final void add(final User user, final BaseSprite sprite) {
         toAdd.add(new Pair(user, sprite));
     }
 
@@ -257,7 +257,7 @@ class UserListenerCatalog {
      * @param user
      * @param sprite
      */
-    final void remove(User user, BaseSprite sprite) {
+    final void remove(final User user, final BaseSprite sprite) {
         toRemove.add(new Pair(user, sprite));
     }
 
@@ -286,7 +286,7 @@ class UserListenerCatalog {
      * one if it does.
      * @param user
      */
-    private final synchronized UserListenerList fetchList(User user) {
+    private final synchronized UserListenerList fetchList(final User user) {
         if (!userListeners.contains(user)) {
             UserListenerList list = new UserListenerList();
             userListeners.put(user, list);
