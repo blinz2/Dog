@@ -17,6 +17,7 @@
 package org.blinz.world;
 
 import org.blinz.util.User;
+import org.blinz.graphics.Graphics;
 
 /**
  * Used to allow ZoneObservers to denote selection when a Sprite is click on.
@@ -24,7 +25,12 @@ import org.blinz.util.User;
  */
 public interface SelectibleSprite {
 
-    public abstract void drawSelectionIndicator();
+    /**
+     * Called to draw on top of the primary draw method when this sprite is
+     * selected.
+     * @param Graphics object with which to draw the selection indicator.
+     */
+    public void drawSelectionIndicator(Graphics gfx);
 
     /**
      * Called when the sprite is selected from a ZoneObserver.

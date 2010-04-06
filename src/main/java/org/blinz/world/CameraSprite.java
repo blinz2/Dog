@@ -110,6 +110,8 @@ class CameraSprite implements MouseListener {
 
     final void draw(final Graphics graphics, final Bounds bounds) {
         sprite.draw(graphics, bounds);
+        if (sprite instanceof SelectibleSprite)
+	    ((SelectibleSprite) sprite).drawSelectionIndicator(graphics);
     }
 
     boolean isMouseListener() {
