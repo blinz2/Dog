@@ -37,7 +37,7 @@ public class KeyEvent extends InputEvent {
     }
 
     /**
-     *
+     * Returns the key associated with this event.
      * @return the key associated with this event
      */
     public final int key() {

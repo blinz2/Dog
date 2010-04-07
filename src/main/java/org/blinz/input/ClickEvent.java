@@ -27,7 +27,6 @@ public class ClickEvent extends MouseEvent {
     private int clickCount;
 
     /**
-     * Do I really have to explain what a constructor does?
      * @param user the User associated with this InputEvent
      * @param buttonID the button operated
      * @param cursorX the x coordinate of the cursor at the time of the event
@@ -39,7 +38,7 @@ public class ClickEvent extends MouseEvent {
     }
 
     /**
-     *
+     * Returns the number of clicks in this event.
      * @return the number of clicks behind this event.
      */
     public final int clickCount() {

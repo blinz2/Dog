@@ -41,7 +41,7 @@ public class MouseWheelEvent extends InputEvent {
     }
 
     /**
-     *
+     * Replace the number of scroll ticks in this event.
      * @return the number of scroll ticks in this event.
      */
     public final int getScrollTicks() {
@@ -49,7 +49,7 @@ public class MouseWheelEvent extends InputEvent {
     }
 
     /**
-     *
+     * Returns the x coordinate of the cursor at the time of this event
      * @return the x coordinate of the cursor at the time of this event
      */
     public final int cursorX() {
@@ -57,7 +57,7 @@ public class MouseWheelEvent extends InputEvent {
     }
 
     /**
-     *
+     * Returns the y coordinate of the cursor at the time of this event
      * @return the y coordinate of the cursor at the time of this event
      */
     public final int cursorY() {

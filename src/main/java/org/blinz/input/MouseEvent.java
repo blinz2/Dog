@@ -48,7 +48,7 @@ public class MouseEvent extends InputEvent {
     }
 
     /**
-     *
+     * Replace the x coordinate of the cursor at the time of this event
      * @return the x coordinate of the cursor at the time of this event
      */
     public final int cursorX() {
@@ -56,7 +56,7 @@ public class MouseEvent extends InputEvent {
     }
 
     /**
-     *
+     * Returns the y coordinate of the cursor at the time of this event.
      * @return the y coordinate of the cursor at the time of this event
      */
     public final int cursorY() {
