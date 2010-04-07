@@ -33,7 +33,7 @@ public class User {
      * Returns a String representing the name of the User.
      * @return String with the name of the User
      */
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
@@ -41,11 +41,11 @@ public class User {
      * Sets the name of the User to that in the String provided.
      * @param name
      */
-    public void setName(String name) {
+    public final void setName(String name) {
         this.name = name;
     }
 
-    private static synchronized int getIndex() {
+    private static final synchronized int getIndex() {
         if (oldIDs.isEmpty()) {
             return idIndex++;
         }
