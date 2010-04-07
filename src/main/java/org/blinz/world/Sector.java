@@ -34,7 +34,7 @@ final class Sector extends ZoneObject {
      * Sector from above.
      */
     private final UnorderedList<BaseSprite> intersectingSprites = new UnorderedList<BaseSprite>();
-    private final UnorderedList<CollidibleSprite> collidibleSprites = new UnorderedList<CollidibleSprite>();
+    private final UnorderedList<CollidableSprite> collidibleSprites = new UnorderedList<CollidableSprite>();
     private final Vector<Camera> cameras = new Vector<Camera>();
     private final Vector<Camera> camerasToAdd = new Vector<Camera>(), camerasToRemove = new Vector<Camera>();
     private final Bounds bounds = new Bounds();
@@ -160,9 +160,9 @@ final class Sector extends ZoneObject {
      */
     final void addIntersectingSprite(BaseSprite sprite) {
         intersectingSprites.add(sprite);
-        if (sprite instanceof CollidibleSprite) {
+        if (sprite instanceof CollidableSprite) {
             synchronized (collidibleSprites) {
-                collidibleSprites.add((CollidibleSprite) sprite);
+                collidibleSprites.add((CollidableSprite) sprite);
             }
         }
         for (Camera camera : cameras) {
@@ -176,9 +176,9 @@ final class Sector extends ZoneObject {
      */
     final void removeIntersectingSprite(BaseSprite sprite) {
         intersectingSprites.remove(sprite);
-        if (sprite instanceof CollidibleSprite) {
+        if (sprite instanceof CollidableSprite) {
             synchronized (collidibleSprites) {
-                collidibleSprites.add((CollidibleSprite) sprite);
+                collidibleSprites.add((CollidableSprite) sprite);
             }
         }
         for (Camera camera : cameras) {
@@ -186,7 +186,7 @@ final class Sector extends ZoneObject {
         }
     }
 
-    final void checkCollisionsFor(CollidibleSprite sprite) {
+    final void checkCollisionsFor(CollidableSprite sprite) {
         synchronized (collidibleSprites) {
             for (int i = 0; i < collidibleSprites.size(); i++) {
                 BaseSprite s1 = (BaseSprite) sprite, s2 = (BaseSprite) collidibleSprites.get(i);
@@ -194,8 +194,8 @@ final class Sector extends ZoneObject {
                         Bounds.intersects(s1.getX(), s1.getY(), s1.getWidth(), s1.getHeight(),
                         s2.getX(), s2.getY(), s2.getWidth(), s2.getHeight())) {
                     if (s1 != s2) {
-                        ((CollidibleSprite) s1).collide(s2);
-                        ((CollidibleSprite) s2).collide(s1);
+                        ((CollidableSprite) s1).collide(s2);
+                        ((CollidableSprite) s2).collide(s1);
                     }
                 }
             }

@@ -84,6 +84,14 @@ class CameraSprite implements MouseListener {
         return useCount;
     }
 
+    /**
+     *
+     * @return true if the contained sprite is selectable, false otherwise
+     */
+    final boolean isSelectable() {
+        return sprite instanceof SelectableSprite;
+    }
+
     final BaseSprite getSprite() {
         return sprite;
     }
@@ -110,8 +118,8 @@ class CameraSprite implements MouseListener {
 
     final void draw(final Graphics graphics, final Bounds bounds) {
         sprite.draw(graphics, bounds);
-        if (sprite instanceof SelectibleSprite)
-	    ((SelectibleSprite) sprite).drawSelectionIndicator(graphics, bounds);
+        if (sprite instanceof SelectableSprite && isSelected())
+	    ((SelectableSprite) sprite).drawSelectionIndicator(graphics, bounds);
     }
 
     boolean isMouseListener() {
@@ -123,8 +131,8 @@ class CameraSprite implements MouseListener {
      * @param user the User that selected this sprite
      */
     final void select(final User user) {
-        if (sprite instanceof SelectibleSprite) {
-            ((SelectibleSprite) sprite).select(user);
+        if (sprite instanceof SelectableSprite) {
+            ((SelectableSprite) sprite).select(user);
             isSelected = true;
         }
     }
@@ -134,8 +142,8 @@ class CameraSprite implements MouseListener {
      * @param user the User that deselected this sprite
      */
     final void deselect(final User user) {
-        if (sprite instanceof SelectibleSprite) {
-            ((SelectibleSprite) sprite).deselect(user);
+        if (sprite instanceof SelectableSprite) {
+            ((SelectableSprite) sprite).deselect(user);
             isSelected = false;
         }
     }

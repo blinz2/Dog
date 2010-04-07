@@ -32,11 +32,11 @@ abstract class ZoneObject {
     byte zoneID = 0;
 
     /**
-     * Runs the given CollidibleSprite against other CollidibleSprites to check
+     * Runs the given CollidableSprite against other CollidableSprites to check
      * for collisions.
      * @param sprite
      */
-    public final void checkCollisions(final CollidibleSprite sprite) {
+    public final void checkCollisions(final CollidableSprite sprite) {
         Sector tl = getData().getSectorOf(((BaseSprite) sprite).getX(), ((BaseSprite) sprite).getY());
         Sector br = getData().getSectorOf(((BaseSprite) sprite).getX() + ((BaseSprite) sprite).getWidth(),
                 ((BaseSprite) sprite).getY() + ((BaseSprite) sprite).getHeight());

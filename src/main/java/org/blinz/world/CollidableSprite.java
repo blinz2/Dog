@@ -20,7 +20,7 @@ package org.blinz.world;
  *
  * @author Blinz
  */
-public interface CollidibleSprite {
+public interface CollidableSprite {
 
     void collide(BaseSprite sprite);
 }

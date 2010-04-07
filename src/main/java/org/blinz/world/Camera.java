@@ -20,7 +20,6 @@ import org.blinz.util.User;
 import org.blinz.graphics.Graphics;
 import org.blinz.util.Bounds;
 import org.blinz.input.MouseListener;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 import org.blinz.input.ClickEvent;
@@ -43,9 +42,9 @@ public class Camera extends ZoneObject {
      * Determines whether or not this Camera represents a local user. True by default.
      */
     private final Bounds bounds = new Bounds();
-    private final Hashtable<BaseSprite, CameraSprite> sprites =
+    private final Hashtable<BaseSprite, CameraSprite> spritesTable =
             new Hashtable<BaseSprite, CameraSprite>();
-    private final Vector<CameraSprite> selectableSprites = new Vector<CameraSprite>();
+    private final Vector<CameraSprite> spriteList = new Vector<CameraSprite>();
     private final Vector<BaseSprite> spritesToRemove = new Vector<BaseSprite>();
     private Zone zone;
     private User user;
@@ -66,6 +65,7 @@ public class Camera extends ZoneObject {
      * @param user
      */
     public Camera(final User user) {
+        System.out.println("Camera(User)");
         this.user = user;
     }
 
@@ -104,8 +104,8 @@ public class Camera extends ZoneObject {
     public final void dropZone() {
         if (zone != null) {
             zone.removeCamera(this);
-            selectableSprites.clear();
-            sprites.clear();
+            spriteList.clear();
+            spritesTable.clear();
             spritesToRemove.clear();
             zone = null;
             inputListener = null;
@@ -399,16 +399,14 @@ public class Camera extends ZoneObject {
      * @param sprite
      */
     final void addSprite(final BaseSprite sprite) {
-        CameraSprite s = sprites.get(sprite);
+        CameraSprite s = spritesTable.get(sprite);
         if (s != null) {
             s.incrementUseCount();
         } else {
             s = new CameraSprite(sprite);
-            sprites.put(sprite, s);
-            if (sprite instanceof SelectibleSprite) {
-                selectableSprites.add(s);
-                sortByLayer(selectableSprites, 0, selectableSprites.size());
-            }
+            spritesTable.put(sprite, s);
+            insertSprite(s);
+            sortByLayer(spriteList, 0, spriteList.size() - 1);
         }
     }
 
@@ -417,7 +415,7 @@ public class Camera extends ZoneObject {
      * @param sprite
      */
     final void decrementSpriteUsage(final BaseSprite sprite) {
-        CameraSprite w = sprites.get(sprite);
+        CameraSprite w = spritesTable.get(sprite);
         if (w != null) {
             w.decrementUseCount();
             if (w.getUsageCount() < 1) {
@@ -436,6 +434,25 @@ public class Camera extends ZoneObject {
     }
 
     /**
+     * Inserts the givne sprite at proper in spriteList.
+     * List is kept in ascending order.
+     * @param sprite
+     */
+    private final void insertSprite(CameraSprite sprite) {
+        synchronized (spriteList) {
+            if (spriteList.isEmpty()) {
+                spriteList.add(sprite);
+                return;
+            }
+            for (int i = 0; i < spriteList.size(); i++) {
+                if (spriteList.get(i).getSprite().getLayer() > sprite.getLayer()) {
+                    spriteList.insertElementAt(sprite, i);
+                }
+            }
+        }
+    }
+
+    /**
      * Finds the sprite currently on screen, gathers them, orders them by layer
      * and sets it to the current scene.
      */
@@ -448,9 +465,8 @@ public class Camera extends ZoneObject {
         Bounds b = new Bounds();
         b.setPosition(upcoming.translation);
         b.setSize(upcoming.size);
-        Enumeration<CameraSprite> spriteList = sprites.elements();
-        while (spriteList.hasMoreElements()) {
-            CameraSprite s = spriteList.nextElement();
+        for (int i = 0; i < spriteList.size(); i++) {
+            CameraSprite s = spriteList.get(i);
             if (b.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight())) {
                 upcoming.add(s);
             }
@@ -514,11 +530,13 @@ public class Camera extends ZoneObject {
         for (int i = 0; i < spritesToRemove.size(); i++) {
             //Make sure the sprite didn't re-enter the observer between the
             //decrement to 0 and now.
-            if (sprites.get(spritesToRemove.get(i)).getUsageCount() < 1) {
-                sprites.remove(spritesToRemove.get(i));
-                for (int n = 0; n < selectableSprites.size(); n++) {
-                    if (spritesToRemove.get(i) instanceof SelectibleSprite) {
-                        selectableSprites.remove(n);
+            if (spritesTable.get(spritesToRemove.get(i)).getUsageCount() < 1) {
+                spritesTable.remove(spritesToRemove.get(i));
+                synchronized (spriteList) {
+                    for (int n = 0; n < spriteList.size(); n++) {
+                        if (spritesToRemove.get(i) == spriteList.get(n).getSprite()) {
+                            spriteList.remove(n);
+                        }
                     }
                 }
             }
@@ -595,21 +613,25 @@ public class Camera extends ZoneObject {
                     cursorX + getX(), cursorY + getY(), clickCount);
             list.buttonClick(e);
 
-            CameraSprite oldSelected = selected;
-            if (selected != null) {
-                for (int i = 0; i < selectableSprites.size(); i++) {
-                    if (selectableSprites.get(i).getSprite() instanceof SelectibleSprite) {
-                        BaseSprite s = selectableSprites.get(i).getSprite();
-                        if (Bounds.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight(),
-                                cursorX - getX(), cursorY - getY(), 1, 1)) {
-                            if (selectableSprites.get(i) != oldSelected) {
-                                if (oldSelected != null) {
-                                    oldSelected.deselect(user);
-                                }
-                                selectableSprites.get(i).select(user);
-                            }
-                        }
+            final CameraSprite oldSelected = selected;
+            CameraSprite newSelected = null;
+            synchronized (spriteList) {
+                for (int i = spriteList.size() - 1; i > -1; i--) {
+                    final BaseSprite s = spriteList.get(i).getSprite();
+                    if (Bounds.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight(), cursorX + getX(), cursorY + getY(), 1, 1)) {
+                        newSelected = spriteList.get(i);
+                        break;
                     }
+                }
+            }
+
+            if (newSelected != oldSelected) {
+                selected = newSelected;
+                if (newSelected != null && newSelected.isSelectable()) {
+                    newSelected.select(user);
+                }
+                if (oldSelected != null && oldSelected.isSelectable()) {
+                    oldSelected.deselect(user);
                 }
             }
         }

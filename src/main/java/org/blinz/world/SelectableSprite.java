@@ -24,7 +24,7 @@ import org.blinz.graphics.Graphics;
  * Used to allow ZoneObservers to denote selection when a Sprite is click on.
  * @author Blinz
  */
-public interface SelectibleSprite {
+public interface SelectableSprite {
 
     /**
      * Called to draw on top of the primary draw method when this sprite is
