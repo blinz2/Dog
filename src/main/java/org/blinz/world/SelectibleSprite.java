@@ -16,6 +16,7 @@
  */
 package org.blinz.world;
 
+import org.blinz.util.Bounds;
 import org.blinz.util.User;
 import org.blinz.graphics.Graphics;
 
@@ -30,7 +31,7 @@ public interface SelectibleSprite {
      * selected.
      * @param Graphics object with which to draw the selection indicator.
      */
-    public void drawSelectionIndicator(Graphics gfx);
+    public void drawSelectionIndicator(Graphics gfx, Bounds bounds);
 
     /**
      * Called when the sprite is selected from a ZoneObserver.
