@@ -201,7 +201,7 @@ public abstract class Zone extends ZoneObject {
              * Sets the group of Sectors that this group is to contain.
              * @param sectors
              */
-            final void setSectors(Sector[] sectors) {
+            final void setSectors(final Sector[] sectors) {
                 this.sectors = sectors;
             }
         }
@@ -215,7 +215,7 @@ public abstract class Zone extends ZoneObject {
          * @param zoneName the name of the Zone this thread group is for
          * @param threadCount number of threads to be used in this group
          */
-        ZoneProcessor(String zoneName, int threadCount) {
+        ZoneProcessor(final String zoneName, final int threadCount) {
             ThreadGroup group = new ThreadGroup(zoneName);
 
             threads = new ZoneThread[threadCount];
@@ -231,7 +231,7 @@ public abstract class Zone extends ZoneObject {
         }
 
         /**
-         * Starts the thread(s) in this ZoneProcesser an thereby starts this Zone.
+         * Starts the thread(s) in this ZoneProcesser and thereby starts this Zone.
          */
         final void start() {
             for (int i = 0; i < threads.length; i++) {
@@ -239,7 +239,7 @@ public abstract class Zone extends ZoneObject {
             }
         }
 
-        final void generateSectorGroups(Sector[][] sectors) {
+        final void generateSectorGroups(final Sector[][] sectors) {
             final int sectorsPerThread = (sectors.length * sectors[0].length) / threads.length;
             final Position index = new Position();
 
@@ -367,29 +367,29 @@ public abstract class Zone extends ZoneObject {
      * to 5 milliseconds.
      * @param interval the time between cycles of execution for this Zone in milliseconds
      */
-    public final void setCycleInterval(long interval) {
+    public final void setCycleInterval(final long interval) {
         cycleIntervalTime = interval;
     }
 
     /**
-     *
-     * @return a new Size object representing the dimensions of this zone.
+     * Returns a new Size object representing the dimensions of this Zone.
+     * @return a new Size object representing the dimensions of this Zone.
      */
     public final Size getSize() {
         return new Size(size);
     }
 
     /**
-     *
-     * @return int representing the width of this zone
+     * Returns int representing the width of this Zone.
+     * @return int representing the width of this Zone
      */
     public final int getWidth() {
         return size.width;
     }
 
     /**
-     *
-     * @return int representing the height of this zone
+     * Returns int representing the height of this Zone.
+     * @return int representing the height of this Zone
      */
     public final int getHeight() {
         return size.height;
@@ -399,7 +399,7 @@ public abstract class Zone extends ZoneObject {
      * Adds the given sprite to this sprites zone.
      * @param sprite
      */
-    public final void addSprite(BaseSprite sprite) {
+    public final void addSprite(final BaseSprite sprite) {
         getData().addSprite(sprite);
     }
 
@@ -407,7 +407,7 @@ public abstract class Zone extends ZoneObject {
      * Creates threads for processing this Zone.
      * @param threads number of threads dedicated to this Zone
      */
-    public final synchronized void start(int threads) {
+    public final synchronized void start(final int threads) {
         start("Zone", threads);
     }
 
@@ -416,7 +416,7 @@ public abstract class Zone extends ZoneObject {
      * @param name the name assigned to the threads processing this Zone
      * @param threads number of threads dedicated to this Zone
      */
-    public final synchronized void start(String name, int threads) {
+    public final synchronized void start(final String name, final int threads) {
         if (!isRunning) {
             getData().setName(name);
             initTime = System.currentTimeMillis();
@@ -441,7 +441,7 @@ public abstract class Zone extends ZoneObject {
      * @param user
      * @param sprite
      */
-    public final void addUserListeningSprite(User user, BaseSprite sprite) {
+    public final void addUserListeningSprite(final User user, final BaseSprite sprite) {
         getData().addUserListener(user, sprite);
     }
 
@@ -450,7 +450,7 @@ public abstract class Zone extends ZoneObject {
      * @param user
      * @param sprite
      */
-    public final void removeUserListeningSprite(User user, BaseSprite sprite) {
+    public final void removeUserListeningSprite(final User user, final BaseSprite sprite) {
         getData().removeUserListener(user, sprite);
     }
 
@@ -458,7 +458,7 @@ public abstract class Zone extends ZoneObject {
      * Sets the width of this Zone to the given value.
      * @param width
      */
-    protected final void setWidth(int width) {
+    protected final void setWidth(final int width) {
         size.setWidth(width);
         refactorSectors();
     }
@@ -467,7 +467,7 @@ public abstract class Zone extends ZoneObject {
      * Sets the height of this Zone to the given value.
      * @param height
      */
-    protected final void setHeight(int height) {
+    protected final void setHeight(final int height) {
         size.setHeight(height);
         refactorSectors();
     }
@@ -477,13 +477,13 @@ public abstract class Zone extends ZoneObject {
      * @param width
      * @param height
      */
-    protected final void setSize(int width, int height) {
+    protected final void setSize(final int width, final int height) {
         size.setSize(width, height);
         refactorSectors();
     }
 
     /**
-     *
+     * Returns a long representing the number of cycles the zone has gone through.
      * @return a long representing the number of cycles the zone has gone through
      */
     protected final long cycles() {
@@ -491,7 +491,7 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     *
+     * Return the amount of time the zone has been running minus the pause time.
      * @return the amount of time the zone has been running minus the pause time
      */
     protected final long time() {
@@ -506,7 +506,7 @@ public abstract class Zone extends ZoneObject {
      * does not have to be assigned to each sprite to reduce memory consumption.
      * @param sharedData
      */
-    protected final void setSharedZoneData(Object sharedData) {
+    protected final void setSharedZoneData(final Object sharedData) {
         getData().data = sharedData;
     }
 
@@ -526,58 +526,57 @@ public abstract class Zone extends ZoneObject {
      * A stub method for listening to clicks. Implement as needed.
      * @param event contains data about the input
      */
-    protected void buttonClicked(ClickEvent event) {
+    protected void buttonClicked(final ClickEvent event) {
     }
 
     /**
      * A stub method for listening to mouse button presses. Implement as needed.
      * @param event contains data about the input
      */
-    protected void buttonPressed(MouseEvent event) {
+    protected void buttonPressed(final MouseEvent event) {
     }
 
     /**
      * A stub method for listening to mouse button releases. Implement as needed.
      * @param event contains data about the input
      */
-    protected void buttonReleased(MouseEvent event) {
+    protected void buttonReleased(final MouseEvent event) {
     }
 
     /**
      * A stub method for listening to the mouse wheel. Implement as needed.
      * @param event contains data about the input
      */
-    protected void mouseWheelScroll(MouseWheelEvent event) {
+    protected void mouseWheelScroll(final MouseWheelEvent event) {
     }
 
     /**
      * A stub method for listening to the keys pressed. Implement as needed.
      * @param event contains data about the input
      */
-    protected void keyPressed(KeyEvent event) {
+    protected void keyPressed(final KeyEvent event) {
     }
 
     /**
      * A stub method for listening to the keys released. Implement as needed.
      * @param event contains data about the input
      */
-    protected void keyReleased(KeyEvent event) {
+    protected void keyReleased(final KeyEvent event) {
     }
 
     /**
      * A stub method for listening to the key typed. Implement as needed.
      * @param event contains data about the input
      */
-    protected void keyTyped(KeyEvent event) {
+    protected void keyTyped(final KeyEvent event) {
     }
 
     /**
      * Adds the given Camera to this Zone, to moniter the sprites in its area.
      * @param camera
      */
-    final void addCamera(Camera camera) {
+    final void addCamera(final Camera camera) {
         cameras.add(camera);
-        
         getData().registerZoneObject(camera);
     }
 
@@ -585,7 +584,7 @@ public abstract class Zone extends ZoneObject {
      * Removes the given Camera from this Zone.
      * @param camera
      */
-    final void removeCamera(Camera camera) {
+    final void removeCamera(final Camera camera) {
         cameras.remove(camera);
 
         for (int i = 0; i < getData().sectors.length; i++) {
