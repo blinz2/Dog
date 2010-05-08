@@ -38,9 +38,6 @@ import org.blinz.world.UserListenerCatalog.UserListenerList;
  */
 public class Camera extends ZoneObject {
 
-    /**
-     * Determines whether or not this Camera represents a local user. True by default.
-     */
     private final Bounds bounds = new Bounds();
     private final Hashtable<BaseSprite, CameraSprite> spritesTable =
             new Hashtable<BaseSprite, CameraSprite>();
