@@ -30,7 +30,7 @@ public abstract class InputEvent {
      *
      * @param user the User associated with this InputEvent
      */
-    protected InputEvent(User user) {
+    protected InputEvent(final User user) {
         this.user = user;
     }
 

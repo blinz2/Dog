@@ -32,7 +32,7 @@ public class ClickEvent extends MouseEvent {
      * @param cursorX the x coordinate of the cursor at the time of the event
      * @param cursorY the y coordinate of the cursor at the time of the event
      */
-    public ClickEvent(User user, int buttonID, int cursorX, int cursorY, int clickCount) {
+    public ClickEvent(final User user, final int buttonID, final int cursorX, final int cursorY, final int clickCount) {
         super(user, buttonID, cursorX, cursorY);
         this.clickCount = clickCount;
     }

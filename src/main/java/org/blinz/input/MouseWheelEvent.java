@@ -33,7 +33,7 @@ public class MouseWheelEvent extends InputEvent {
      * @param cursorY the y coordinate of the cursor at the time of this event
      * @param scrollTicks the number of ticks behind this event
      */
-    public MouseWheelEvent(User user, int cursorX, int cursorY, int scrollTicks) {
+    public MouseWheelEvent(final User user, final int cursorX, final int cursorY, final int scrollTicks) {
         super(user);
         ticks = scrollTicks;
         this.cursorX = cursorX;

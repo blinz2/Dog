@@ -34,13 +34,15 @@ public class MouseEvent extends InputEvent {
      * @param cursorX the x coordinate of the cursor at the time of the event
      * @param cursorY the y coordinate of the cursor at the time of the event
      */
-    public MouseEvent(User user, int buttonID, int cursorX, int cursorY) {
+    public MouseEvent(final User user, final int buttonID, final int cursorX, final int cursorY) {
         super(user);
+        x = cursorX;
+        y = cursorY;
         this.buttonID = buttonID;
     }
 
     /**
-     * Returns the numerical identification of the mouse button.
+     * Gets the numerical identification of the mouse button.
      * @return the button associated with this event.
      */
     public final int getButton() {
@@ -48,7 +50,7 @@ public class MouseEvent extends InputEvent {
     }
 
     /**
-     * Replace the x coordinate of the cursor at the time of this event
+     * Gets the x coordinate of the cursor at the time of this event
      * @return the x coordinate of the cursor at the time of this event
      */
     public final int cursorX() {
@@ -56,7 +58,7 @@ public class MouseEvent extends InputEvent {
     }
 
     /**
-     * Returns the y coordinate of the cursor at the time of this event.
+     * Gets the y coordinate of the cursor at the time of this event.
      * @return the y coordinate of the cursor at the time of this event
      */
     public final int cursorY() {

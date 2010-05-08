@@ -31,7 +31,7 @@ public class KeyEvent extends InputEvent {
      * @param user user that generated this event
      * @param key key associated with this event
      */
-    public KeyEvent(User user, int key) {
+    public KeyEvent(final User user, final int key) {
         super(user);
         this.key = key;
     }
