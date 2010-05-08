@@ -119,27 +119,27 @@ public abstract class Sprite extends BaseSprite {
     //PROTECTED METHODS---------------------------------------------------------
 
     @Override
-    protected final void updateWidth(short width) {
-        this.width = (short) width;
+    protected final void updateWidth(final short width) {
+        this.width = width;
     }
 
     @Override
-    protected final void updateHeight(short height) {
-        this.height = (short) height;
+    protected final void updateHeight(final short height) {
+        this.height = height;
     }
 
     @Override
-    protected final void updateX(int x) {
+    protected final void updateX(final int x) {
         this.x = x;
     }
 
     @Override
-    protected final void updateY(int y) {
+    protected final void updateY(final int y) {
         this.y = y;
     }
 
     @Override
-    protected final void updateLayer(float layer) {
+    protected final void updateLayer(final float layer) {
         this.layer = layer;
     }
 }

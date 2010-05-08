@@ -30,7 +30,7 @@ public final class Users {
      * Adds given User to the list of Users.
      * @param user
      */
-    public final static void add(User user) {
+    public final static void add(final User user) {
         users.add(user);
     }
 
@@ -39,7 +39,7 @@ public final class Users {
      * @param index
      * @return the User at that given index.
      */
-    public final static User get(int index) {
+    public final static User get(final int index) {
         return users.get(index);
     }
 
@@ -47,7 +47,7 @@ public final class Users {
      * Removes the User at the specified index.
      * @param index
      */
-    public final static void remove(int index) {
+    public final static void remove(final int index) {
         users.remove(index);
     }
 

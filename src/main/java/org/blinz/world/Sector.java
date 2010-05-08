@@ -44,7 +44,7 @@ final class Sector extends ZoneObject {
      * @param x x coordinate of this Sectoer
      * @param y y coordinate of this Sectoer
      */
-    Sector(int x, int y) {
+    Sector(final int x, final int y) {
         bounds.setPosition(x, y);
     }
 
@@ -122,7 +122,7 @@ final class Sector extends ZoneObject {
      * Adds given Camera to this Sector to recieve current and incoming sprites.
      * @param sprite
      */
-    final void addCamera(Camera camera) {
+    final void addCamera(final Camera camera) {
         camerasToAdd.add(camera);
     }
 
@@ -130,7 +130,7 @@ final class Sector extends ZoneObject {
      * Removes the given Camera from this Sector.
      * @param camera
      */
-    final void removeCamera(Camera camera) {
+    final void removeCamera(final Camera camera) {
         camerasToRemove.add(camera);
     }
 
@@ -138,7 +138,7 @@ final class Sector extends ZoneObject {
      * Adds given sprite to this Sector.
      * @param sprite
      */
-    protected final void addSprite(BaseSprite sprite) {
+    protected final void addSprite(final BaseSprite sprite) {
         if (sprite instanceof UpdatingSprite) {
             updatingSpritesToAdd.add((UpdatingSprite) sprite);
         }
@@ -148,7 +148,7 @@ final class Sector extends ZoneObject {
      * Removes the given sprite from this sector.
      * @param sprite
      */
-    final void removeSprite(BaseSprite sprite) {
+    final void removeSprite(final BaseSprite sprite) {
         if (sprite instanceof UpdatingSprite) {
             updatingSpritesToRemove.add((UpdatingSprite) sprite);
         }
@@ -158,7 +158,7 @@ final class Sector extends ZoneObject {
      * Adds given sprite to the list of sprites intersecting this Sector.
      * @param sprite
      */
-    final void addIntersectingSprite(BaseSprite sprite) {
+    final void addIntersectingSprite(final BaseSprite sprite) {
         intersectingSprites.add(sprite);
         if (sprite instanceof CollidableSprite) {
             synchronized (collidibleSprites) {
@@ -174,7 +174,7 @@ final class Sector extends ZoneObject {
      * Removes the given sprite from the list of sprites intersecting this Sector.
      * @param sprite
      */
-    final void removeIntersectingSprite(BaseSprite sprite) {
+    final void removeIntersectingSprite(final BaseSprite sprite) {
         intersectingSprites.remove(sprite);
         if (sprite instanceof CollidableSprite) {
             synchronized (collidibleSprites) {
@@ -186,7 +186,7 @@ final class Sector extends ZoneObject {
         }
     }
 
-    final void checkCollisionsFor(CollidableSprite sprite) {
+    final void checkCollisionsFor(final CollidableSprite sprite) {
         synchronized (collidibleSprites) {
             for (int i = 0; i < collidibleSprites.size(); i++) {
                 BaseSprite s1 = (BaseSprite) sprite, s2 = (BaseSprite) collidibleSprites.get(i);
@@ -206,7 +206,7 @@ final class Sector extends ZoneObject {
      * Removes the given sprite from the list of sprites intersecting this Sector.
      * @param sprite
      */
-    synchronized final void deleteIntersectingSprite(BaseSprite sprite) {
+    synchronized final void deleteIntersectingSprite(final BaseSprite sprite) {
         removeIntersectingSprite(sprite);
     }
 
@@ -215,7 +215,7 @@ final class Sector extends ZoneObject {
      * in Zone.
      * @param sprite
      */
-    synchronized final void deleteUpdatingSprite(UpdatingSprite sprite) {
+    synchronized final void deleteUpdatingSprite(final UpdatingSprite sprite) {
         if (updatingSprites.remove(sprite)) {
             updatingSpritesToAdd.remove(sprite);
         }
@@ -227,7 +227,7 @@ final class Sector extends ZoneObject {
      * @param y
      * @return true if given point is within the bounds of this Sector, false otherwise
      */
-    final boolean contains(int x, int y) {
+    final boolean contains(final int x, final int y) {
         bounds.setSize(getData().sectorSize);
         return bounds.contains(x, y);
     }
@@ -238,7 +238,7 @@ final class Sector extends ZoneObject {
      * @param bounds
      * @return true if the specified coordinates intersect this Sector
      */
-    final boolean intersects(Bounds bounds) {
+    final boolean intersects(final Bounds bounds) {
         this.bounds.setSize(getData().sectorSize);
         return this.bounds.intersects(bounds);
     }
@@ -252,7 +252,7 @@ final class Sector extends ZoneObject {
      * @param height
      * @return true if the specified coordinates intersect this Sector
      */
-    final boolean intersects(int x, int y, int width, int height) {
+    final boolean intersects(final int x, final int y, final int width, final int height) {
         this.bounds.setSize(getData().sectorSize);
         return this.bounds.intersects(x, y, width, height);
     }

@@ -140,7 +140,7 @@ final class Scene {
      * @param sprite
      * @return SpriteContainer
      */
-    private final SpriteContainer fetchContainer(CameraSprite sprite) {
+    private final SpriteContainer fetchContainer(final CameraSprite sprite) {
         if (containers.empty()) {
             return new SpriteContainer(sprite);
         } else {
@@ -182,7 +182,7 @@ final class Scene {
      * @param low the point on the list where the sorting will begin
      * @param high the point on the list where the sorting will end
      */
-    private final void sortLayer(ArrayList<SpriteContainer> layer, int low, int high) {
+    private final void sortLayer(final ArrayList<SpriteContainer> layer, final int low, final int high) {
         if (low >= high) {
             return;
         }
@@ -209,7 +209,7 @@ final class Scene {
      * Holds important status information about the sprite it contains at the time
      * of the generation of a Scene.
      */
-    private class SpriteContainer {
+    private final class SpriteContainer {
 
         CameraSprite sprite;
         final Position3D loc = new Position3D();
@@ -223,7 +223,7 @@ final class Scene {
          *
          * @return the layer of the sprite this SpriteContainer represents.
          */
-        float layer() {
+        final float layer() {
             return loc.z;
         }
     }

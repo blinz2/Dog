@@ -519,7 +519,7 @@ public abstract class BaseSprite extends ZoneObject {
      * @param x the new x coordinate of this sprite
      * @param y the new y coordinate of this sprite
      */
-    public final void setPosition(int x, int y) {
+    public final void setPosition(final int x, final int y) {
         setX(x);
         setY(y);
     }
@@ -553,49 +553,49 @@ public abstract class BaseSprite extends ZoneObject {
      * A stub method for listening to clicks. Implement as needed.
      * @param event contains data about the input
      */
-    protected void buttonClicked(ClickEvent event) {
+    protected void buttonClicked(final ClickEvent event) {
     }
 
     /**
      * A stub method for listening to mouse button presses. Implement as needed.
      * @param event contains data about the input
      */
-    protected void buttonPressed(MouseEvent event) {
+    protected void buttonPressed(final MouseEvent event) {
     }
 
     /**
      * A stub method for listening to mouse button releases. Implement as needed.
      * @param event contains data about the input
      */
-    protected void buttonReleased(MouseEvent event) {
+    protected void buttonReleased(final MouseEvent event) {
     }
 
     /**
      * A stub method for listening to the mouse wheel. Implement as needed.
      * @param event contains data about the input
      */
-    protected void mouseWheelScroll(MouseWheelEvent event) {
+    protected void mouseWheelScroll(final MouseWheelEvent event) {
     }
 
     /**
      * A stub method for listening to the keys pressed. Implement as needed.
      * @param event contains data about the input
      */
-    protected void keyPressed(KeyEvent event) {
+    protected void keyPressed(final KeyEvent event) {
     }
 
     /**
      * A stub method for listening to the keys released. Implement as needed.
      * @param event contains data about the input
      */
-    protected void keyReleased(KeyEvent event) {
+    protected void keyReleased(final KeyEvent event) {
     }
 
     /**
      * A stub method for listening to the key typed. Implement as needed.
      * @param event contains data about the input
      */
-    protected void keyTyped(KeyEvent event) {
+    protected void keyTyped(final KeyEvent event) {
     }
 
     /**

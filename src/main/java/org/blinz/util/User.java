@@ -41,7 +41,7 @@ public class User {
      * Sets the name of the User to that in the String provided.
      * @param name
      */
-    public final void setName(String name) {
+    public final void setName(final String name) {
         this.name = name;
     }
 

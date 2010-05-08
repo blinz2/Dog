@@ -31,17 +31,17 @@ public interface SelectableSprite {
      * selected.
      * @param Graphics object with which to draw the selection indicator.
      */
-    public void drawSelectionIndicator(Graphics gfx, Bounds bounds);
+    public void drawSelectionIndicator(final Graphics gfx, final Bounds bounds);
 
     /**
      * Called when the sprite is selected from a ZoneObserver.
      * @param user the User that selected this sprite
      */
-    public void select(User user);
+    public void select(final User user);
 
     /**
      * Called when the sprite loses selected status.
      * @param user the User that deselected this sprite
      */
-    public void deselect(User user);
+    public void deselect(final User user);
 }

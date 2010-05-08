@@ -35,7 +35,7 @@ class UserListenerCatalog {
      * Contains a list of sprites that listen to the input of a certain User.
      * @author Blinz
      */
-    class UserListenerList {
+    final class UserListenerList {
 
         /**
          * Used for when the Zone is paused.
@@ -46,7 +46,6 @@ class UserListenerCatalog {
          */
         private final Vector<BaseSprite> sprites = new Vector<BaseSprite>();
         private Vector<BaseSprite> inputSprites;
-        private User user = null;
         /**
          * Count of how many Cameras accessing this UserListenerList.
          */

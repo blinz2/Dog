@@ -32,7 +32,7 @@ final class UnorderedList<E> {
      * @param i the index of the sprite to be retrieved
      * @return the sprite at the given location
      */
-    final E get(int i) {
+    final E get(final int i) {
         return elements.get(i);
     }
 
@@ -40,7 +40,7 @@ final class UnorderedList<E> {
      * Adds the given sprite to this SpriteList.
      * @param element added to this SpriteList
      */
-    final void add(E element) {
+    final void add(final E element) {
         synchronized (elements) {
             elements.add(element);
         }
@@ -52,7 +52,7 @@ final class UnorderedList<E> {
      * @param i the index of the sprite to be removed
      * @return the sprite removed
      */
-    final E remove(int i) {
+    final E remove(final int i) {
         if (elements.size() > i) {
             synchronized (elements) {
                 final E e = elements.set(i, elements.get(i));

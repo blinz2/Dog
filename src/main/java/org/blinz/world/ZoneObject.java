@@ -72,7 +72,7 @@ abstract class ZoneObject {
         return dataList[zoneID];
     }
 
-    final static void setZoneData(final int zoneID, ZoneData zoneData) {
+    final static void setZoneData(final int zoneID, final ZoneData zoneData) {
         dataList[zoneID] = zoneData;
     }
 

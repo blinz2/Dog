@@ -36,7 +36,7 @@ class CameraSprite implements MouseListener {
     }
 
     @Override
-    public void buttonClick(int buttonNumber, int numberOfClicks, int cursorX, int cursorY) {
+    public void buttonClick(final int buttonNumber, final int numberOfClicks, final int cursorX, final int cursorY) {
         if (sprite instanceof MouseListener) {
             MouseListener listener = (MouseListener) sprite;
             listener.buttonClick(buttonNumber, numberOfClicks, cursorX, cursorY);
@@ -44,7 +44,7 @@ class CameraSprite implements MouseListener {
     }
 
     @Override
-    public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
+    public void buttonPress(final int buttonNumber, final int cursorX, final int cursorY) {
         if (sprite instanceof MouseListener) {
             MouseListener listener = (MouseListener) sprite;
             listener.buttonPress(buttonNumber, cursorX, cursorY);
@@ -52,7 +52,7 @@ class CameraSprite implements MouseListener {
     }
 
     @Override
-    public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
+    public void buttonRelease(final int buttonNumber, final int cursorX, final int cursorY) {
         if (sprite instanceof MouseListener) {
             MouseListener listener = (MouseListener) sprite;
             listener.buttonRelease(buttonNumber, cursorX, cursorY);
@@ -118,8 +118,9 @@ class CameraSprite implements MouseListener {
 
     final void draw(final Graphics graphics, final Bounds bounds) {
         sprite.draw(graphics, bounds);
-        if (sprite instanceof SelectableSprite && isSelected())
-	    ((SelectableSprite) sprite).drawSelectionIndicator(graphics, bounds);
+        if (sprite instanceof SelectableSprite && isSelected()) {
+            ((SelectableSprite) sprite).drawSelectionIndicator(graphics, bounds);
+        }
     }
 
     boolean isMouseListener() {
