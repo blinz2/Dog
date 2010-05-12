@@ -62,7 +62,6 @@ public class Camera extends ZoneObject {
      * @param user
      */
     public Camera(final User user) {
-        System.out.println("Camera(User)");
         this.user = user;
     }
 
