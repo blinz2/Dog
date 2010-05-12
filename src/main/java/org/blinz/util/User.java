@@ -30,8 +30,22 @@ public class User {
     private static Vector<Integer> oldIDs = new Vector<Integer>();
 
     /**
-     * Returns a String representing the name of the User.
-     * @return String with the name of the User
+     * Constructor
+     */
+    public User() {
+    }
+
+    /**
+     * Constructor
+     * @param name the name of this user
+     */
+    public User(final String name) {
+        setName(name);
+    }
+
+    /**
+     * Gets a String representing the name of the User.
+     * @return a String with the name of the User
      */
     public final String getName() {
         return name;
@@ -39,7 +53,7 @@ public class User {
 
     /**
      * Sets the name of the User to that in the String provided.
-     * @param name
+     * @param name the name of this user
      */
     public final void setName(final String name) {
         this.name = name;
