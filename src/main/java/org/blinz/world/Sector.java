@@ -35,6 +35,10 @@ final class Sector extends ZoneObject {
      */
     private final UnorderedList<BaseSprite> intersectingSprites = new UnorderedList<BaseSprite>();
     private final UnorderedList<CollidableSprite> collidibleSprites = new UnorderedList<CollidableSprite>();
+    private UnorderedList<CollidableSprite> rightBorder = new UnorderedList<CollidableSprite>();
+    private UnorderedList<CollidableSprite> leftBorder = new UnorderedList<CollidableSprite>();
+    private UnorderedList<CollidableSprite> topBorder = new UnorderedList<CollidableSprite>();
+    private UnorderedList<CollidableSprite> bottomBorder = new UnorderedList<CollidableSprite>();
     private final Vector<Camera> cameras = new Vector<Camera>();
     private final Vector<Camera> camerasToAdd = new Vector<Camera>(), camerasToRemove = new Vector<Camera>();
     private final Bounds bounds = new Bounds();
@@ -165,7 +169,7 @@ final class Sector extends ZoneObject {
                 collidibleSprites.add((CollidableSprite) sprite);
             }
         }
-        for (Camera camera : cameras) {
+        for (final Camera camera : cameras) {
             camera.addSprite(sprite);
         }
     }
@@ -181,7 +185,7 @@ final class Sector extends ZoneObject {
                 collidibleSprites.add((CollidableSprite) sprite);
             }
         }
-        for (Camera camera : cameras) {
+        for (final Camera camera : cameras) {
             camera.decrementSpriteUsage(sprite);
         }
     }
@@ -190,8 +194,8 @@ final class Sector extends ZoneObject {
         synchronized (collidibleSprites) {
             for (int i = 0; i < collidibleSprites.size(); i++) {
                 BaseSprite s1 = (BaseSprite) sprite, s2 = (BaseSprite) collidibleSprites.get(i);
-                if ((Math.abs(s1.getLayer() - s2.getLayer()) < 1) &&
-                        Bounds.intersects(s1.getX(), s1.getY(), s1.getWidth(), s1.getHeight(),
+                if ((Math.abs(s1.getLayer() - s2.getLayer()) < 1)
+                        && Bounds.intersects(s1.getX(), s1.getY(), s1.getWidth(), s1.getHeight(),
                         s2.getX(), s2.getY(), s2.getWidth(), s2.getHeight())) {
                     if (s1 != s2) {
                         ((CollidableSprite) s1).collide(s2);
