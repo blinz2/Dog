@@ -145,8 +145,8 @@ public abstract class BaseSprite extends ZoneObject {
             }
 	}
 
-        Sector nbl = getData().getSectorOf(getX(), getY() + height);
-        Sector obl = getData().getSectorOf(getX(), getY() + getHeight());
+        final Sector nbl = getData().getSectorOf(getX(), getY() + height);
+        final Sector obl = getData().getSectorOf(getX(), getY() + getHeight());
 
         if (nbl != obl) {
             if (height > getHeight()) {
