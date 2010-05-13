@@ -63,7 +63,8 @@ public abstract class BaseSprite extends ZoneObject {
     public abstract int getHeight();
 
     /**
-     * @return a Position3D representing the position of this Sprite.
+     * Gets a new Position3D object representing the position of this Sprite.
+     * @return a new Position3D object representing the position of this Sprite.
      */
     public abstract Position3D getPosition();
 
@@ -274,17 +275,17 @@ public abstract class BaseSprite extends ZoneObject {
         }
 
 
-        Sector otl = zoneData.getSectorOf(getX(), getY());
-        Sector obr = zoneData.getSectorOf(getX() + getWidth(), getY() + getHeight());
+        final Sector otl = zoneData.getSectorOf(getX(), getY());
+        final Sector obr = zoneData.getSectorOf(getX() + getWidth(), getY() + getHeight());
 
-        Sector ntl = zoneData.getSectorOf(x, getY());
-        Sector nbr = zoneData.getSectorOf(x + getWidth(), getY() + getHeight());
+        final Sector ntl = zoneData.getSectorOf(x, getY());
+        final Sector nbr = zoneData.getSectorOf(x + getWidth(), getY() + getHeight());
 
         if (ntl != otl || nbr != obr) {//if Sector set has changed
-            Sector otr = zoneData.getSectorOf(getX() + getWidth(), getY());
-            Sector obl = zoneData.getSectorOf(getX(), getY() + getHeight());
-            Sector ntr = zoneData.getSectorOf(x + getWidth(), getY());
-            Sector nbl = zoneData.getSectorOf(x, getY() + getHeight());
+            final Sector otr = zoneData.getSectorOf(getX() + getWidth(), getY());
+            final Sector obl = zoneData.getSectorOf(getX(), getY() + getHeight());
+            final Sector ntr = zoneData.getSectorOf(x + getWidth(), getY());
+            final Sector nbl = zoneData.getSectorOf(x, getY() + getHeight());
 
             if (x > getX()) {//if moving right
                 if (ntl != nbl) {//if top does not equal bottom

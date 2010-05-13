@@ -35,10 +35,10 @@ final class Sector extends ZoneObject {
      */
     private final UnorderedList<BaseSprite> intersectingSprites = new UnorderedList<BaseSprite>();
     private final UnorderedList<CollidableSprite> collidibleSprites = new UnorderedList<CollidableSprite>();
-    private UnorderedList<CollidableSprite> rightBorder = new UnorderedList<CollidableSprite>();
-    private UnorderedList<CollidableSprite> leftBorder = new UnorderedList<CollidableSprite>();
-    private UnorderedList<CollidableSprite> topBorder = new UnorderedList<CollidableSprite>();
-    private UnorderedList<CollidableSprite> bottomBorder = new UnorderedList<CollidableSprite>();
+    private UnorderedList<CollidableSprite> leftBorder;
+    private final UnorderedList<CollidableSprite> rightBorder = new UnorderedList<CollidableSprite>();
+    private UnorderedList<CollidableSprite> topBorder;
+    private final UnorderedList<CollidableSprite> bottomBorder = new UnorderedList<CollidableSprite>();
     private final Vector<Camera> cameras = new Vector<Camera>();
     private final Vector<Camera> camerasToAdd = new Vector<Camera>(), camerasToRemove = new Vector<Camera>();
     private final Bounds bounds = new Bounds();
@@ -273,9 +273,11 @@ final class Sector extends ZoneObject {
         }
         if (ix < getData().sectors.length - 1) {
             rightNeighbor = getData().sectors[ix + 1][iy];
+            rightNeighbor.leftBorder = rightBorder;
         }
         if (iy < getData().sectors[ix].length - 1) {
             bottomNeighbor = getData().sectors[ix][iy + 1];
+            bottomNeighbor.topBorder = bottomBorder;
         }
     }
 
