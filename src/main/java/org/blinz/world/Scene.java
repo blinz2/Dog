@@ -146,7 +146,7 @@ final class Scene {
         } else {
             SpriteContainer sc = containers.pop();
             sc.sprite = sprite;
-            sc.loc.setPosition(sprite.getX(), sprite.getY(), sprite.getLayer());
+            sc.loc.setPosition(sprite.getX(), sprite.getY(), (int)sprite.getLayer());
             return sc;
         }
     }
@@ -216,7 +216,7 @@ final class Scene {
 
         SpriteContainer(CameraSprite sprite) {
             this.sprite = sprite;
-            loc.setPosition(sprite.getX(), sprite.getY(), sprite.getLayer());
+            loc.setPosition(sprite.getX(), sprite.getY(), (int)sprite.getLayer());
         }
 
         /**

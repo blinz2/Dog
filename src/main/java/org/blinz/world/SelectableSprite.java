@@ -29,7 +29,7 @@ public interface SelectableSprite {
     /**
      * Called to draw on top of the primary draw method when this sprite is
      * selected.
-     * @param Graphics object with which to draw the selection indicator.
+     * @param gfx Graphics object with which to draw the selection indicator.
      */
     public void drawSelectionIndicator(final Graphics gfx, final Bounds bounds);
 
