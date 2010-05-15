@@ -73,26 +73,8 @@ class ZoneData {
 
     final void addSprite(final BaseSprite sprite) {
         registerZoneObject(sprite);
-
-        Sector tl = getSectorOf(sprite.getX(), sprite.getY());
-        Sector br = getSectorOf(sprite.getX() + sprite.getWidth(),
-                sprite.getY() + sprite.getHeight());
-        tl.addIntersectingSprite(sprite);
+        final Sector tl = getSectorOf(sprite.getX(), sprite.getY());
         tl.addSprite(sprite);
-        if (tl != br) {
-            br.addIntersectingSprite(sprite);
-
-            //if the following condition evaluates to false the only way which br
-            //could have gone outside the area is if the bottom right corner is
-            //in the sector bellow the primary, thus there is no question whether
-            //or not the sprite should be added to bl
-            Sector tr = getSectorOf(sprite.getX() + sprite.getWidth(), sprite.getY());
-            if (tr != tl) {
-                tr.addIntersectingSprite(sprite);
-                //bl
-                getSectorOf(sprite.getX(), sprite.getY() + sprite.getHeight()).addIntersectingSprite(sprite);
-            }
-        }
     }
 
     /**
@@ -155,7 +137,7 @@ class ZoneData {
      * @param y
      * @return Sector of specified point
      */
-    final Sector getSectorOf(final int x,final  int y) {
+    final Sector getSectorOf(final int x, final int y) {
         return sectors[x / sectorWidth][y / sectorSize.height];
     }
 

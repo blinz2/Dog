@@ -98,33 +98,14 @@ public abstract class BaseSprite extends ZoneObject {
      * @param width
      */
     public final void setWidth(int width) {
-        if (width < 1)
-	    width = 1;
-	else {
+        if (width < 1) {
+            width = 1;
+        } else {
             if (width > getData().sectorWidth()) {
                 width = getData().sectorWidth();
             }
             if (width + getX() > getData().getZoneWidth()) {
                 width = getData().getZoneWidth() - getX();
-            }
-	}
-
-        Sector otr = getData().getSectorOf(getX() + getWidth(), getY());
-        Sector ntr = getData().getSectorOf(getX() + width, getY());
-
-        if (otr != ntr) {
-            if (width > getWidth()) {//if new width is greater
-                ntr.addIntersectingSprite(this);
-                Sector nbr = getData().getSectorOf(getX() + width, getY() + getHeight());
-                if (ntr != nbr) {
-                    nbr.addIntersectingSprite(this);
-                }
-            } else {//if old width is greater
-                otr.removeIntersectingSprite(this);
-                Sector obr = getData().getSectorOf(getX() + getWidth(), getY() + getHeight());
-                if (otr != obr) {
-                    obr.removeIntersectingSprite(this);
-                }
             }
         }
         updateWidth((short) width);
@@ -135,33 +116,14 @@ public abstract class BaseSprite extends ZoneObject {
      * @param height
      */
     public final void setHeight(int height) {
-    	if (height < 1) 
-	    height = 1;
-	else {
+        if (height < 1) {
+            height = 1;
+        } else {
             if (getY() + height > getData().getZoneHeight()) {
                 height = getData().getZoneHeight() - getY();
             }
             if (height > getData().sectorHeight()) {
                 height = getData().sectorHeight() - getY();
-            }
-	}
-
-        final Sector nbl = getData().getSectorOf(getX(), getY() + height);
-        final Sector obl = getData().getSectorOf(getX(), getY() + getHeight());
-
-        if (nbl != obl) {
-            if (height > getHeight()) {
-                nbl.addIntersectingSprite(this);
-                Sector nbr = getData().getSectorOf(getX() + getWidth(), getY() + height);
-                if (nbr != nbl) {
-                    nbr.addIntersectingSprite(this);
-                }
-            } else {
-                obl.removeIntersectingSprite(this);
-                Sector obr = getData().getSectorOf(getX() + getWidth(), getY() + getHeight());
-                if (obl != obr) {
-                    obr.removeIntersectingSprite(this);
-                }
             }
         }
         updateHeight((short) height);
@@ -179,80 +141,6 @@ public abstract class BaseSprite extends ZoneObject {
         }
         if (height > getData().sectorHeight()) {
             height = getData().sectorHeight();
-        }
-
-        if (getData() == null || (sector2().contains(getX() + getWidth(), getY() + height))) {
-            updateWidth((short) width);
-            updateHeight((short) height);
-            return;
-        }
-
-        if (height < getHeight()) {
-            final Sector goal = getData().getSectorOf(getX() + getWidth(), getY() + height);
-            Sector s2 = sector2();
-            while (s2 != goal) {
-                s2.removeSprite(this);
-
-                Sector s = s2.rightNeighbor;
-                Sector ts = getData().getSectorOf(getX(), s2.getY());
-
-                while (s != ts) {
-                    s.removeSprite(this);
-                    s = s.rightNeighbor;
-                }
-
-                s2 = s2.leftNeighbor;
-            }
-        } else {
-            final Sector goal = getData().getSectorOf(getX() + getWidth(), getY() + height);
-            Sector s2 = sector2();
-            while (s2 != goal) {
-                s2.addIntersectingSprite(this);
-
-                Sector s = s2.bottomNeighbor;
-                Sector ts = getData().getSectorOf(getX(), s2.getY());
-
-                while (s != ts) {
-                    s.addIntersectingSprite(this);
-                    s = s.bottomNeighbor;
-                }
-
-                s2 = s2.rightNeighbor;
-            }
-        }
-
-
-        if (width < getWidth()) {
-            final Sector goal = getData().getSectorOf(getX() + width, getY() + height);
-            Sector s2 = sector2();
-            while (s2 != goal) {
-                s2.removeSprite(this);
-
-                Sector s = s2.topNeighbor;
-                Sector ts = getData().getSectorOf(s2.getX(), getY() + height);
-
-                while (s != ts) {
-                    s.removeSprite(this);
-                    s = s.topNeighbor;
-                }
-
-                s2 = s2.leftNeighbor;
-            }
-        } else if (width > getWidth()) {
-            final Sector goal = getData().getSectorOf(getX() + width, getY() + height);
-            Sector s2 = sector2();
-            while (s2 != goal) {
-                s2.addIntersectingSprite(this);
-                Sector s = s2.topNeighbor;
-                Sector ts = getData().getSectorOf(s2.getX(), getY() + height);
-
-                while (s != ts) {
-                    s.addIntersectingSprite(this);
-                    s = s.topNeighbor;
-                }
-
-                s2 = s2.rightNeighbor;
-            }
         }
         updateWidth((short) width);
         updateHeight((short) height);
@@ -273,116 +161,10 @@ public abstract class BaseSprite extends ZoneObject {
         } else if (x + getWidth() > zoneData.getZoneWidth()) {
             x = zoneData.getZoneWidth() - getWidth();
         }
-
-
         final Sector otl = zoneData.getSectorOf(getX(), getY());
-        final Sector obr = zoneData.getSectorOf(getX() + getWidth(), getY() + getHeight());
-
         final Sector ntl = zoneData.getSectorOf(x, getY());
-        final Sector nbr = zoneData.getSectorOf(x + getWidth(), getY() + getHeight());
-
-        if (ntl != otl || nbr != obr) {//if Sector set has changed
-            final Sector otr = zoneData.getSectorOf(getX() + getWidth(), getY());
-            final Sector obl = zoneData.getSectorOf(getX(), getY() + getHeight());
-            final Sector ntr = zoneData.getSectorOf(x + getWidth(), getY());
-            final Sector nbl = zoneData.getSectorOf(x, getY() + getHeight());
-
-            if (x > getX()) {//if moving right
-                if (ntl != nbl) {//if top does not equal bottom
-                    if (ntl != otl) {//if left Sectors have changed
-                        otl.removeSprite(this);
-                        otl.removeIntersectingSprite(this);
-                        obl.removeIntersectingSprite(this);
-                        ntl.addSprite(this);
-                        if (ntl != otr) {//if new left isn't old right
-                            otr.removeIntersectingSprite(this);
-                            obr.removeIntersectingSprite(this);
-                            ntl.addIntersectingSprite(this);
-                            nbl.addIntersectingSprite(this);
-                        }
-                        if (ntl != ntr) {//if new left Sectors aren't the new right Sectors
-                            ntr.addIntersectingSprite(this);
-                            nbr.addIntersectingSprite(this);
-                        }
-                    } else {//the left Sectors have not changed, thus right Sectors have changed
-                        ntr.addIntersectingSprite(this);
-                        nbr.addIntersectingSprite(this);
-                    }
-
-                } else {//if top equals bottom
-                    if (ntl != otl) {//if left Sector has changed
-                        otl.removeSprite(this);
-                        otl.removeIntersectingSprite(this);
-                        ntl.addSprite(this);
-                        if (ntl != otr) {//if new left isn't old right
-                            otr.removeIntersectingSprite(this);
-                            ntl.addIntersectingSprite(this);
-                        }
-                        if (ntl != ntr) {//if new left Sector isn't the new right Sector
-                            ntr.addIntersectingSprite(this);
-                        }
-                    } else {//the left Sector has not changed, thus the right Sector has changed
-                        ntr.addIntersectingSprite(this);
-                    }
-                }
-
-            } else {//moving left
-                if (ntl != nbl) {//if top does not equal bottom
-                    if (ntr != otr) {//if right has changed
-                        otr.removeIntersectingSprite(this);
-                        obr.removeIntersectingSprite(this);
-                        if (ntl != otl) {//if old left isn't new left
-                            otl.removeSprite(this);
-                            ntl.addSprite(this);
-                            ntl.addIntersectingSprite(this);
-                            nbl.addIntersectingSprite(this);
-                            if (ntr != otl) {//if new right isn't old left
-                                otl.removeIntersectingSprite(this);
-                                obr.removeIntersectingSprite(this);
-                                if (ntr != ntl) {
-                                    ntr.addIntersectingSprite(this);
-                                    nbr.addIntersectingSprite(this);
-                                }
-                            }
-                        } else {//if old left is the new right
-                            otl.removeSprite(this);
-                            ntl.addSprite(this);
-                            ntl.addIntersectingSprite(this);
-                            nbr.addIntersectingSprite(this);
-                        }
-                    } else {//if right has not changed, left must have changed
-                        otl.removeSprite(this);
-                        ntl.addSprite(this);
-                        ntl.addIntersectingSprite(this);
-                        nbr.addIntersectingSprite(this);
-                    }
-                } else {//if top equals bottom
-                    if (ntr != otr) {//if right has changed
-                        otr.removeIntersectingSprite(this);
-                        if (ntl != otl) {//if old left isn't new left
-                            otl.removeSprite(this);
-                            ntl.addSprite(this);
-                            ntl.addIntersectingSprite(this);
-                            if (ntr != otl) {//if new right isn't old left
-                                otl.removeIntersectingSprite(this);
-                                if (ntr != ntl) {
-                                    ntr.addIntersectingSprite(this);
-                                }
-                            }
-                        } else {//if old left is the new right
-                            otl.removeSprite(this);
-                            ntl.addSprite(this);
-                            ntl.addIntersectingSprite(this);
-                        }
-                    } else {//if right has not changed, left must have changed
-                        otl.removeSprite(this);
-                        ntl.addSprite(this);
-                        ntl.addIntersectingSprite(this);
-                    }
-                }
-            }
-        }
-
+        otl.removeSprite(this, ntl);
+        ntl.addSprite(this);
         updateX(x);
     }
 
@@ -400,118 +182,10 @@ public abstract class BaseSprite extends ZoneObject {
         } else if (y + getHeight() > zoneData.getZoneHeight()) {
             y = zoneData.getZoneHeight() - getHeight();
         }
-
         final Sector otl = getData().getSectorOf(getX(), getY());
         final Sector ntl = getData().getSectorOf(getX(), y);
-        final Sector obr = getData().getSectorOf(getX() + getWidth(), getY() + getHeight());
-        final Sector nbr = getData().getSectorOf(getX() + getWidth(), y + getHeight());
-
-        if (otl != ntl || obr != nbr) {
-            final Sector otr = getData().getSectorOf(getX() + getWidth(), getY());
-            final Sector obl = getData().getSectorOf(getX(), getY() + getHeight());
-            final Sector ntr = getData().getSectorOf(getX() + getWidth(), y);
-            final Sector nbl = getData().getSectorOf(getX(), y + getHeight());
-            if (y > getY()) {//if moving down
-                if (otl != otr) {//if left does not equal right
-                    if (otl != ntl) {//if the top Sectors have changed
-                        otl.removeSprite(this);
-                        otl.removeIntersectingSprite(this);
-                        otr.removeIntersectingSprite(this);
-                        ntl.addSprite(this);
-                        if (ntl != obl) {
-                            ntl.addIntersectingSprite(this);
-                            ntr.addIntersectingSprite(this);
-                            obl.removeIntersectingSprite(this);
-                            obr.removeIntersectingSprite(this);
-                            if (ntl != nbl) {
-                                nbl.addIntersectingSprite(this);
-                                nbr.addIntersectingSprite(this);
-                            }
-                        } else {
-                            nbl.addIntersectingSprite(this);
-                            nbr.addIntersectingSprite(this);
-                        }
-                    } else {//if top Sectors haven't changed
-                        //add self to new bottom Sectors
-                        nbl.addIntersectingSprite(this);
-                        nbr.addIntersectingSprite(this);
-                    }
-                } else {//if left equals right
-                    if (otl != ntl) {//if the top Sector has changed
-                        otl.removeSprite(this);
-                        otl.removeIntersectingSprite(this);
-                        ntl.addSprite(this);
-                        if (ntl != obl) {//if the new top isn't the old bottom
-                            ntl.addIntersectingSprite(this);
-                            obl.removeIntersectingSprite(this);
-                            if (ntl != nbl) {
-                                nbl.addIntersectingSprite(this);
-                            }
-                        } else {
-                            nbl.addIntersectingSprite(this);
-                        }
-                    } else {//if top Sector hasn't changed
-                        //add self to the new bottom Sector
-                        nbl.addIntersectingSprite(this);
-                    }
-                }
-            } else {//if moving up
-                if (ntl != ntr) {//if does not left equal right
-                    if (otl != ntl) {//if the bottom Sector has changed
-                        obr.removeIntersectingSprite(this);
-                        obl.removeIntersectingSprite(this);
-                        if (nbl != otl) {//new bottom isn't old top
-                            otl.removeSprite(this);
-                            ntl.addSprite(this);
-                            otl.removeIntersectingSprite(this);
-                            otr.removeIntersectingSprite(this);
-                            ntl.addIntersectingSprite(this);
-                            ntr.addIntersectingSprite(this);
-                            if (ntl != nbl) {
-                                nbl.addIntersectingSprite(this);
-                                nbr.addIntersectingSprite(this);
-                            }
-                        } else {//if the new bottom is the old top
-                            if (ntl != otl) {
-                                ntl.addIntersectingSprite(this);
-                                ntr.addIntersectingSprite(this);
-                                ntl.addSprite(this);
-                                otl.removeSprite(this);
-                            }
-                        }
-                    } else {//bottom Sector has not changed
-                        otl.removeSprite(this);
-                        ntl.addIntersectingSprite(this);
-                        ntr.addIntersectingSprite(this);
-                        ntl.addSprite(this);
-                    }
-                } else {//if left equals right
-                    if (otl != ntl) {//if the bottom Sector has changed
-
-                        obl.removeIntersectingSprite(this);
-                        if (nbl != otl) {//new bottom isn't old top
-                            otl.removeSprite(this);
-                            ntl.addSprite(this);
-                            otl.removeIntersectingSprite(this);
-                            ntl.addIntersectingSprite(this);
-                            if (ntl != nbl) {
-                                nbl.addIntersectingSprite(this);
-                            }
-                        } else {//if the new bottom is the old top
-                            if (ntl != otl) {
-                                ntl.addIntersectingSprite(this);
-                                ntl.addSprite(this);
-                                otl.removeSprite(this);
-                            }
-                        }
-                    } else {//bottom Sector has not changed
-                        ntl.addSprite(this);
-                        ntl.addIntersectingSprite(this);
-                    }
-                }
-            }
-        }
-
+        otl.removeSprite(this, ntl);
+        ntl.addSprite(this);
         updateY(y);
     }
 

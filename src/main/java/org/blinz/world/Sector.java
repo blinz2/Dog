@@ -29,18 +29,11 @@ final class Sector extends ZoneObject {
     private final UnorderedList<UpdatingSprite> updatingSprites = new UnorderedList<UpdatingSprite>();
     private final Vector<UpdatingSprite> updatingSpritesToAdd = new Vector<UpdatingSprite>();
     private final Vector<UpdatingSprite> updatingSpritesToRemove = new Vector<UpdatingSprite>();
-    /**
-     * Sprites that intersect this Sector can be seen by observers viewing this
-     * Sector from above.
-     */
-    private final UnorderedList<BaseSprite> intersectingSprites = new UnorderedList<BaseSprite>();
+    private final UnorderedList<BaseSprite> memberSprites = new UnorderedList<BaseSprite>();
     private final UnorderedList<CollidableSprite> collidibleSprites = new UnorderedList<CollidableSprite>();
-    private UnorderedList<CollidableSprite> leftBorder;
-    private final UnorderedList<CollidableSprite> rightBorder = new UnorderedList<CollidableSprite>();
-    private UnorderedList<CollidableSprite> topBorder;
-    private final UnorderedList<CollidableSprite> bottomBorder = new UnorderedList<CollidableSprite>();
     private final Vector<Camera> cameras = new Vector<Camera>();
-    private final Vector<Camera> camerasToAdd = new Vector<Camera>(), camerasToRemove = new Vector<Camera>();
+    private final Vector<Camera> camerasToAdd = new Vector<Camera>();
+    private final Vector<Camera> camerasToRemove = new Vector<Camera>();
     private final Bounds bounds = new Bounds();
 
     /**
@@ -146,47 +139,29 @@ final class Sector extends ZoneObject {
         if (sprite instanceof UpdatingSprite) {
             updatingSpritesToAdd.add((UpdatingSprite) sprite);
         }
+        if (sprite instanceof CollidableSprite) {
+            collidibleSprites.add((CollidableSprite) sprite);
+        }
+        memberSprites.add(sprite);
     }
 
     /**
      * Removes the given sprite from this sector.
-     * @param sprite
+     * @param sprite the sprite to remove
+     * @param destination the Sector the given sprite is going to
      */
-    final void removeSprite(final BaseSprite sprite) {
+    final void removeSprite(final BaseSprite sprite, final Sector destination) {
         if (sprite instanceof UpdatingSprite) {
             updatingSpritesToRemove.add((UpdatingSprite) sprite);
         }
-    }
-
-    /**
-     * Adds given sprite to the list of sprites intersecting this Sector.
-     * @param sprite
-     */
-    final void addIntersectingSprite(final BaseSprite sprite) {
-        intersectingSprites.add(sprite);
         if (sprite instanceof CollidableSprite) {
             synchronized (collidibleSprites) {
-                collidibleSprites.add((CollidableSprite) sprite);
+                collidibleSprites.remove((CollidableSprite) sprite);
             }
         }
-        for (final Camera camera : cameras) {
-            camera.addSprite(sprite);
-        }
-    }
-
-    /**
-     * Removes the given sprite from the list of sprites intersecting this Sector.
-     * @param sprite
-     */
-    final void removeIntersectingSprite(final BaseSprite sprite) {
-        intersectingSprites.remove(sprite);
-        if (sprite instanceof CollidableSprite) {
-            synchronized (collidibleSprites) {
-                collidibleSprites.add((CollidableSprite) sprite);
-            }
-        }
-        for (final Camera camera : cameras) {
-            camera.decrementSpriteUsage(sprite);
+        memberSprites.remove(sprite);
+        for (int i = 0; i < cameras.size(); i++) {
+            cameras.get(i).alertToRelocation(sprite, destination);
         }
     }
 
@@ -204,14 +179,6 @@ final class Sector extends ZoneObject {
                 }
             }
         }
-    }
-
-    /**
-     * Removes the given sprite from the list of sprites intersecting this Sector.
-     * @param sprite
-     */
-    synchronized final void deleteIntersectingSprite(final BaseSprite sprite) {
-        removeIntersectingSprite(sprite);
     }
 
     /**
@@ -273,11 +240,9 @@ final class Sector extends ZoneObject {
         }
         if (ix < getData().sectors.length - 1) {
             rightNeighbor = getData().sectors[ix + 1][iy];
-            rightNeighbor.leftBorder = rightBorder;
         }
         if (iy < getData().sectors[ix].length - 1) {
             bottomNeighbor = getData().sectors[ix][iy + 1];
-            bottomNeighbor.topBorder = bottomBorder;
         }
     }
 
@@ -287,7 +252,6 @@ final class Sector extends ZoneObject {
     final void trimLists() {
         updatingSpritesToAdd.trimToSize();
         updatingSpritesToRemove.trimToSize();
-        intersectingSprites.trimToSize();
         cameras.trimToSize();
     }
 
@@ -309,18 +273,18 @@ final class Sector extends ZoneObject {
     private final void manageCameras() {
         //remove old Cameras
         for (int i = camerasToRemove.size() - 1; i > -1; i--) {
-            Camera camera = camerasToRemove.remove(i);
+            final Camera camera = camerasToRemove.remove(i);
             cameras.remove(camera);
-            for (int n = 0; n < intersectingSprites.size(); n++) {
-                camera.decrementSpriteUsage(intersectingSprites.get(n));
+            for (int n = 0; n < memberSprites.size(); n++) {
+                camera.removeSprite(memberSprites.get(n));
             }
         }
         //add new Cameras
         for (int i = camerasToAdd.size() - 1; i > -1; i--) {
-            Camera camera = camerasToAdd.remove(i);
+            final Camera camera = camerasToAdd.remove(i);
             cameras.add(camera);
-            for (int n = 0; n < intersectingSprites.size(); n++) {
-                camera.addSprite(intersectingSprites.get(n));
+            for (int n = 0; n < memberSprites.size(); n++) {
+                camera.removeSprite(memberSprites.get(n));
             }
         }
     }

@@ -380,44 +380,36 @@ public class Camera extends ZoneObject {
     }
 
     /**
-     * Adds the sprites on this list to the specified Sector's representation in
-     * this Camera.
-     * @param sprites
-     */
-    final void addSprites(final Vector<BaseSprite> sprites) {
-        for (int i = 0; i < sprites.size(); i++) {
-            addSprite(sprites.get(i));
-        }
-    }
-
-    /**
      * Adds a Sprite to the Camera. The Sprite is stored in a CameraSprite.
      * @param sprite
      */
-    final void addSprite(final BaseSprite sprite) {
-        CameraSprite s = spritesTable.get(sprite);
-        if (s != null) {
-            s.incrementUseCount();
-        } else {
-            s = new CameraSprite(sprite);
-            spritesTable.put(sprite, s);
-            insertSprite(s);
-            sortByLayer(spriteList, 0, spriteList.size() - 1);
+    final void addSprite(final BaseSprite sprite, final Sector sector) {
+        final CameraSprite s = new CameraSprite(sprite);
+        s.setSector(sector);
+        spritesTable.put(sprite, s);
+        insertSprite(s);
+        sortByLayer(spriteList, 0, spriteList.size() - 1);
+    }
+
+    /**
+     * Tells this Camera that the given sprite is moving.
+     * @param sprite the sprite moving
+     * @param destination the sprites destination
+     */
+    final void alertToRelocation(final BaseSprite sprite, final Sector destination) {
+        final CameraSprite w = spritesTable.get(sprite);
+        w.setSector(destination);
+        if (!inSector(destination)) {
+            spritesToRemove.add(sprite);
         }
     }
 
     /**
-     * Decrements the usage count for the Sprite's CameraSprite.
-     * @param sprite
+     * Removes the given sprite from this Camera.
+     * @param sprite the sprite to remove
      */
-    final void decrementSpriteUsage(final BaseSprite sprite) {
-        CameraSprite w = spritesTable.get(sprite);
-        if (w != null) {
-            w.decrementUseCount();
-            if (w.getUsageCount() < 1) {
-                spritesToRemove.add(sprite);
-            }
-        }
+    final void removeSprite(final BaseSprite sprite) {
+        spritesToRemove.add(sprite);
     }
 
     /**
@@ -430,7 +422,16 @@ public class Camera extends ZoneObject {
     }
 
     /**
-     * Inserts the givne sprite at proper in spriteList.
+     * Indicates whether or not this Camera is in the given Sector.
+     * @param Sector
+     * @return true if in the given Sector, false otherwise
+     */
+    private final boolean inSector(final Sector Sector) {
+        return bounds.contains(Sector.getX(), Sector.getY());
+    }
+
+    /**
+     * Inserts the given sprite at the proper place in spriteList.
      * List is kept in ascending order.
      * @param sprite
      */
@@ -526,7 +527,7 @@ public class Camera extends ZoneObject {
         for (int i = 0; i < spritesToRemove.size(); i++) {
             //Make sure the sprite didn't re-enter the observer between the
             //decrement to 0 and now.
-            if (spritesTable.get(spritesToRemove.get(i)).getUsageCount() < 1) {
+            if (!inSector(spritesTable.get(spritesToRemove.get(i)).getSector())) {
                 spritesTable.remove(spritesToRemove.get(i));
                 synchronized (spriteList) {
                     for (int n = 0; n < spriteList.size(); n++) {

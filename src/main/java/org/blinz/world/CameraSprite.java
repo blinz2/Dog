@@ -27,7 +27,7 @@ import org.blinz.util.Bounds;
  */
 class CameraSprite implements MouseListener {
 
-    private short useCount = 1;
+    private Sector sector;
     private BaseSprite sprite;
     private boolean isSelected = false;
 
@@ -60,28 +60,19 @@ class CameraSprite implements MouseListener {
     }
 
     /**
-     * Increments the number of Sectors in the Camera that have this CameraSprite's
-     * sprite.
+     * Sets the Sector that the sprite this CameraSprite represents belongs to.
+     * @param sector the Sector that the sprite this CameraSprite represents belongs to
      */
-    final void incrementUseCount() {
-        useCount++;
+    final void setSector(final Sector sector) {
+        this.sector = sector;
     }
 
     /**
-     * Decrements the number of Sectors in the Camera that have this CameraSprite's
-     * sprite.
+     * Gets the Sector that the sprite this CameraSprite represents belongs to.
+     * @return the Sector that the sprite this CameraSprite represents belongs to
      */
-    final void decrementUseCount() {
-        useCount--;
-    }
-
-    /**
-     * Returns the number of Sector's in the Camera that have this CameraSprite's
-     * sprite.
-     * @return int
-     */
-    final int getUsageCount() {
-        return useCount;
+    final Sector getSector() {
+        return sector;
     }
 
     /**

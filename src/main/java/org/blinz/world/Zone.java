@@ -626,20 +626,8 @@ public abstract class Zone extends ZoneObject {
      * @param sprite
      */
     private final void deleteSprite(final BaseSprite sprite) {
-        Sector tl = getData().getSectorOf(sprite.getX(), sprite.getY());
-        Sector br = getData().getSectorOf(sprite.getX() + sprite.getWidth(), sprite.getY() + sprite.getHeight());
-        tl.deleteIntersectingSprite(sprite);
-        if (sprite instanceof UpdatingSprite) {
-            tl.deleteUpdatingSprite((UpdatingSprite) sprite);
-        }
-        if (tl != br) {
-            br.deleteIntersectingSprite(sprite);
-            Sector tr = getData().getSectorOf(sprite.getX() + sprite.getWidth(), sprite.getY());
-            if (tr != br && tl != tr) {
-                getData().getSectorOf(sprite.getX(), sprite.getY() + sprite.getHeight()).deleteIntersectingSprite(sprite);
-                tr.deleteIntersectingSprite(sprite);
-            }
-        }
+        final Sector tl = getData().getSectorOf(sprite.getX(), sprite.getY());
+        tl.removeSprite(sprite, null);
         sprite.onDelete();
     }
 
