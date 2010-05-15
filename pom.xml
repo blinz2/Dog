@@ -4,7 +4,7 @@
   <groupId>org.blinz</groupId>
   <artifactId>BlinzEngine</artifactId>
   <packaging>jar</packaging>
-  <version>0.9.3.1</version>
+  <version>0.9.4.0-beta</version>
   <name>BlinzEngine</name>
   <url>None</url>
 
