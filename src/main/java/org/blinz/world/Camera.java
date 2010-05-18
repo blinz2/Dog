@@ -385,13 +385,13 @@ public class Camera extends ZoneObject {
     /**
      * Adds a Sprite to the Camera. The Sprite is tored in a CameraSprite.
      * @param sprite
+     * @param sector the Sector that the sprite belongs to
      */
     final void addSprite(final BaseSprite sprite, final Sector sector) {
 	final CameraSprite s = new CameraSprite(sprite);
 	s.setSector(sector);
 	spritesTable.put(sprite, s);
 	insertSprite(s);
-	sortByLayer(spriteList, 0, spriteList.size() - 1);
     }
 
     /**
@@ -438,15 +438,16 @@ public class Camera extends ZoneObject {
      * List is kept in ascending order.
      * @param sprite
      */
-    private final void insertSprite(CameraSprite sprite) {
+    private final void insertSprite(final CameraSprite sprite) {
 	synchronized (spriteList) {
-	    if (spriteList.isEmpty()) {
+	    if (spriteList.isEmpty()){
 		spriteList.add(sprite);
 		return;
 	    }
-	    for (int i = 0; i < spriteList.size(); i++) {
-		if (spriteList.get(i).getSprite().getLayer() > sprite.getLayer()) {
-		    spriteList.insertElementAt(sprite, i);
+	    for (int i = spriteList.size() - 1; i > -1; i--) {
+		if (spriteList.get(i).getLayer() <= sprite.getLayer()) {
+		    spriteList.insertElementAt(sprite, i + 1);
+		    break;
 		}
 	    }
 	}
@@ -461,55 +462,25 @@ public class Camera extends ZoneObject {
 	upcoming.manageContainers();
 
 	upcoming.translation.setPosition(getX(), getY());
-
-	Bounds b = new Bounds();
+	final Bounds b = new Bounds();
 	b.setPosition(upcoming.translation);
 	b.setSize(upcoming.size);
 	for (int i = 0; i < spriteList.size(); i++) {
-	    CameraSprite s = spriteList.get(i);
+	    final CameraSprite s = spriteList.get(i);
 	    if (b.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight())) {
 		upcoming.add(s);
 	    }
 	}
-
+	
 	upcoming.sortLayers();
-
-	b = null;
-
 	upcoming.unLock();
 	scene = upcoming;
     }
 
     /**
-     * Sorts the given layer's sprites according the sub-layer data using quick
-     * sort.
-     * NOTE: Should be rewritten with insertion sort.
-     * @param low the point on the list where the sorting will begin
-     * @param high the point on the list where the sorting will end
+     * Gets a Scene that is safe to write to.
+     * @return a Scene that is safe to write to
      */
-    private final void sortByLayer(Vector<CameraSprite> layer, int low, int high) {
-	if (low >= high) {
-	    return;
-	}
-
-	final CameraSprite pivot = layer.get(high);
-	int pivotIndex = high;
-	for (int i = low; i <= pivotIndex;) {
-	    if (layer.get(i).getLayer() > pivot.getLayer()) {
-		final CameraSprite current = layer.get(i);
-		layer.set(pivotIndex, current);
-		layer.set(i, layer.get(pivotIndex - 1));
-		layer.set(pivotIndex - 1, pivot);
-		pivotIndex--;
-	    } else {
-		i++;
-	    }
-	}
-
-	sortByLayer(layer, low, pivotIndex - 1);
-	sortByLayer(layer, pivotIndex + 1, high);
-    }
-
     private final Scene getScene() {
 	Scene retval = null;
 	while (retval == null) {
