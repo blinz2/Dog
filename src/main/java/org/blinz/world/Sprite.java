@@ -119,13 +119,13 @@ public abstract class Sprite extends BaseSprite {
     //PROTECTED METHODS---------------------------------------------------------
 
     @Override
-    protected final void updateWidth(final short width) {
-        this.width = width;
+    protected final void updateWidth(final int width) {
+        this.width = (short)width;
     }
 
     @Override
-    protected final void updateHeight(final short height) {
-        this.height = height;
+    protected final void updateHeight(final int height) {
+        this.height = (short)height;
     }
 
     @Override

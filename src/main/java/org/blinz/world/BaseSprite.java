@@ -37,7 +37,7 @@ public abstract class BaseSprite extends ZoneObject {
      * will be deleted by the garbage colletor.
      */
     public final void delete() {
-        getData().spritesToDelete.add(this);
+	getData().spritesToDelete.add(this);
     }
 
     /**
@@ -98,17 +98,17 @@ public abstract class BaseSprite extends ZoneObject {
      * @param width
      */
     public final void setWidth(int width) {
-        if (width < 1) {
-            width = 1;
-        } else {
-            if (width > getData().sectorWidth()) {
-                width = getData().sectorWidth();
-            }
-            if (width + getX() > getData().getZoneWidth()) {
-                width = getData().getZoneWidth() - getX();
-            }
-        }
-        updateWidth((short) width);
+	if (width < 1) {
+	    width = 1;
+	} else {
+	    if (width > getData().sectorWidth()) {
+		width = getData().sectorWidth();
+	    }
+	    if (width + getX() > getData().getZoneWidth()) {
+		width = getData().getZoneWidth() - getX();
+	    }
+	}
+	updateWidth((short) width);
     }
 
     /**
@@ -116,17 +116,17 @@ public abstract class BaseSprite extends ZoneObject {
      * @param height
      */
     public final void setHeight(int height) {
-        if (height < 1) {
-            height = 1;
-        } else {
-            if (getY() + height > getData().getZoneHeight()) {
-                height = getData().getZoneHeight() - getY();
-            }
-            if (height > getData().sectorHeight()) {
-                height = getData().sectorHeight() - getY();
-            }
-        }
-        updateHeight((short) height);
+	if (height < 1) {
+	    height = 1;
+	} else {
+	    if (getY() + height > getData().getZoneHeight()) {
+		height = getData().getZoneHeight() - getY();
+	    }
+	    if (height > getData().sectorHeight()) {
+		height = getData().sectorHeight() - getY();
+	    }
+	}
+	updateHeight((short) height);
     }
 
     /**
@@ -135,15 +135,15 @@ public abstract class BaseSprite extends ZoneObject {
      * @param height
      */
     public final void setSize(int width, int height) {
-        //Method excessively large because of frequency of call and need for efficiency
-        if (width > getData().sectorWidth()) {
-            width = getData().sectorWidth();
-        }
-        if (height > getData().sectorHeight()) {
-            height = getData().sectorHeight();
-        }
-        updateWidth((short) width);
-        updateHeight((short) height);
+	//Method excessively large because of frequency of call and need for efficiency
+	if (width > getData().sectorWidth()) {
+	    width = getData().sectorWidth();
+	}
+	if (height > getData().sectorHeight()) {
+	    height = getData().sectorHeight();
+	}
+	updateWidth((short) width);
+	updateHeight((short) height);
     }
 
     /**
@@ -152,20 +152,22 @@ public abstract class BaseSprite extends ZoneObject {
     
      */
     public final void setX(int x) {
-        //Method excessively large because of frequency of call and need for efficiency
-        final ZoneData zoneData = getData();
+	//Method excessively large because of frequency of call and need for efficiency
+	final ZoneData zoneData = getData();
 
-        //ensure the new location is within bounds
-        if (x < 0) {
-            x = 0;
-        } else if (x + getWidth() > zoneData.getZoneWidth()) {
-            x = zoneData.getZoneWidth() - getWidth();
-        }
-        final Sector otl = zoneData.getSectorOf(getX(), getY());
-        final Sector ntl = zoneData.getSectorOf(x, getY());
-        otl.removeSprite(this, ntl);
-        ntl.addSprite(this);
-        updateX(x);
+	//ensure the new location is within bounds
+	if (x < 0) {
+	    x = 0;
+	} else if (x + getWidth() > zoneData.getZoneWidth()) {
+	    x = zoneData.getZoneWidth() - getWidth();
+	}
+	final Sector otl = zoneData.getSectorOf(getX(), getY());
+	final Sector ntl = zoneData.getSectorOf(x, getY());
+	if (otl != ntl) {
+	    otl.removeSprite(this, ntl);
+	    ntl.addSprite(this);
+	}
+	updateX(x);
     }
 
     /**
@@ -173,20 +175,22 @@ public abstract class BaseSprite extends ZoneObject {
      * @param y the new y coordinate of this sprite
      */
     public final void setY(int y) {
-        //Method excessively large because of frequency of call and need for efficiency
-        final ZoneData zoneData = getData();
+	//Method excessively large because of frequency of call and need for efficiency
+	final ZoneData zoneData = getData();
 
-        //ensure the new location is within bounds
-        if (y < 0) {
-            y = 0;
-        } else if (y + getHeight() > zoneData.getZoneHeight()) {
-            y = zoneData.getZoneHeight() - getHeight();
-        }
-        final Sector otl = getData().getSectorOf(getX(), getY());
-        final Sector ntl = getData().getSectorOf(getX(), y);
-        otl.removeSprite(this, ntl);
-        ntl.addSprite(this);
-        updateY(y);
+	//ensure the new location is within bounds
+	if (y < 0) {
+	    y = 0;
+	} else if (y + getHeight() > zoneData.getZoneHeight()) {
+	    y = zoneData.getZoneHeight() - getHeight();
+	}
+	final Sector otl = getData().getSectorOf(getX(), getY());
+	final Sector ntl = getData().getSectorOf(getX(), y);
+	if (otl != ntl) {
+	    otl.removeSprite(this, ntl);
+	    ntl.addSprite(this);
+	}
+	updateY(y);
     }
 
     /**
@@ -195,8 +199,8 @@ public abstract class BaseSprite extends ZoneObject {
      * @param y the new y coordinate of this sprite
      */
     public final void setPosition(final int x, final int y) {
-        setX(x);
-        setY(y);
+	setX(x);
+	setY(y);
     }
 
     /**
@@ -207,12 +211,12 @@ public abstract class BaseSprite extends ZoneObject {
      * @param layer
      */
     public final void setLayer(float layer) {
-        if (layer < 0) {
-            layer = 0;
-        } else if (layer > 49) {
-            layer = 49;
-        }
-        updateLayer(layer);
+	if (layer < 0) {
+	    layer = 0;
+	} else if (layer > 49) {
+	    layer = 49;
+	}
+	updateLayer(layer);
     }
 
     /**
@@ -221,7 +225,7 @@ public abstract class BaseSprite extends ZoneObject {
      * time before it started executing for time it was paused.
      */
     protected final long zoneTime() {
-        return getData().zoneTime;
+	return getData().zoneTime;
     }
 
     /**
@@ -278,15 +282,15 @@ public abstract class BaseSprite extends ZoneObject {
      * @param sprite
      */
     protected final void addSpriteToZone(final BaseSprite sprite) {
-        getData().addSprite(sprite);
+	getData().addSprite(sprite);
     }
 
     /**
-     *
-     * @return the name assigned to this class as a String
+     * Gets the name assigned to this sprite as a String.
+     * @return the name assigned to this sprite as a String
      */
     protected String getName() {
-        return "BaseSprite";
+	return "BaseSprite";
     }
 
     protected abstract void draw(final Graphics g, final Bounds bounds);
@@ -298,13 +302,13 @@ public abstract class BaseSprite extends ZoneObject {
      * Updates the width of this sprite to that given.
      * @param width
      */
-    protected abstract void updateWidth(short width);
+    protected abstract void updateWidth(int width);
 
     /**
      * Updates the height of this sprite to that given.
      * @param height
      */
-    protected abstract void updateHeight(short height);
+    protected abstract void updateHeight(int height);
 
     /**
      * Updates the x of the sprite to that given.
@@ -323,12 +327,4 @@ public abstract class BaseSprite extends ZoneObject {
      * @param layer
      */
     protected abstract void updateLayer(float layer);
-
-    /**
-     * Returns the Sector in which the lower right corner of this sprite resides.
-     * @return Sector
-     */
-    private final Sector sector2() {
-        return getData().sectors[(getX() + getWidth()) / getData().sectorWidth()][getY() + getHeight() / getData().sectorHeight()];
-    }
 }
