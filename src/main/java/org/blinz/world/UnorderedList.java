@@ -28,6 +28,13 @@ final class UnorderedList<E> {
     private final ArrayList<E> elements = new ArrayList<E>();
 
     /**
+     * Clears all elements from the list.
+     */
+    final void clear() {
+        elements.clear();
+    }
+
+    /**
      *
      * @param i the index of the sprite to be retrieved
      * @return the sprite at the given location
