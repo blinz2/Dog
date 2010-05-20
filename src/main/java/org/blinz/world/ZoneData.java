@@ -206,6 +206,7 @@ class ZoneData {
                 sectors[i][n].trimLists();
             }
         }
+        userListeners.trimLists();
     }
 
     /**

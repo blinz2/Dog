@@ -29,7 +29,7 @@ import org.blinz.util.User;
  * Contains lists sprites listening for input from specific Users.
  * @author Blinz
  */
-class UserListenerCatalog {
+final class UserListenerCatalog {
 
     /**
      * Contains a list of sprites that listen to the input of a certain User.
@@ -37,6 +37,10 @@ class UserListenerCatalog {
      */
     final class UserListenerList {
 
+        /**
+         * Determines when the lists need to be trimmed.
+         */
+        private long timeOfLastClean = System.currentTimeMillis();
         /**
          * Used for when the Zone is paused.
          */
@@ -46,51 +50,56 @@ class UserListenerCatalog {
          */
         private final Vector<BaseSprite> sprites = new Vector<BaseSprite>();
         private Vector<BaseSprite> inputSprites;
+        private final Vector<ClickEvent> buttonClicks = new Vector<ClickEvent>();
+        private final Vector<MouseEvent> buttonPresses = new Vector<MouseEvent>();
+        private final Vector<MouseEvent> buttonReleases = new Vector<MouseEvent>();
+        private final Vector<KeyEvent> keyPresses = new Vector<KeyEvent>();
+        private final Vector<KeyEvent> keyReleases = new Vector<KeyEvent>();
+        private final Vector<KeyEvent> keyTypes = new Vector<KeyEvent>();
+        private final Vector<MouseWheelEvent> wheelScrolls = new Vector<MouseWheelEvent>();
         /**
          * Count of how many Cameras accessing this UserListenerList.
          */
         private int cameraCount = 0;
 
         public final void buttonClick(final ClickEvent e) {
-            for (int i = 0; i < inputSprites.size(); i++) {
-                inputSprites.get(i).buttonClicked(e);
-            }
+            buttonClicks.add(e);
         }
 
         public final void buttonPress(final MouseEvent e) {
-            for (int i = 0; i < inputSprites.size(); i++) {
-                inputSprites.get(i).buttonPressed(e);
-            }
+            buttonPresses.add(e);
         }
 
         public final void buttonRelease(final MouseEvent e) {
-            for (int i = 0; i < inputSprites.size(); i++) {
-                inputSprites.get(i).buttonReleased(e);
-            }
+            buttonReleases.add(e);
         }
 
         public final void keyPressed(final KeyEvent e) {
-            for (int i = 0; i < inputSprites.size(); i++) {
-                inputSprites.get(i).keyPressed(e);
-            }
+            keyPresses.add(e);
         }
 
         public final void keyReleased(final KeyEvent e) {
-            for (int i = 0; i < inputSprites.size(); i++) {
-                inputSprites.get(i).keyReleased(e);
-            }
+            keyReleases.add(e);
         }
 
         public final void keyTyped(final KeyEvent e) {
-            for (int i = 0; i < inputSprites.size(); i++) {
-                inputSprites.get(i).keyTyped(e);
-            }
+            keyTypes.add(e);
         }
 
         public final void wheelScroll(final MouseWheelEvent e) {
-            for (int i = 0; i < inputSprites.size(); i++) {
-                inputSprites.get(i).mouseWheelScroll(e);
-            }
+            wheelScrolls.add(e);
+        }
+
+        final void trimLists() {
+            sprites.trimToSize();
+            buttonClicks.trimToSize();
+            buttonPresses.trimToSize();
+            buttonReleases.trimToSize();
+            inputSprites.trimToSize();
+            keyPresses.trimToSize();
+            keyReleases.trimToSize();
+            keyTypes.trimToSize();
+            wheelScrolls.trimToSize();
         }
 
         private final void init() {
@@ -136,6 +145,48 @@ class UserListenerCatalog {
         private final void remove(final BaseSprite sprite) {
             inputSprites.remove(sprite);
         }
+
+        /**
+         * Updates this UserListenerCatalog, telling all sprites about relevant input.
+         */
+        private final void update() {
+
+            for (int n = 0; n < buttonClicks.size(); n++) {
+                for (int i = 0; i < inputSprites.size(); i++) {
+                    inputSprites.get(i).buttonClicked(buttonClicks.get(i));
+                }
+            }
+            for (int n = 0; n < buttonPresses.size(); n++) {
+                for (int i = 0; i < inputSprites.size(); i++) {
+                    inputSprites.get(i).buttonPressed(buttonPresses.get(i));
+                }
+            }
+            for (int n = 0; n < buttonReleases.size(); n++) {
+                for (int i = 0; i < inputSprites.size(); i++) {
+                    inputSprites.get(i).buttonReleased(buttonReleases.get(i));
+                }
+            }
+            for (int n = 0; n < keyPresses.size(); n++) {
+                for (int i = 0; i < inputSprites.size(); i++) {
+                    inputSprites.get(i).keyPressed(keyPresses.get(i));
+                }
+            }
+            for (int n = 0; n < keyReleases.size(); n++) {
+                for (int i = 0; i < inputSprites.size(); i++) {
+                    inputSprites.get(i).keyReleased(keyReleases.get(i));
+                }
+            }
+            for (int n = 0; n < keyTypes.size(); n++) {
+                for (int i = 0; i < inputSprites.size(); i++) {
+                    inputSprites.get(i).keyTyped(keyTypes.get(i));
+                }
+            }
+            for (int n = 0; n < wheelScrolls.size(); n++) {
+                for (int i = 0; i < inputSprites.size(); i++) {
+                    inputSprites.get(i).mouseWheelScroll(wheelScrolls.get(i));
+                }
+            }
+        }
     }
 
     /**
@@ -177,6 +228,21 @@ class UserListenerCatalog {
                 }
                 list.add(current.sprite);
             } while (!userListeners.contains(list));
+        }
+
+        final Enumeration<UserListenerList> list = userListeners.elements();
+        while (list.hasMoreElements()) {
+            list.nextElement().update();
+        }
+    }
+
+    /**
+     * Trims the lists under this object and its subordinates down to size.
+     */
+    final void trimLists() {
+        final Enumeration<UserListenerList> list = userListeners.elements();
+        while (list.hasMoreElements()) {
+            list.nextElement().trimLists();
         }
     }
 
