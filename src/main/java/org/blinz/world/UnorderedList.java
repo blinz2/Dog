@@ -16,7 +16,7 @@
  */
 package org.blinz.world;
 
-import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  * An unordered list with special optimizations for handling unordered items more
@@ -25,7 +25,15 @@ import java.util.ArrayList;
  */
 final class UnorderedList<E> {
 
-    private final ArrayList<E> elements = new ArrayList<E>();
+    private final Vector<E> elements = new Vector<E>();
+
+    /**
+     * Indicates whether or not this list is empty.
+     * @return true if the list is empty, false otherwise
+     */
+    final boolean isEmpty() {
+        return elements.isEmpty();
+    }
 
     /**
      * Clears all elements from the list.
