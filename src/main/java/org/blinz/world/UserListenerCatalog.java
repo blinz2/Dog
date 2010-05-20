@@ -150,40 +150,46 @@ final class UserListenerCatalog {
          * Updates this UserListenerCatalog, telling all sprites about relevant input.
          */
         private final void update() {
-
-            for (int n = 0; n < buttonClicks.size(); n++) {
+            int end = buttonClicks.size() - 1;
+            while (!buttonClicks.isEmpty()) {
                 for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).buttonClicked(buttonClicks.get(i));
+                    inputSprites.get(i).buttonClicked(buttonClicks.remove(end));
                 }
             }
-            for (int n = 0; n < buttonPresses.size(); n++) {
+            end = buttonPresses.size() - 1;
+            while (!buttonPresses.isEmpty()) {
                 for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).buttonPressed(buttonPresses.get(i));
+                    inputSprites.get(i).buttonPressed(buttonPresses.remove(end));
                 }
             }
-            for (int n = 0; n < buttonReleases.size(); n++) {
+            end = buttonReleases.size() - 1;
+            while (!buttonReleases.isEmpty()) {
                 for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).buttonReleased(buttonReleases.get(i));
+                    inputSprites.get(i).buttonReleased(buttonReleases.remove(end));
                 }
             }
-            for (int n = 0; n < keyPresses.size(); n++) {
+            end = keyPresses.size() - 1;
+            while (!keyPresses.isEmpty()) {
                 for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).keyPressed(keyPresses.get(i));
+                    inputSprites.get(i).keyPressed(keyPresses.remove(end));
                 }
             }
-            for (int n = 0; n < keyReleases.size(); n++) {
+            end = keyReleases.size() - 1;
+            while (!keyReleases.isEmpty()) {
                 for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).keyReleased(keyReleases.get(i));
+                    inputSprites.get(i).keyReleased(keyReleases.remove(end));
                 }
             }
-            for (int n = 0; n < keyTypes.size(); n++) {
+            end = keyTypes.size() - 1;
+            while (!keyTypes.isEmpty()) {
                 for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).keyTyped(keyTypes.get(i));
+                    inputSprites.get(i).keyTyped(keyTypes.remove(end));
                 }
             }
-            for (int n = 0; n < wheelScrolls.size(); n++) {
+            end = wheelScrolls.size() - 1;
+            while (!wheelScrolls.isEmpty()) {
                 for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).mouseWheelScroll(wheelScrolls.get(i));
+                    inputSprites.get(i).mouseWheelScroll(wheelScrolls.remove(end));
                 }
             }
         }
