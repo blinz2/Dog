@@ -37,157 +37,160 @@ final class UserListenerCatalog {
      */
     final class UserListenerList {
 
-        /**
-         * Used for when the Zone is paused.
-         */
-        private final Vector<BaseSprite> dummyList = new Vector<BaseSprite>();
-        /**
-         * The primary sprite list.
-         */
-        private final Vector<BaseSprite> sprites = new Vector<BaseSprite>();
-        private Vector<BaseSprite> inputSprites;
-        private final Vector<ClickEvent> buttonClicks = new Vector<ClickEvent>();
-        private final Vector<MouseEvent> buttonPresses = new Vector<MouseEvent>();
-        private final Vector<MouseEvent> buttonReleases = new Vector<MouseEvent>();
-        private final Vector<KeyEvent> keyPresses = new Vector<KeyEvent>();
-        private final Vector<KeyEvent> keyReleases = new Vector<KeyEvent>();
-        private final Vector<KeyEvent> keyTypes = new Vector<KeyEvent>();
-        private final Vector<MouseWheelEvent> wheelScrolls = new Vector<MouseWheelEvent>();
-        /**
-         * Count of how many Cameras accessing this UserListenerList.
-         */
-        private int cameraCount = 0;
+	/**
+	 * Used for when the Zone is paused.
+	 */
+	private final Vector<BaseSprite> dummyList = new Vector<BaseSprite>();
+	/**
+	 * The primary sprite list.
+	 */
+	private final Vector<BaseSprite> sprites = new Vector<BaseSprite>();
+	private Vector<BaseSprite> inputSprites;
+	private final Vector<ClickEvent> buttonClicks = new Vector<ClickEvent>();
+	private final Vector<MouseEvent> buttonPresses = new Vector<MouseEvent>();
+	private final Vector<MouseEvent> buttonReleases = new Vector<MouseEvent>();
+	private final Vector<KeyEvent> keyPresses = new Vector<KeyEvent>();
+	private final Vector<KeyEvent> keyReleases = new Vector<KeyEvent>();
+	private final Vector<KeyEvent> keyTypes = new Vector<KeyEvent>();
+	private final Vector<MouseWheelEvent> wheelScrolls = new Vector<MouseWheelEvent>();
+	/**
+	 * Count of how many Cameras accessing this UserListenerList.
+	 */
+	private int cameraCount = 0;
 
-        public final void buttonClick(final ClickEvent e) {
-            buttonClicks.add(e);
-        }
+	private UserListenerList() {
+	}
 
-        public final void buttonPress(final MouseEvent e) {
-            buttonPresses.add(e);
-        }
+	public final void buttonClick(final ClickEvent e) {
+	    buttonClicks.add(e);
+	}
 
-        public final void buttonRelease(final MouseEvent e) {
-            buttonReleases.add(e);
-        }
+	public final void buttonPress(final MouseEvent e) {
+	    buttonPresses.add(e);
+	}
 
-        public final void keyPressed(final KeyEvent e) {
-            keyPresses.add(e);
-        }
+	public final void buttonRelease(final MouseEvent e) {
+	    buttonReleases.add(e);
+	}
 
-        public final void keyReleased(final KeyEvent e) {
-            keyReleases.add(e);
-        }
+	public final void keyPressed(final KeyEvent e) {
+	    keyPresses.add(e);
+	}
 
-        public final void keyTyped(final KeyEvent e) {
-            keyTypes.add(e);
-        }
+	public final void keyReleased(final KeyEvent e) {
+	    keyReleases.add(e);
+	}
 
-        public final void wheelScroll(final MouseWheelEvent e) {
-            wheelScrolls.add(e);
-        }
+	public final void keyTyped(final KeyEvent e) {
+	    keyTypes.add(e);
+	}
 
-        final void trimLists() {
-            sprites.trimToSize();
-            buttonClicks.trimToSize();
-            buttonPresses.trimToSize();
-            buttonReleases.trimToSize();
-            keyPresses.trimToSize();
-            keyReleases.trimToSize();
-            keyTypes.trimToSize();
-            wheelScrolls.trimToSize();
-        }
+	public final void wheelScroll(final MouseWheelEvent e) {
+	    wheelScrolls.add(e);
+	}
 
-        private final void init() {
-            inputSprites = paused ? dummyList : sprites;
-        }
+	final void trimLists() {
+	    sprites.trimToSize();
+	    buttonClicks.trimToSize();
+	    buttonPresses.trimToSize();
+	    buttonReleases.trimToSize();
+	    keyPresses.trimToSize();
+	    keyReleases.trimToSize();
+	    keyTypes.trimToSize();
+	    wheelScrolls.trimToSize();
+	}
 
-        /**
-         * Suspend reception of user input to the sprites.
-         */
-        private final void pause() {
-            inputSprites = dummyList;
-        }
+	private final void init() {
+	    inputSprites = paused ? dummyList : sprites;
+	}
 
-        /**
-         * Resume reception of user input to the sprites.
-         */
-        private final void unpause() {
-            inputSprites = sprites;
-        }
+	/**
+	 * Suspend reception of user input to the sprites.
+	 */
+	private final void pause() {
+	    inputSprites = dummyList;
+	}
 
-        /**
-         *
-         * @return true if this list has no Cameras or sprites, false otherwise.
-         */
-        private final boolean dead() {
-            return cameraCount == 0 && inputSprites.isEmpty();
-        }
+	/**
+	 * Resume reception of user input to the sprites.
+	 */
+	private final void unpause() {
+	    inputSprites = sprites;
+	}
 
-        /**
-         * Adds the given sprite to this list.
-         * For use by UserListenerCatalog.
-         * @param sprite
-         */
-        private final void add(final BaseSprite sprite) {
-            inputSprites.add(sprite);
-        }
+	/**
+	 *
+	 * @return true if this list has no Cameras or sprites, false otherwise.
+	 */
+	private final boolean dead() {
+	    return cameraCount == 0 && inputSprites.isEmpty();
+	}
 
-        /**
-         * Removes the given sprite from this list.
-         * For use by UserListenerCatalog.
-         * @param sprite
-         */
-        private final void remove(final BaseSprite sprite) {
-            inputSprites.remove(sprite);
-        }
+	/**
+	 * Adds the given sprite to this list.
+	 * For use by UserListenerCatalog.
+	 * @param sprite
+	 */
+	private final void add(final BaseSprite sprite) {
+	    inputSprites.add(sprite);
+	}
 
-        /**
-         * Updates this UserListenerCatalog, telling all sprites about relevant input.
-         */
-        private final void update() {
-            int end = buttonClicks.size() - 1;
-            while (!buttonClicks.isEmpty()) {
-                for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).buttonClicked(buttonClicks.remove(end));
-                }
-            }
-            end = buttonPresses.size() - 1;
-            while (!buttonPresses.isEmpty()) {
-                for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).buttonPressed(buttonPresses.remove(end));
-                }
-            }
-            end = buttonReleases.size() - 1;
-            while (!buttonReleases.isEmpty()) {
-                for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).buttonReleased(buttonReleases.remove(end));
-                }
-            }
-            end = keyPresses.size() - 1;
-            while (!keyPresses.isEmpty()) {
-                for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).keyPressed(keyPresses.remove(end));
-                }
-            }
-            end = keyReleases.size() - 1;
-            while (!keyReleases.isEmpty()) {
-                for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).keyReleased(keyReleases.remove(end));
-                }
-            }
-            end = keyTypes.size() - 1;
-            while (!keyTypes.isEmpty()) {
-                for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).keyTyped(keyTypes.remove(end));
-                }
-            }
-            end = wheelScrolls.size() - 1;
-            while (!wheelScrolls.isEmpty()) {
-                for (int i = 0; i < inputSprites.size(); i++) {
-                    inputSprites.get(i).mouseWheelScroll(wheelScrolls.remove(end));
-                }
-            }
-        }
+	/**
+	 * Removes the given sprite from this list.
+	 * For use by UserListenerCatalog.
+	 * @param sprite
+	 */
+	private final void remove(final BaseSprite sprite) {
+	    inputSprites.remove(sprite);
+	}
+
+	/**
+	 * Updates this UserListenerCatalog, telling all sprites about relevant input.
+	 */
+	private final void update() {
+	    int end = buttonClicks.size() - 1;
+	    while (!buttonClicks.isEmpty()) {
+		for (int i = 0; i < inputSprites.size(); i++) {
+		    inputSprites.get(i).buttonClicked(buttonClicks.remove(end--));
+		}
+	    }
+	    end = buttonPresses.size() - 1;
+	    while (!buttonPresses.isEmpty()) {
+		for (int i = 0; i < inputSprites.size(); i++) {
+		    inputSprites.get(i).buttonPressed(buttonPresses.remove(end--));
+		}
+	    }
+	    end = buttonReleases.size() - 1;
+	    while (!buttonReleases.isEmpty()) {
+		for (int i = 0; i < inputSprites.size(); i++) {
+		    inputSprites.get(i).buttonReleased(buttonReleases.remove(end--));
+		}
+	    }
+	    end = keyPresses.size() - 1;
+	    while (!keyPresses.isEmpty()) {
+		for (int i = 0; i < inputSprites.size(); i++) {
+		    inputSprites.get(i).keyPressed(keyPresses.remove(end--));
+		}
+	    }
+	    end = keyReleases.size() - 1;
+	    while (!keyReleases.isEmpty()) {
+		for (int i = 0; i < inputSprites.size(); i++) {
+		    inputSprites.get(i).keyReleased(keyReleases.remove(end--));
+		}
+	    }
+	    end = keyTypes.size() - 1;
+	    while (!keyTypes.isEmpty()) {
+		for (int i = 0; i < inputSprites.size(); i++) {
+		    inputSprites.get(i).keyTyped(keyTypes.remove(end--));
+		}
+	    }
+	    end = wheelScrolls.size() - 1;
+	    while (!wheelScrolls.isEmpty()) {
+		for (int i = 0; i < inputSprites.size(); i++) {
+		    inputSprites.get(i).mouseWheelScroll(wheelScrolls.remove(end--));
+		}
+	    }
+	}
     }
 
     /**
@@ -195,13 +198,13 @@ final class UserListenerCatalog {
      */
     private final class Pair {
 
-        private User user;
-        private BaseSprite sprite;
+	private User user;
+	private BaseSprite sprite;
 
-        private Pair(User user, BaseSprite sprite) {
-            this.user = user;
-            this.sprite = sprite;
-        }
+	private Pair(User user, BaseSprite sprite) {
+	    this.user = user;
+	    this.sprite = sprite;
+	}
     }
     private boolean paused = false;
     private final Hashtable<User, UserListenerList> userListeners = new Hashtable<User, UserListenerList>();
@@ -209,42 +212,42 @@ final class UserListenerCatalog {
     private final Vector<Pair> toAdd = new Vector<Pair>();
 
     protected final void update() {
-        //remove old pairs
-        Pair current = null;
-        while ((current = nextToRemove()) != null) {
-            UserListenerList list = userListeners.get(current.user);
-            list.remove(current.sprite);
-            if (list.dead()) {
-                userListeners.remove(current.user);
-            }
-        }
+	//remove old pairs
+	Pair current = null;
+	while ((current = nextToRemove()) != null) {
+	    final UserListenerList list = userListeners.get(current.user);
+	    list.remove(current.sprite);
+	    if (list.dead()) {
+		userListeners.remove(current.user);
+	    }
+	}
 
-        //add new pairs
-        while ((current = nextToAdd()) != null) {
-            UserListenerList list;
-            do {
-                list = userListeners.get(current.user);
-                if (list == null) {
-                    list = fetchList(current.user);
-                }
-                list.add(current.sprite);
-            } while (!userListeners.contains(list));
-        }
+	//add new pairs
+	while ((current = nextToAdd()) != null) {
+	    UserListenerList list;
+	    do {
+		list = userListeners.get(current.user);
+		if (list == null) {
+		    list = fetchList(current.user, 0);
+		}
+		list.add(current.sprite);
+	    } while (!userListeners.contains(list));
+	}
 
-        final Enumeration<UserListenerList> list = userListeners.elements();
-        while (list.hasMoreElements()) {
-            list.nextElement().update();
-        }
+	final Enumeration<UserListenerList> list = userListeners.elements();
+	while (list.hasMoreElements()) {
+	    list.nextElement().update();
+	}
     }
 
     /**
      * Trims the lists under this object and its subordinates down to size.
      */
     final void trimLists() {
-        final Enumeration<UserListenerList> list = userListeners.elements();
-        while (list.hasMoreElements()) {
-            list.nextElement().trimLists();
-        }
+	final Enumeration<UserListenerList> list = userListeners.elements();
+	while (list.hasMoreElements()) {
+	    list.nextElement().trimLists();
+	}
     }
 
     /**
@@ -253,48 +256,47 @@ final class UserListenerCatalog {
      * @return the list of sprites listening to the given User
      */
     final UserListenerList get(final User user) {
-        return userListeners.get(user);
+	return userListeners.get(user);
     }
 
     /**
      * Checks out the list associated with the given User.
      * checkIn should be called when the list is no longer needed.
-     *
+     * For use by Cameras.
      * @param user the User who's list is to be returned
      * @return the sprite list associated with the given User
      */
     final UserListenerList checkOut(final User user) {
-        UserListenerList list;
-        do {
-            list = get(user);
-            if (list == null) {
-                list = fetchList(user);
-            }
-            list.cameraCount++;
-        } while (!userListeners.containsKey(user));
-        return list;
+	UserListenerList list;
+	do {
+	    list = get(user);
+	    if (list == null) {
+		list = fetchList(user, 1);
+	    }
+	} while (!userListeners.containsKey(user));
+	return list;
     }
 
     /**
      * Used by Zone to pause sprites recieving of user input while the Zone is paused.
      */
     final void pause() {
-        paused = true;
-        Enumeration<UserListenerList> list = userListeners.elements();
-        while (list.hasMoreElements()) {
-            list.nextElement().pause();
-        }
+	paused = true;
+	Enumeration<UserListenerList> list = userListeners.elements();
+	while (list.hasMoreElements()) {
+	    list.nextElement().pause();
+	}
     }
 
     /**
      * Used by Zone to unpause sprites recieving of user input while the Zone is paused.
      */
     final void unpause() {
-        paused = false;
-        Enumeration<UserListenerList> list = userListeners.elements();
-        while (list.hasMoreElements()) {
-            list.nextElement().unpause();
-        }
+	paused = false;
+	Enumeration<UserListenerList> list = userListeners.elements();
+	while (list.hasMoreElements()) {
+	    list.nextElement().unpause();
+	}
     }
 
     /**
@@ -302,11 +304,11 @@ final class UserListenerCatalog {
      * @param user
      */
     final void checkIn(final User user) {
-        UserListenerList list = userListeners.get(user);
-        list.cameraCount--;
-        if (list.dead()) {
-            userListeners.remove(user);
-        }
+	UserListenerList list = userListeners.get(user);
+	list.cameraCount--;
+	if (list.dead()) {
+	    userListeners.remove(user);
+	}
     }
 
     /**
@@ -315,7 +317,7 @@ final class UserListenerCatalog {
      * @param sprite
      */
     final void add(final User user, final BaseSprite sprite) {
-        toAdd.add(new Pair(user, sprite));
+	toAdd.add(new Pair(user, sprite));
     }
 
     /**
@@ -324,42 +326,44 @@ final class UserListenerCatalog {
      * @param sprite
      */
     final void remove(final User user, final BaseSprite sprite) {
-        toRemove.add(new Pair(user, sprite));
+	toRemove.add(new Pair(user, sprite));
     }
 
     /**
      * @return the next sprite to remove
      */
     private final Pair nextToRemove() {
-        if (toRemove.isEmpty()) {
-            return null;
-        }
-        return toRemove.remove(0);
+	if (toRemove.isEmpty()) {
+	    return null;
+	}
+	return toRemove.remove(0);
     }
 
     /**
      * @return the next sprite to add
      */
     private final Pair nextToAdd() {
-        if (toAdd.isEmpty()) {
-            return null;
-        }
-        return toAdd.remove(0);
+	if (toAdd.isEmpty()) {
+	    return null;
+	}
+	return toAdd.remove(0);
     }
 
     /**
      * Adds a sprite list for the given User if it does not exist, returns the existing
      * one if it does.
      * @param user
+     * @param cameras the number of additional Cameras to access this list.
      */
-    private final synchronized UserListenerList fetchList(final User user) {
-        if (!userListeners.contains(user)) {
-            UserListenerList list = new UserListenerList();
-            userListeners.put(user, list);
-            list.init();
-            return list;
-        } else {
-            return userListeners.get(user);
-        }
+    private final synchronized UserListenerList fetchList(final User user, final int cameras) {
+	if (!userListeners.contains(user)) {
+	    final UserListenerList list = new UserListenerList();
+	    list.cameraCount += cameras;
+	    userListeners.put(user, list);
+	    list.init();
+	    return list;
+	} else {
+	    return userListeners.get(user);
+	}
     }
 }

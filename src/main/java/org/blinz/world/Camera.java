@@ -76,7 +76,6 @@ public class Camera extends ZoneObject {
      */
     public Camera(final User user) {
 	this.user = user;
-	userListeners = getData().userListeners.checkOut(user);
     }
 
     /**
@@ -111,10 +110,11 @@ public class Camera extends ZoneObject {
      * Drops the current zone, the Camera will have no Zone to moniter after
      * this method is called.
      */
-    public final void dropZone() {
+    public final synchronized void dropZone() {
 	if (zone != null) {
 	    zone.removeCamera(this);
 	    spriteTable.clear();
+	    getData().userListeners.checkIn(user);
 	    zone = null;
 	    inputListener = null;
 	}
@@ -267,6 +267,7 @@ public class Camera extends ZoneObject {
 
     @Override
     final void internalInit() {
+	userListeners = getData().userListeners.checkOut(user);
 	//add relevant Sectors
 	final int x1 = sector1().leftNeighbor != null ? sector1().leftNeighbor.getX() : 0;
 	final int y1 = sector1().topNeighbor != null ? sector1().topNeighbor.getY() : 0;
@@ -283,6 +284,7 @@ public class Camera extends ZoneObject {
 		}
 	    }
 	}
+	init();
     }
 
     /**
@@ -428,7 +430,7 @@ public class Camera extends ZoneObject {
 	    for (int x = x1; x < x2; x += getData().sectorWidth()) {
 		for (int y = y1; y < y2; y += getData().sectorHeight()) {
 		    final Sector s = getData().getSectorOf(x, y);
-		    if (s.withinSpriteRange(oldBounds.x, oldBounds.y)) {
+		    if (!s.withinSpriteRange(oldBounds.x, oldBounds.y)) {
 			sectors.add(s);
 			final UnorderedList<BaseSprite> list = s.getSprites();
 			for (int i = 0; i < list.size(); i++) {
