@@ -169,6 +169,7 @@ public abstract class Zone extends ZoneObject {
                     }
 
                     //Update Cameras
+                    addCameras();
                     for (Camera camera = nextCamera(); camera != null; camera = nextCamera()) {
                         camera.internalUpdate();
                     }
@@ -308,6 +309,7 @@ public abstract class Zone extends ZoneObject {
     }
     private Size size;
     private final Vector<Camera> cameras = new Vector<Camera>();
+    private final Vector<Camera> camerasToAdd = new Vector<Camera>();
     private String name = "Zone";
     private long initTime;
     private long pauseTime = 0;
@@ -576,8 +578,7 @@ public abstract class Zone extends ZoneObject {
      * @param camera
      */
     final void addCamera(final Camera camera) {
-        cameras.add(camera);
-        getData().registerZoneObject(camera);
+        camerasToAdd.add(camera);
     }
 
     /**
@@ -586,16 +587,6 @@ public abstract class Zone extends ZoneObject {
      */
     final void removeCamera(final Camera camera) {
         cameras.remove(camera);
-
-        for (int i = 0; i < getData().sectors.length; i++) {
-            for (int n = 0; n < getData().sectors[i].length; n++) {
-                if (getData().sectors[i][n].intersects(camera.getX(), camera.getY(), camera.getWidth(), camera.getHeight())) {
-                    getData().sectors[i][n].removeCamera(camera);
-                    i = getData().sectors.length;
-                    break;
-                }
-            }
-        }
     }
 
     /**
@@ -604,6 +595,16 @@ public abstract class Zone extends ZoneObject {
     final void trimLists() {
         getData().trimLists();
         cameras.trimToSize();
+    }
+
+    /**
+     * Adds new Cameras to this Zone.
+     */
+    private final void addCameras() {
+        for (int i = 0; i < camerasToAdd.size(); i++) {
+            cameras.add(camerasToAdd.get(i));
+            getData().registerZoneObject(camerasToAdd.get(i));
+        }
     }
 
     /**
