@@ -16,6 +16,8 @@
  */
 package org.blinz.world;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
 import org.blinz.util.User;
 import org.blinz.graphics.Graphics;
 import org.blinz.util.Bounds;
@@ -28,6 +30,7 @@ import org.blinz.input.KeyListener;
 import org.blinz.input.MouseEvent;
 import org.blinz.input.MouseWheelEvent;
 import org.blinz.input.MouseWheelListener;
+import org.blinz.util.Position;
 import org.blinz.world.UserListenerCatalog.UserListenerList;
 
 /**
@@ -38,23 +41,34 @@ import org.blinz.world.UserListenerCatalog.UserListenerList;
  */
 public class Camera extends ZoneObject {
 
-    private final Bounds bounds = new Bounds();
-    private final Hashtable<BaseSprite, CameraSprite> spritesTable =
-	    new Hashtable<BaseSprite, CameraSprite>();
+    /**
+     * Represents the bounds of this Camera during the last round.
+     */
+    private final Bounds oldBounds = new Bounds();
+    private CameraSprite selected;
+    /**
+     * Used to keep track of how click inputs affect the selected sprite.
+     */
+    private final Vector<Position> selections = new Vector<Position>();
+    private final Vector<Sector> sectors = new Vector<Sector>();
+    private final Vector<CameraSprite> orphanedSprites = new Vector<CameraSprite>();
     private final Vector<CameraSprite> spriteList = new Vector<CameraSprite>();
-    private final Vector<BaseSprite> spritesToRemove = new Vector<BaseSprite>();
+    private final Hashtable<Sector, Vector<CameraSprite>> spritesTable =
+            new Hashtable<Sector, Vector<CameraSprite>>();
+    private final Bounds bounds = new Bounds();
     private Zone zone;
     private User user;
     private Scene scene = new Scene();
     private Scene swap1 = new Scene();
     private Scene swap2 = new Scene();
     private InputListener inputListener;
+    private UserListenerList userListeners;
 
     /**
      * Constructer for Camera.
      */
     public Camera() {
-	this(new User());
+        this(new User());
     }
 
     /**
@@ -62,7 +76,8 @@ public class Camera extends ZoneObject {
      * @param user
      */
     public Camera(final User user) {
-	this.user = user;
+        this.user = user;
+        userListeners = getData().userListeners.checkOut(user);
     }
 
     /**
@@ -70,7 +85,7 @@ public class Camera extends ZoneObject {
      * @return the User that this Camera represents.
      */
     public final User getUser() {
-	return user;
+        return user;
     }
 
     /**
@@ -79,7 +94,7 @@ public class Camera extends ZoneObject {
      * @return an Mouse, MouseWheel, Key listener object
      */
     public final synchronized Object getInputListener() {
-	return inputListener == null ? inputListener = new InputListener() : inputListener;
+        return inputListener == null ? inputListener = new InputListener() : inputListener;
     }
 
     /**
@@ -88,9 +103,9 @@ public class Camera extends ZoneObject {
      * @param zone
      */
     public final synchronized void setZone(final Zone zone) {
-	dropZone();
-	this.zone = zone;
-	zone.addCamera(this);
+        dropZone();
+        this.zone = zone;
+        zone.addCamera(this);
     }
 
     /**
@@ -98,51 +113,54 @@ public class Camera extends ZoneObject {
      * this method is called.
      */
     public final void dropZone() {
-	if (zone != null) {
-	    zone.removeCamera(this);
-	    spriteList.clear();
-	    spritesTable.clear();
-	    spritesToRemove.clear();
-	    zone = null;
-	    inputListener = null;
-	}
+        if (zone != null) {
+            zone.removeCamera(this);
+            spritesTable.clear();
+            zone = null;
+            inputListener = null;
+        }
     }
 
     /**
-     * 
+     * Gets the x coordinate of this Camera
      * @return the x location of this Camera
      */
     public final int getX() {
-	return bounds.x;
+        return bounds.x;
     }
 
     /**
-     * 
+     * Gets the y coordinate of this Camera
      * @return the y location of this Camera
      */
     public final int getY() {
-	return bounds.y;
+        return bounds.y;
     }
 
     /**
-     * 
+     * Gets the width of this Camera.
      * @return the width of this Camera
      */
     public final int getWidth() {
-	return bounds.width;
+        return bounds.width;
     }
 
     /**
-     * 
+     * Gets the height of this Camera.
      * @return the height of this Camera
      */
     public final int getHeight() {
-	return bounds.height;
+        return bounds.height;
     }
 
+    /**
+     * Sets the size of this Camera in the Zone.
+     * @param width the new width of this Camera
+     * @param height the new height of this Camera
+     */
     public final void setSize(final int width, final int height) {
-	setWidth(width);
-	setHeight(height);
+        setWidth(width);
+        setHeight(height);
     }
 
     /**
@@ -150,19 +168,7 @@ public class Camera extends ZoneObject {
      * @param width
      */
     public final void setWidth(final int width) {
-	if (zone != null) {
-	    if (getData().getSectorOfSafe(bounds.x2(), bounds.y)
-		    != getData().getSectorOfSafe(bounds.x + width, bounds.y)) {
-		if (width > bounds.width) {
-		    //Growing
-		    joinSectors(bounds.x2() + getData().sectorWidth, bounds.y, bounds.x + width, bounds.y2());
-		} else {
-		    //Shrinking
-		    leaveSectors(bounds.x + width + getData().sectorWidth, bounds.y, bounds.x2(), bounds.y2());
-		}
-	    }
-	}
-	bounds.width = width;
+        bounds.width = width;
     }
 
     /**
@@ -170,19 +176,7 @@ public class Camera extends ZoneObject {
      * @param height
      */
     public final void setHeight(final int height) {
-	if (zone != null) {
-	    if (getData().getSectorOfSafe(bounds.x, bounds.y2())
-		    != getData().getSectorOfSafe(bounds.x, bounds.y + height)) {
-		if (height > bounds.height) {
-		    //Growing
-		    joinSectors(bounds.x, bounds.y + getData().sectorHeight, bounds.x2(), bounds.y + height);
-		} else {
-		    //Shrinking
-		    leaveSectors(bounds.x, bounds.y + height + getData().sectorHeight, bounds.x2(), bounds.y2());
-		}
-	    }
-	}
-	bounds.height = height;
+        bounds.height = height;
     }
 
     /**
@@ -190,11 +184,7 @@ public class Camera extends ZoneObject {
      * @param x
      */
     public final void setX(final int x) {
-	if (x < bounds.x) {
-	    moveLeft(bounds.x - x);
-	} else {
-	    moveRight(x - bounds.x);
-	}
+        bounds.x = x;
     }
 
     /**
@@ -202,11 +192,7 @@ public class Camera extends ZoneObject {
      * @param y
      */
     public final void setY(final int y) {
-	if (y < bounds.y) {
-	    moveUp(bounds.y - y);
-	} else {
-	    moveDown(y - bounds.y);
-	}
+        bounds.y = y;
     }
 
     /**
@@ -215,8 +201,8 @@ public class Camera extends ZoneObject {
      * @param y
      */
     public final void setPosition(final int x, final int y) {
-	setX(x);
-	setY(y);
+        setX(x);
+        setY(y);
     }
 
     /**
@@ -224,29 +210,7 @@ public class Camera extends ZoneObject {
      * @param distance
      */
     public final void moveUp(final int distance) {
-	if (distance < 0) {
-	    moveDown(-distance);
-	    return;
-	}
-
-	final int newY = bounds.y - distance;
-
-	if (zone != null) {
-	    //Leave old Sectors
-	    if (sector2() != getData().getSectorOfSafe(bounds.x2(), bounds.height + newY)) {
-		final int y1 = (newY + bounds.height < bounds.y
-			? bounds.y - getData().sectorHeight : newY + getData().sectorHeight());
-		leaveSectors(bounds.x - getData().sectorWidth, y1, bounds.x2(), bounds.y2());
-	    }
-
-	    //Join new Sectors
-	    if (sector1() != getData().getSectorOfSafe(bounds.x, newY)) {
-		final int y2 = newY + bounds.height < bounds.y ? bounds.y - getData().sectorHeight()
-			: newY + bounds.height;
-		joinSectors(bounds.x, newY, bounds.x2(), y2);
-	    }
-	}
-	bounds.y = newY;
+        bounds.y = -distance;
     }
 
     /**
@@ -254,30 +218,7 @@ public class Camera extends ZoneObject {
      * @param distance
      */
     public final void moveDown(final int distance) {
-	if (distance < 0) {
-	    moveUp(-distance);
-	    return;
-	}
-
-	final int newY = bounds.y + distance;
-
-	if (zone != null) {
-	    //Join new Sectors
-	    if (sector2() != getData().getSectorOfSafe(bounds.x2(), newY + bounds.height)) {
-		final int y1 = (newY > bounds.y2()
-			? newY : bounds.y + getData().sectorHeight());
-		joinSectors(bounds.x, y1, bounds.x2(), newY + bounds.height);
-	    }
-
-	    //Leave old Sectors
-	    if (sector1() != getData().getSectorOfSafe(bounds.x, newY)) {
-		final int y2 = (newY < bounds.y2()
-			? newY - getData().sectorHeight() : bounds.y2());
-		leaveSectors(bounds.x - getData().sectorWidth, newY, bounds.x2(), y2);
-	    }
-	}
-
-	bounds.y = newY;
+        bounds.y += distance;
     }
 
     /**
@@ -285,29 +226,7 @@ public class Camera extends ZoneObject {
      * @param distance
      */
     public final void moveRight(final int distance) {
-	if (distance < 0) {
-	    moveLeft(-distance);
-	    return;
-	}
-
-	final int newX = bounds.x + distance;
-
-	if (zone != null) {
-	    //Join new Sectors
-	    if (sector2() != getData().getSectorOfSafe(newX + bounds.width, bounds.y2())) {
-		final int x1 = newX > bounds.x2()
-			? newX : bounds.x + getData().sectorWidth();
-		joinSectors(x1, bounds.y, newX + bounds.width, bounds.y2() + getData().sectorHeight);
-	    }
-
-	    //Leave old Sectors
-	    if (sector1() != getData().getSectorOfSafe(newX, bounds.y)) {
-		final int x2 = newX < bounds.x2() ? newX - getData().sectorWidth() : bounds.x2();
-		leaveSectors(newX, bounds.y - getData().sectorHeight, x2, bounds.y2());
-	    }
-	}
-
-	bounds.x = newX;
+        bounds.x += distance;
     }
 
     /**
@@ -315,30 +234,7 @@ public class Camera extends ZoneObject {
      * @param distance
      */
     public final void moveLeft(final int distance) {
-	if (distance < 0) {
-	    moveRight(-distance);
-	    return;
-	}
-
-	final int newX = bounds.x - distance;
-
-	if (zone != null) {
-	    //Leave old Sectors
-	    if (sector2() != getData().getSectorOfSafe(newX + bounds.width, bounds.y2())) {
-		final int x1 = (newX + bounds.width < bounds.x - getData().sectorWidth
-			? bounds.x - getData().sectorWidth : newX + getData().sectorWidth());
-		leaveSectors(x1, bounds.y - getData().sectorHeight, bounds.x2(), bounds.y2());
-	    }
-
-	    //Join new Sectors
-	    if (sector1() != getData().getSectorOfSafe(bounds.x, newX)) {
-		final int x2 = (newX + bounds.width < bounds.x
-			? newX + bounds.width : bounds.x);
-		joinSectors(newX, bounds.y - getData().sectorHeight, x2, bounds.y2());
-	    }
-	}
-
-	bounds.x = newX;
+        bounds.x -= distance;
     }
 
     /**
@@ -347,12 +243,12 @@ public class Camera extends ZoneObject {
      * @param graphics
      */
     public synchronized final void draw(final Graphics graphics) {
-	Scene s = scene;
-	while (!s.lock()) {
-	    s = scene;
-	}
-	s.draw(graphics);
-	s.unLock();
+        Scene s = scene;
+        while (!s.lock()) {
+            s = scene;
+        }
+        s.draw(graphics);
+        s.unLock();
     }
 
     /**
@@ -372,85 +268,193 @@ public class Camera extends ZoneObject {
 
     @Override
     final void internalInit() {
-	super.internalInit();
-	for (int i = 0; i < getData().sectors.length; i++) {
-	    for (int n = 0; n < getData().sectors[i].length; n++) {
-		if (getData().sectors[i][n].intersects(bounds)) {
-		    getData().sectors[i][n].addCamera(this);
-		}
-	    }
-	}
-    }
+        super.internalInit();
+        //add relevant Sectors
+        final int x1 = sector1().leftNeighbor.getX();
+        final int y1 = sector1().topNeighbor.getY();
+        final int x2 = sector2().getX();
+        final int y2 = sector2().getY();
 
-    /**
-     * Adds a Sprite to the Camera. The Sprite is tored in a CameraSprite.
-     * @param sprite
-     * @param sector the Sector that the sprite belongs to
-     */
-    final void addSprite(final BaseSprite sprite, final Sector sector) {
-	final CameraSprite s = new CameraSprite(sprite);
-	s.setSector(sector);
-	spritesTable.put(sprite, s);
-	insertSprite(s);
-    }
-
-    /**
-     * Tells this Camera that the given sprite is moving.
-     * @param sprite the sprite moving
-     * @param destination the sprites destination
-     */
-    final void alertToRelocation(final BaseSprite sprite, final Sector destination) {
-	final CameraSprite w = spritesTable.get(sprite);
-	w.setSector(destination);
-	if (!inSector(destination)) {
-	    spritesToRemove.add(sprite);
-	}
-    }
-
-    /**
-     * Removes the given sprite from this Camera.
-     * @param sprite the sprite to remove
-     */
-    final void removeSprite(final BaseSprite sprite) {
-	spritesToRemove.add(sprite);
+        for (int x = x1; x < x2; x += getData().sectorWidth()) {
+            for (int y = y1; y < y2; y += getData().sectorHeight()) {
+                final Sector s = getData().getSectorOf(x, y);
+                sectors.add(s);
+                final UnorderedList<BaseSprite> list = s.getSprites();
+                for (int i = 0; i < list.size(); i++) {
+                    addSprite(list.get(i), s);
+                }
+            }
+        }
     }
 
     /**
      * Updates the Camera.
      */
     final void internalUpdate() {
-	removeStaleSprites();
-	update();
-	generateCurrentScene();
+        update();
+        updateSprites();
+        processSpriteSelection();
+        generateCurrentScene();
     }
 
     /**
-     * Indicates whether or not this Camera is in the given Sector.
-     * @param Sector
-     * @return true if in the given Sector, false otherwise
+     * Processes all sprite selection from this Camera within the last round.
      */
-    private final boolean inSector(final Sector Sector) {
-	return bounds.contains(Sector.getX(), Sector.getY());
+    private final void processSpriteSelection() {
+        final int end = selections.size() - 1;
+        while (!selections.isEmpty()) {
+            final int x = selections.get(end).x;
+            final int y = selections.get(end).y;
+            final CameraSprite oldSelected = selected;
+
+
+            CameraSprite newSelected = null;
+            for (int i = spriteList.size() - 1; i > -1; i--) {
+                final BaseSprite s = spriteList.get(i).getSprite();
+                if (Bounds.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight(), x + getX(), y + getY(), 1, 1)) {
+                    if (newSelected == null || newSelected.getLayer() < spriteList.get(i).getLayer()) {
+                        newSelected = spriteList.get(i);
+                    }
+                    break;
+                }
+            }
+
+            if (newSelected != oldSelected) {
+                selected = newSelected;
+                if (newSelected != null && newSelected.isSelectable()) {
+                    newSelected.select(user);
+                }
+                if (oldSelected != null && oldSelected.isSelectable()) {
+                    oldSelected.deselect(user);
+                }
+            }
+        }
     }
 
     /**
-     * Inserts the given sprite at the proper place in spriteList.
-     * List is kept in ascending order.
-     * @param sprite
+     * Lists the given sprite as an orphan and removes it from its Sector.
+     * @param sprite the orphaned sprite
+     * @param sector the Sector of the now orphaned sprite
      */
-    private final void insertSprite(final CameraSprite sprite) {
-	synchronized (spriteList) {
-	    if (spriteList.isEmpty()){
-		spriteList.add(sprite);
-		return;
-	    }
-	    for (int i = spriteList.size() - 1; i > -1; i--) {
-		if (spriteList.get(i).getLayer() <= sprite.getLayer()) {
-		    spriteList.insertElementAt(sprite, i + 1);
-		    break;
-		}
-	    }
-	}
+    private final void orphanSprite(final BaseSprite sprite, final Sector sector) {
+        final Vector<CameraSprite> list = spritesTable.get(sector);
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getSprite() == sprite) {
+                orphanedSprites.add(list.get(i));
+                list.remove(i).setSector(null);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Adds the given sprite to this Camera for the given Sector.
+     * @param sprite the sprite to be added
+     * @param sector the Sector of the sprite to be added
+     */
+    private final void addSprite(final BaseSprite sprite, final Sector sector) {
+        for (int i = 0; i < orphanedSprites.size(); i++) {
+            if (orphanedSprites.get(i).getSprite() == sprite) {
+                final CameraSprite cs = orphanedSprites.remove(i);
+                i--;
+                cs.setSector(sector);
+                spritesTable.get(sector).add(cs);
+                return;
+            }
+        }
+        final CameraSprite cs = new CameraSprite(sprite);
+        cs.setSector(sector);
+        spritesTable.get(sector).add(cs);
+        //add the sprite to sprite list at the proper location
+        synchronized (spriteList) {
+            if (spriteList.isEmpty()) {
+                spriteList.add(cs);
+                return;
+            }
+            for (int i = spriteList.size() - 1; i > -1; i--) {
+                if (spriteList.get(i).getLayer() <= sprite.getLayer()) {
+                    spriteList.insertElementAt(cs, i + 1);
+                    break;
+                }
+            }
+        }
+
+    }
+
+    /**
+     * Updates the sprites in this Camera.
+     */
+    private final void updateSprites() {
+        //manage sprites for current sectors
+        //find and declare orphaned sprites
+        for (int i = bounds.x - getData().sectorWidth(); i < bounds.x2(); i += getData().sectorWidth()) {
+            for (int n = bounds.y - getData().sectorHeight(); i < bounds.y2(); n += getData().sectorHeight()) {
+                final Sector sector = getData().getSectorOf(i, n);
+                final ArrayList<BaseSprite> list = sector.getRemovedSprites();
+                for (int r = 0; r < list.size(); r++) {
+                    orphanSprite(list.get(r), sector);
+                }
+            }
+        }
+
+        //add new sprites
+        for (int i = bounds.x - getData().sectorWidth(); i < bounds.x2(); i += getData().sectorWidth()) {
+            for (int n = bounds.y - getData().sectorHeight(); i < bounds.y2(); n += getData().sectorHeight()) {
+                final Sector sector = getData().getSectorOf(i, n);
+                final ArrayList<BaseSprite> list = getData().getSectorOf(i, n).getAddedSprites();
+                for (int r = 0; r < list.size(); r++) {
+                    addSprite(list.get(r), sector);
+                }
+            }
+        }
+
+        //update the bounds
+        if (bounds.x == oldBounds.x && bounds.y == oldBounds.y
+                && bounds.width == oldBounds.width && bounds.height == oldBounds.height) {
+            //update the Sectors
+            //remove old Sectors
+            for (int i = 0; i < sectors.size(); i++) {
+                if (!sectors.get(i).withinSpriteRange(bounds.x, bounds.y)) {
+                    final UnorderedList<BaseSprite> list = sectors.get(i).getSprites();
+                    for (int n = 0; n < list.size(); n++) {
+                        orphanSprite(list.get(n), sectors.get(i));
+                    }
+                    spritesTable.remove(sectors.get(i));
+                    sectors.remove(i);
+                    i--;
+                }
+            }
+
+            //add new Sectors
+            final int x1 = sector1().leftNeighbor.getX();
+            final int y1 = sector1().topNeighbor.getY();
+            final int x2 = sector2().getX();
+            final int y2 = sector2().getY();
+
+            for (int x = x1; x < x2; x += getData().sectorWidth()) {
+                for (int y = y1; y < y2; y += getData().sectorHeight()) {
+                    final Sector s = getData().getSectorOf(x, y);
+                    if (s.withinSpriteRange(oldBounds.x, oldBounds.y)) {
+                        sectors.add(s);
+                        final UnorderedList<BaseSprite> list = s.getSprites();
+                        for (int i = 0; i < list.size(); i++) {
+                            addSprite(list.get(i), s);
+                        }
+                    }
+                }
+            }
+            //update oldBounds
+            oldBounds.setBounds(bounds);
+        }
+
+        //remove remaining orphans from spriteList
+        for (int i = 0; i < spriteList.size(); i++) {
+            if (spriteList.get(i).getSector() == null) {
+                spriteList.remove(i);
+                i--;
+            }
+        }
+        orphanedSprites.clear();
     }
 
     /**
@@ -458,23 +462,29 @@ public class Camera extends ZoneObject {
      * and sets it to the current scene.
      */
     private final void generateCurrentScene() {
-	final Scene upcoming = getScene();
-	upcoming.manageContainers();
+        final Scene upcoming = getScene();
+        upcoming.manageContainers();
 
-	upcoming.translation.setPosition(getX(), getY());
-	final Bounds b = new Bounds();
-	b.setPosition(upcoming.translation);
-	b.setSize(upcoming.size);
-	for (int i = 0; i < spriteList.size(); i++) {
-	    final CameraSprite s = spriteList.get(i);
-	    if (b.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight())) {
-		upcoming.add(s);
-	    }
-	}
-	
-	upcoming.sortLayers();
-	upcoming.unLock();
-	scene = upcoming;
+        upcoming.translation.setPosition(getX(), getY());
+        upcoming.size.setSize(bounds.width, bounds.height);
+        final Bounds b = new Bounds();
+        b.setPosition(upcoming.translation);
+        b.setSize(upcoming.size);
+
+        final Enumeration<Vector<CameraSprite>> e = spritesTable.elements();
+        while (e.hasMoreElements()) {
+            final Vector<CameraSprite> list = e.nextElement();
+            for (int i = 0; i < list.size(); i++) {
+                final CameraSprite s = list.get(i);
+                if (b.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight())) {
+                    upcoming.add(s);
+                }
+            }
+        }
+
+        upcoming.sortLayers();
+        upcoming.unLock();
+        scene = upcoming;
     }
 
     /**
@@ -482,37 +492,16 @@ public class Camera extends ZoneObject {
      * @return a Scene that is safe to write to
      */
     private final Scene getScene() {
-	Scene retval = null;
-	while (retval == null) {
-	    if (swap1.lock()) {
-		retval = swap1;
-	    } else if (swap2.lock()) {
-		retval = swap2;
-	    }
-	}
-	retval.size.setSize(getWidth(), getHeight());
-	return retval;
-    }
-
-    /**
-     * Removes sprite that no longer have a Sector representing them.
-     */
-    private final void removeStaleSprites() {
-	for (int i = 0; i < spritesToRemove.size(); i++) {
-	    //Make sure the sprite didn't re-enter the observer between the
-	    //decrement to 0 and now.
-	    if (!inSector(spritesTable.get(spritesToRemove.get(i)).getSector())) {
-		spritesTable.remove(spritesToRemove.get(i));
-		synchronized (spriteList) {
-		    for (int n = 0; n < spriteList.size(); n++) {
-			if (spritesToRemove.get(i) == spriteList.get(n).getSprite()) {
-			    spriteList.remove(n);
-			}
-		    }
-		}
-	    }
-	}
-	spritesToRemove.clear();
+        Scene retval = null;
+        while (retval == null) {
+            if (swap1.lock()) {
+                retval = swap1;
+            } else if (swap2.lock()) {
+                retval = swap2;
+            }
+        }
+        retval.size.setSize(getWidth(), getHeight());
+        return retval;
     }
 
     /**
@@ -520,7 +509,7 @@ public class Camera extends ZoneObject {
      * @return Sector of the upper left hand corner of this Camera.
      */
     private final Sector sector1() {
-	return getData().getSectorOfSafe(bounds.x, bounds.y);
+        return getData().getSectorOfSafe(bounds.x, bounds.y);
     }
 
     /**
@@ -528,124 +517,61 @@ public class Camera extends ZoneObject {
      * @return Sector of the lower right hand corner of this Camera.
      */
     private final Sector sector2() {
-	return getData().getSectorOfSafe(bounds.x + bounds.width, bounds.y + bounds.height);
+        return getData().getSectorOfSafe(bounds.x + bounds.width, bounds.y + bounds.height);
     }
 
-    /**
-     * Joins the Sectors of the given coordinates and all Sectors in between, inclusive.
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
-     */
-    private final void joinSectors(int x1, int y1, int x2, int y2) {
-	x1 /= getData().sectorWidth();
-	x2 /= getData().sectorWidth();
-	y1 /= getData().sectorHeight();
-	y2 /= getData().sectorHeight();
-	for (int x = x1; x <= x2; x++) {
-	    for (int y = y1; y <= y2; y++) {
-		getData().sectors[x][y].addCamera(this);
-	    }
-	}
-    }
+    private final class InputListener implements MouseListener, MouseWheelListener, KeyListener {
 
-    /**
-     * Joins the Sectors of the given coordinates and all Sectors in between, inclusive.
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
-     */
-    private final void leaveSectors(int x1, int y1, int x2, int y2) {
-	x1 /= getData().sectorWidth();
-	x2 /= getData().sectorWidth();
-	y1 /= getData().sectorHeight();
-	y2 /= getData().sectorHeight();
-	for (int x = x1; x <= x2; x++) {
-	    for (int y = y1; y <= y2; y++) {
-		getData().sectors[x][y].removeCamera(this);
-	    }
-	}
-    }
+        private InputListener() {
+        }
 
-    private class InputListener implements MouseListener, MouseWheelListener, KeyListener {
+        @Override
+        public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
+            final ClickEvent e = new ClickEvent(user, buttonNumber,
+                    cursorX + getX(), cursorY + getY(), clickCount);
+            userListeners.buttonClick(e);
+            selections.add(new Position(cursorX, cursorY));
+        }
 
-	private UserListenerList list;
-	private CameraSprite selected;
+        @Override
+        public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
+            final MouseEvent e = new MouseEvent(user, buttonNumber, cursorX + getX(), cursorY + getY());
+            userListeners.buttonPress(e);
+        }
 
-	private InputListener() {
-	    this.list = getData().userListeners.checkOut(user);
-	}
+        @Override
+        public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
+            final MouseEvent e = new MouseEvent(user, buttonNumber, cursorX + getX(), cursorY + getY());
+            userListeners.buttonRelease(e);
+        }
 
-	@Override
-	public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
-	    ClickEvent e = new ClickEvent(user, buttonNumber,
-		    cursorX + getX(), cursorY + getY(), clickCount);
-	    list.buttonClick(e);
+        @Override
+        public void wheelScroll(int number, int cursorX, int cursorY) {
+            final MouseWheelEvent e = new MouseWheelEvent(user, number, cursorX + getX(), cursorY + getY());
+            userListeners.wheelScroll(e);
+        }
 
-	    final CameraSprite oldSelected = selected;
-	    CameraSprite newSelected = null;
-	    synchronized (spriteList) {
-		for (int i = spriteList.size() - 1; i > -1; i--) {
-		    final BaseSprite s = spriteList.get(i).getSprite();
-		    if (Bounds.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight(), cursorX + getX(), cursorY + getY(), 1, 1)) {
-			newSelected = spriteList.get(i);
-			break;
-		    }
-		}
-	    }
+        @Override
+        public void keyPressed(int key) {
+            final KeyEvent e = new KeyEvent(user, key);
+            userListeners.keyPressed(e);
+        }
 
-	    if (newSelected != oldSelected) {
-		selected = newSelected;
-		if (newSelected != null && newSelected.isSelectable()) {
-		    newSelected.select(user);
-		}
-		if (oldSelected != null && oldSelected.isSelectable()) {
-		    oldSelected.deselect(user);
-		}
-	    }
-	}
+        @Override
+        public void keyReleased(int key) {
+            final KeyEvent e = new KeyEvent(user, key);
+            userListeners.keyReleased(e);
+        }
 
-	@Override
-	public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
-	    MouseEvent e = new MouseEvent(user, buttonNumber, cursorX + getX(), cursorY + getY());
-	    list.buttonPress(e);
-	}
+        @Override
+        public void keyTyped(int key) {
+            final KeyEvent e = new KeyEvent(user, key);
+            userListeners.keyTyped(e);
+        }
 
-	@Override
-	public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
-	    MouseEvent e = new MouseEvent(user, buttonNumber, cursorX + getX(), cursorY + getY());
-	    list.buttonRelease(e);
-	}
-
-	@Override
-	public void wheelScroll(int number, int cursorX, int cursorY) {
-	    MouseWheelEvent e = new MouseWheelEvent(user, number, cursorX + getX(), cursorY + getY());
-	    list.wheelScroll(e);
-	}
-
-	@Override
-	public void keyPressed(int key) {
-	    KeyEvent e = new KeyEvent(user, key);
-	    list.keyPressed(e);
-	}
-
-	@Override
-	public void keyReleased(int key) {
-	    KeyEvent e = new KeyEvent(user, key);
-	    list.keyReleased(e);
-	}
-
-	@Override
-	public void keyTyped(int key) {
-	    KeyEvent e = new KeyEvent(user, key);
-	    list.keyTyped(e);
-	}
-
-	@Override
-	protected void finalize() {
-	    getData().userListeners.checkIn(user);
-	}
+        @Override
+        protected void finalize() {
+            getData().userListeners.checkIn(user);
+        }
     }
 }

@@ -16,6 +16,7 @@
  */
 package org.blinz.world;
 
+import java.util.ArrayList;
 import org.blinz.util.Bounds;
 import java.util.Vector;
 
@@ -30,10 +31,9 @@ final class Sector extends ZoneObject {
     private final Vector<UpdatingSprite> updatingSpritesToAdd = new Vector<UpdatingSprite>();
     private final Vector<UpdatingSprite> updatingSpritesToRemove = new Vector<UpdatingSprite>();
     private final UnorderedList<BaseSprite> memberSprites = new UnorderedList<BaseSprite>();
+    private final ArrayList<BaseSprite> addedSprites = new ArrayList<BaseSprite>();
+    private final ArrayList<BaseSprite> removedSprites = new ArrayList<BaseSprite>();
     private final UnorderedList<CollidableSprite> collidibleSprites = new UnorderedList<CollidableSprite>();
-    private final Vector<Camera> cameras = new Vector<Camera>();
-    private final Vector<Camera> camerasToAdd = new Vector<Camera>();
-    private final Vector<Camera> camerasToRemove = new Vector<Camera>();
     private final Bounds bounds = new Bounds();
 
     /**
@@ -42,29 +42,70 @@ final class Sector extends ZoneObject {
      * @param y y coordinate of this Sectoer
      */
     Sector(final int x, final int y) {
-	bounds.setPosition(x, y);
+        bounds.setPosition(x, y);
     }
 
     @Override
     void init() {
-	findNeighbors();
+        findNeighbors();
+    }
+
+    /**
+     * Gets all the sprites added to this sector in the current cycle.
+     * @return all the sprites added to this sector in the current cycle
+     */
+    final ArrayList<BaseSprite> getAddedSprites() {
+        return addedSprites;
+    }
+
+    /**
+     * Gets all the sprites removed from this sector in the current cycle.
+     * @return all the sprites removed from this sector in the current cycle
+     */
+    final ArrayList<BaseSprite> getRemovedSprites() {
+        return removedSprites;
     }
 
     /**
      * Updates the sprites in this Sector.
      */
     final void update() {
-	for (int i = 0; i < updatingSprites.size(); i++) {
-	    updatingSprites.get(i).update();
-	}
+        for (int i = 0; i < updatingSprites.size(); i++) {
+            updatingSprites.get(i).update();
+        }
     }
 
     /**
      * Takes care of modifications made during the update.
      */
     final void postUpdate() {
-	manageUpdatingSprites();
-	manageCameras();
+        manageUpdatingSprites();
+        addedSprites.clear();
+        removedSprites.clear();
+    }
+
+    /**
+     * Gets the list of sprites in this Sector. This is the actual list that the
+     * Sector relies on, so don't access it during the Sector update phases or
+     * modify it.
+     * @return the list of sprites in this Sector
+     */
+    final UnorderedList<BaseSprite> getSprites() {
+        return memberSprites;
+    }
+
+    /**
+     * Indicates whether or not the given point might intersect some of the sprites
+     * in this Sector.
+     * @param x
+     * @param y
+     * @return true if it is within the possible range of sprites, false otherwise
+     */
+    final boolean withinSpriteRange(final int x, final int y) {
+        return (x <= bounds.x - getData().sectorWidth())
+                && (x <= bounds.x2())
+                && (y <= bounds.y - getData().sectorHeight())
+                && (y <= bounds.y2());
     }
 
     /**
@@ -72,7 +113,7 @@ final class Sector extends ZoneObject {
      * @return
      */
     final int getXIndex() {
-	return bounds.getX() / getData().sectorSize.width;
+        return bounds.getX() / getData().sectorSize.width;
     }
 
     /**
@@ -80,7 +121,7 @@ final class Sector extends ZoneObject {
      * @return
      */
     final int getYIndex() {
-	return bounds.getY() / getData().sectorSize.height;
+        return bounds.getY() / getData().sectorSize.height;
     }
 
     /**
@@ -88,7 +129,7 @@ final class Sector extends ZoneObject {
      * @return x
      */
     final int getX() {
-	return bounds.getX();
+        return bounds.getX();
     }
 
     /**
@@ -96,7 +137,7 @@ final class Sector extends ZoneObject {
      * @return y
      */
     final int getY() {
-	return bounds.getY();
+        return bounds.getY();
     }
 
     /**
@@ -104,7 +145,7 @@ final class Sector extends ZoneObject {
      * @return width of this Sector
      */
     final int getWidth() {
-	return getData().sectorSize.width;
+        return getData().sectorSize.width;
     }
 
     /**
@@ -112,40 +153,22 @@ final class Sector extends ZoneObject {
      * @return height of this Sector
      */
     final int getHeight() {
-	return getData().sectorSize.height;
-    }
-
-    /**
-     * Adds given Camera to this Sector to recieve current and incoming sprites.
-     * @param sprite
-     */
-    final void addCamera(final Camera camera) {
-	camerasToAdd.add(camera);
-    }
-
-    /**
-     * Removes the given Camera from this Sector.
-     * @param camera
-     */
-    final void removeCamera(final Camera camera) {
-	camerasToRemove.add(camera);
+        return getData().sectorSize.height;
     }
 
     /**
      * Adds given sprite to this Sector.
      * @param sprite
      */
-    protected final void addSprite(final BaseSprite sprite) {
-	if (sprite instanceof UpdatingSprite) {
-	    updatingSpritesToAdd.add((UpdatingSprite) sprite);
-	}
-	if (sprite instanceof CollidableSprite) {
-	    collidibleSprites.add((CollidableSprite) sprite);
-	}
-	memberSprites.add(sprite);
-	for (int n = 0; n < cameras.size(); n++) {
-		cameras.get(n).addSprite(sprite, this);
-	}
+    final void addSprite(final BaseSprite sprite) {
+        if (sprite instanceof UpdatingSprite) {
+            updatingSpritesToAdd.add((UpdatingSprite) sprite);
+        }
+        if (sprite instanceof CollidableSprite) {
+            collidibleSprites.add((CollidableSprite) sprite);
+        }
+        memberSprites.add(sprite);
+        addedSprites.add(sprite);
     }
 
     /**
@@ -154,34 +177,31 @@ final class Sector extends ZoneObject {
      * @param destination the Sector the given sprite is going to
      */
     final void removeSprite(final BaseSprite sprite, final Sector destination) {
-	if (sprite instanceof UpdatingSprite) {
-	    updatingSpritesToRemove.add((UpdatingSprite) sprite);
-	}
-	if (sprite instanceof CollidableSprite) {
-	    synchronized (collidibleSprites) {
-		collidibleSprites.remove((CollidableSprite) sprite);
-	    }
-	}
-	memberSprites.remove(sprite);
-	for (int i = 0; i < cameras.size(); i++) {
-	    cameras.get(i).alertToRelocation(sprite, destination);
-	}
+        if (sprite instanceof UpdatingSprite) {
+            updatingSpritesToRemove.add((UpdatingSprite) sprite);
+        }
+        if (sprite instanceof CollidableSprite) {
+            synchronized (collidibleSprites) {
+                collidibleSprites.remove((CollidableSprite) sprite);
+            }
+        }
+        memberSprites.remove(sprite);
     }
 
     final void checkCollisionsFor(final CollidableSprite sprite) {
-	synchronized (collidibleSprites) {
-	    for (int i = 0; i < collidibleSprites.size(); i++) {
-		BaseSprite s1 = (BaseSprite) sprite, s2 = (BaseSprite) collidibleSprites.get(i);
-		if ((Math.abs(s1.getLayer() - s2.getLayer()) < 1)
-			&& Bounds.intersects(s1.getX(), s1.getY(), s1.getWidth(), s1.getHeight(),
-			s2.getX(), s2.getY(), s2.getWidth(), s2.getHeight())) {
-		    if (s1 != s2) {
-			((CollidableSprite) s1).collide(s2);
-			((CollidableSprite) s2).collide(s1);
-		    }
-		}
-	    }
-	}
+        synchronized (collidibleSprites) {
+            for (int i = 0; i < collidibleSprites.size(); i++) {
+                BaseSprite s1 = (BaseSprite) sprite, s2 = (BaseSprite) collidibleSprites.get(i);
+                if ((Math.abs(s1.getLayer() - s2.getLayer()) < 1)
+                        && Bounds.intersects(s1.getX(), s1.getY(), s1.getWidth(), s1.getHeight(),
+                        s2.getX(), s2.getY(), s2.getWidth(), s2.getHeight())) {
+                    if (s1 != s2) {
+                        ((CollidableSprite) s1).collide(s2);
+                        ((CollidableSprite) s2).collide(s1);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -190,9 +210,9 @@ final class Sector extends ZoneObject {
      * @param sprite
      */
     synchronized final void deleteUpdatingSprite(final UpdatingSprite sprite) {
-	if (updatingSprites.remove(sprite)) {
-	    updatingSpritesToAdd.remove(sprite);
-	}
+        if (updatingSprites.remove(sprite)) {
+            updatingSpritesToAdd.remove(sprite);
+        }
     }
 
     /**
@@ -202,8 +222,8 @@ final class Sector extends ZoneObject {
      * @return true if given point is within the bounds of this Sector, false otherwise
      */
     final boolean contains(final int x, final int y) {
-	bounds.setSize(getData().sectorSize);
-	return bounds.contains(x, y);
+        bounds.setSize(getData().sectorSize);
+        return bounds.contains(x, y);
     }
 
     /**
@@ -213,8 +233,8 @@ final class Sector extends ZoneObject {
      * @return true if the specified coordinates intersect this Sector
      */
     final boolean intersects(final Bounds bounds) {
-	this.bounds.setSize(getData().sectorSize);
-	return this.bounds.intersects(bounds);
+        this.bounds.setSize(getData().sectorSize);
+        return this.bounds.intersects(bounds);
     }
 
     /**
@@ -227,68 +247,46 @@ final class Sector extends ZoneObject {
      * @return true if the specified coordinates intersect this Sector
      */
     final boolean intersects(final int x, final int y, final int width, final int height) {
-	this.bounds.setSize(getData().sectorSize);
-	return this.bounds.intersects(x, y, width, height);
+        this.bounds.setSize(getData().sectorSize);
+        return this.bounds.intersects(x, y, width, height);
     }
 
     final void findNeighbors() {
-	int ix = bounds.getX() / getData().sectorSize.width;
-	int iy = bounds.getY() / getData().sectorSize.height;
+        int ix = bounds.getX() / getData().sectorSize.width;
+        int iy = bounds.getY() / getData().sectorSize.height;
 
-	if (ix > 0) {
-	    leftNeighbor = getData().sectors[ix - 1][iy];
-	}
-	if (iy > 0) {
-	    topNeighbor = getData().sectors[ix][iy - 1];
-	}
-	if (ix < getData().sectors.length - 1) {
-	    rightNeighbor = getData().sectors[ix + 1][iy];
-	}
-	if (iy < getData().sectors[ix].length - 1) {
-	    bottomNeighbor = getData().sectors[ix][iy + 1];
-	}
+        if (ix > 0) {
+            leftNeighbor = getData().sectors[ix - 1][iy];
+        }
+        if (iy > 0) {
+            topNeighbor = getData().sectors[ix][iy - 1];
+        }
+        if (ix < getData().sectors.length - 1) {
+            rightNeighbor = getData().sectors[ix + 1][iy];
+        }
+        if (iy < getData().sectors[ix].length - 1) {
+            bottomNeighbor = getData().sectors[ix][iy + 1];
+        }
     }
 
     /**
      * Trims the size of lists.
      */
     final void trimLists() {
-	updatingSpritesToAdd.trimToSize();
-	updatingSpritesToRemove.trimToSize();
-	cameras.trimToSize();
+        updatingSpritesToAdd.trimToSize();
+        updatingSpritesToRemove.trimToSize();
+        addedSprites.trimToSize();
     }
 
     /**
      * Manages sprites on the updating sprites list.
      */
     private final void manageUpdatingSprites() {
-	for (int i = updatingSpritesToRemove.size() - 1; i > -1; i--) {
-	    updatingSprites.remove(updatingSpritesToRemove.remove(i));
-	}
-	for (int i = updatingSpritesToAdd.size() - 1; i > -1; i--) {
-	    updatingSprites.add(updatingSpritesToAdd.remove(i));
-	}
-    }
-
-    /**
-     * Manages cameras on the Cameras list.
-     */
-    private final void manageCameras() {
-	//remove old Cameras
-	for (int i = camerasToRemove.size() - 1; i > -1; i--) {
-	    final Camera camera = camerasToRemove.remove(i);
-	    cameras.remove(camera);
-	    for (int n = 0; n < memberSprites.size(); n++) {
-		camera.removeSprite(memberSprites.get(n));
-	    }
-	}
-	//add new Cameras
-	for (int i = camerasToAdd.size() - 1; i > -1; i--) {
-	    final Camera camera = camerasToAdd.remove(i);
-	    cameras.add(camera);
-	    for (int n = 0; n < memberSprites.size(); n++) {
-		camera.addSprite(memberSprites.get(n), this);
-	    }
-	}
+        for (int i = updatingSpritesToRemove.size() - 1; i > -1; i--) {
+            updatingSprites.remove(updatingSpritesToRemove.remove(i));
+        }
+        for (int i = updatingSpritesToAdd.size() - 1; i > -1; i--) {
+            updatingSprites.add(updatingSpritesToAdd.remove(i));
+        }
     }
 }
