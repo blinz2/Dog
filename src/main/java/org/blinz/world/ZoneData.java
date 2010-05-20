@@ -27,7 +27,6 @@ import org.blinz.util.User;
 class ZoneData {
 
     Object data;
-    final Size sectorSize = new Size(2048, 2048);
     final short sectorWidth = 2048, sectorHeight = 2048;
     Sector[][] sectors = new Sector[1][1];
     final Size zoneSize = new Size();
@@ -138,7 +137,7 @@ class ZoneData {
      * @return Sector of specified point
      */
     final Sector getSectorOf(final int x, final int y) {
-        return sectors[x / sectorWidth][y / sectorSize.height];
+        return sectors[x / sectorWidth][y / sectorHeight];
     }
 
     /**
@@ -161,7 +160,7 @@ class ZoneData {
             y = zoneSize.height;
         }
 
-        return sectors[x / sectorSize.width][y / sectorSize.height];
+        return sectors[x / sectorWidth][y / sectorHeight];
     }
 
     /**
@@ -169,7 +168,7 @@ class ZoneData {
      * @return int
      */
     final int sectorWidth() {
-        return sectorSize.width;
+        return sectorWidth;
     }
 
     /**
@@ -177,7 +176,7 @@ class ZoneData {
      * @return int
      */
     final int sectorHeight() {
-        return sectorSize.height;
+        return sectorHeight;
     }
 
     /**

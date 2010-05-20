@@ -38,8 +38,8 @@ final class Sector extends ZoneObject {
 
     /**
      * Sector constructer.
-     * @param x x coordinate of this Sectoer
-     * @param y y coordinate of this Sectoer
+     * @param x x coordinate of this Sector
+     * @param y y coordinate of this Sector
      */
     Sector(final int x, final int y) {
         bounds.setPosition(x, y);
@@ -113,7 +113,7 @@ final class Sector extends ZoneObject {
      * @return
      */
     final int getXIndex() {
-        return bounds.getX() / getData().sectorSize.width;
+        return bounds.getX() / getData().sectorWidth;
     }
 
     /**
@@ -121,7 +121,7 @@ final class Sector extends ZoneObject {
      * @return
      */
     final int getYIndex() {
-        return bounds.getY() / getData().sectorSize.height;
+        return bounds.getY() / getData().sectorHeight;
     }
 
     /**
@@ -145,7 +145,7 @@ final class Sector extends ZoneObject {
      * @return width of this Sector
      */
     final int getWidth() {
-        return getData().sectorSize.width;
+        return getData().sectorWidth;
     }
 
     /**
@@ -153,7 +153,7 @@ final class Sector extends ZoneObject {
      * @return height of this Sector
      */
     final int getHeight() {
-        return getData().sectorSize.height;
+        return getData().sectorHeight;
     }
 
     /**
@@ -222,7 +222,7 @@ final class Sector extends ZoneObject {
      * @return true if given point is within the bounds of this Sector, false otherwise
      */
     final boolean contains(final int x, final int y) {
-        bounds.setSize(getData().sectorSize);
+        bounds.setSize(getData().sectorWidth, getData().sectorHeight);
         return bounds.contains(x, y);
     }
 
@@ -233,7 +233,7 @@ final class Sector extends ZoneObject {
      * @return true if the specified coordinates intersect this Sector
      */
     final boolean intersects(final Bounds bounds) {
-        this.bounds.setSize(getData().sectorSize);
+        this.bounds.setSize(getData().sectorWidth, getData().sectorHeight);
         return this.bounds.intersects(bounds);
     }
 
@@ -247,13 +247,13 @@ final class Sector extends ZoneObject {
      * @return true if the specified coordinates intersect this Sector
      */
     final boolean intersects(final int x, final int y, final int width, final int height) {
-        this.bounds.setSize(getData().sectorSize);
+        this.bounds.setSize(getData().sectorWidth, getData().sectorHeight);
         return this.bounds.intersects(x, y, width, height);
     }
 
     final void findNeighbors() {
-        int ix = bounds.getX() / getData().sectorSize.width;
-        int iy = bounds.getY() / getData().sectorSize.height;
+        int ix = bounds.getX() / getData().sectorWidth;
+        int iy = bounds.getY() / getData().sectorHeight;
 
         if (ix > 0) {
             leftNeighbor = getData().sectors[ix - 1][iy];

@@ -603,7 +603,7 @@ public abstract class Zone extends ZoneObject {
     private final void addCameras() {
         for (int i = 0; i < camerasToAdd.size(); i++) {
             cameras.add(camerasToAdd.get(i));
-            getData().registerZoneObject(camerasToAdd.get(i));
+            getData().registerZoneObject(camerasToAdd.remove(i));
         }
     }
 
@@ -640,19 +640,19 @@ public abstract class Zone extends ZoneObject {
             return;
         }
 
-        if (size.width / getData().sectorSize.width + 1 <= getData().sectors.length
-                || size.height / getData().sectorSize.width + 1 <= getData().sectors[0].length) {
+        if (size.width / getData().sectorWidth + 1 <= getData().sectors.length
+                || size.height / getData().sectorHeight + 1 <= getData().sectors[0].length) {
             return;
         }
 
         ArrayList<Sector> newSectors = new ArrayList<Sector>();
 
         Sector[][] sectors =
-                new Sector[size.width / getData().sectorSize.width + 1][size.height / getData().sectorSize.width + 1];
+                new Sector[size.width / getData().sectorWidth + 1][size.height / getData().sectorWidth + 1];
         for (int i = 0; i < sectors.length; i++) {
             for (int n = 0; n < sectors[i].length; n++) {
                 if (i >= getData().sectors.length || n >= getData().sectors[i].length) {
-                    sectors[i][n] = new Sector(getData().sectorSize.width * i, getData().sectorSize.height * n);
+                    sectors[i][n] = new Sector(getData().sectorWidth() * i, getData().sectorHeight() * n);
                     newSectors.add(sectors[i][n]);
                 } else {
                     sectors[i][n] = getData().sectors[i][n];
@@ -669,8 +669,8 @@ public abstract class Zone extends ZoneObject {
         for (int i = 0; i
                 < sectors.length; i++) {
             for (int n = 0; n < sectors[i].length; n++) {
-                int ix = sectors[i][n].getX() / getData().sectorSize.width;
-                int iy = sectors[i][n].getY() / getData().sectorSize.height;
+                int ix = sectors[i][n].getX() / getData().sectorWidth;
+                int iy = sectors[i][n].getY() / getData().sectorHeight;
 
                 if (ix > 0) {
                     sectors[i][n].leftNeighbor = getData().sectors[ix - 1][iy];

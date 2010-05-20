@@ -38,10 +38,6 @@ final class UserListenerCatalog {
     final class UserListenerList {
 
         /**
-         * Determines when the lists need to be trimmed.
-         */
-        private long timeOfLastClean = System.currentTimeMillis();
-        /**
          * Used for when the Zone is paused.
          */
         private final Vector<BaseSprite> dummyList = new Vector<BaseSprite>();
@@ -95,7 +91,6 @@ final class UserListenerCatalog {
             buttonClicks.trimToSize();
             buttonPresses.trimToSize();
             buttonReleases.trimToSize();
-            inputSprites.trimToSize();
             keyPresses.trimToSize();
             keyReleases.trimToSize();
             keyTypes.trimToSize();
