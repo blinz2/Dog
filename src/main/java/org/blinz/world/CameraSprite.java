@@ -18,45 +18,27 @@ package org.blinz.world;
 
 import org.blinz.util.User;
 import org.blinz.graphics.Graphics;
-import org.blinz.input.MouseListener;
 import org.blinz.util.Bounds;
 
 /**
  *
  * @author Blinz
  */
-class CameraSprite implements MouseListener {
+class CameraSprite {
 
     private Sector sector;
     private BaseSprite sprite;
     private boolean isSelected = false;
+    private short width, height;
 
-    CameraSprite(final BaseSprite sprite) {
+    /**
+     * Constructor
+     * @param sprite the sprite that this CameraSprite represents
+     * @param sector the sector that the sprite that this represents is in
+     */
+    CameraSprite(final BaseSprite sprite, final Sector sector) {
 	this.sprite = sprite;
-    }
-
-    @Override
-    public void buttonClick(final int buttonNumber, final int numberOfClicks, final int cursorX, final int cursorY) {
-	if (sprite instanceof MouseListener) {
-	    MouseListener listener = (MouseListener) sprite;
-	    listener.buttonClick(buttonNumber, numberOfClicks, cursorX, cursorY);
-	}
-    }
-
-    @Override
-    public void buttonPress(final int buttonNumber, final int cursorX, final int cursorY) {
-	if (sprite instanceof MouseListener) {
-	    MouseListener listener = (MouseListener) sprite;
-	    listener.buttonPress(buttonNumber, cursorX, cursorY);
-	}
-    }
-
-    @Override
-    public void buttonRelease(final int buttonNumber, final int cursorX, final int cursorY) {
-	if (sprite instanceof MouseListener) {
-	    MouseListener listener = (MouseListener) sprite;
-	    listener.buttonRelease(buttonNumber, cursorX, cursorY);
-	}
+	setSector(sector);
     }
 
     /**
@@ -138,10 +120,6 @@ class CameraSprite implements MouseListener {
 	}
     }
 
-    boolean isMouseListener() {
-	return sprite instanceof MouseListener;
-    }
-
     /**
      * If the sprite this represents is a SelectibleSprite this calls select.
      * @param user the User that selected this sprite
@@ -164,6 +142,10 @@ class CameraSprite implements MouseListener {
 	}
     }
 
+    /**
+     * Indicates whether or not this sprite is selected by its Camera.
+     * @return true if this CameraSprite is selected by its Camera, false otherwise
+     */
     boolean isSelected() {
 	return isSelected;
     }

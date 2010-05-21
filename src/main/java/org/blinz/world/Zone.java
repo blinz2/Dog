@@ -485,14 +485,6 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     * Returns a long representing the number of cycles the zone has gone through.
-     * @return a long representing the number of cycles the zone has gone through
-     */
-    protected final long cycles() {
-        return getData().zoneCycles;
-    }
-
-    /**
      * Return the amount of time the zone has been running minus the pause time.
      * @return the amount of time the zone has been running minus the pause time
      */
