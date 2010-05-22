@@ -49,10 +49,11 @@ public abstract class Zone extends ZoneObject {
             private int stage;
             private final int MANAGE_TIME = 0;
             private final int ZONE_UPDATE = 1;
-            private final int USER_LISTENER_UPDATE = 2;
+            private final int ADD_CAMERAS = 2;
+            private final int USER_LISTENER_UPDATE = 3;
 
             final void enter() {
-                while (stage < 3) {
+                while (stage < 4) {
                     switch (stage()) {
                         case MANAGE_TIME:
                             cycleStartTime = System.currentTimeMillis();
@@ -61,6 +62,9 @@ public abstract class Zone extends ZoneObject {
                         case ZONE_UPDATE:
                             getData().zoneCycles++;
                             update();
+                            break;
+                        case ADD_CAMERAS:
+                            addCameras();
                             break;
                         case USER_LISTENER_UPDATE:
                             getData().userListeners.update();
@@ -169,7 +173,6 @@ public abstract class Zone extends ZoneObject {
                     }
 
                     //Update Cameras
-                    addCameras();
                     for (Camera camera = nextCamera(); camera != null; camera = nextCamera()) {
                         camera.internalUpdate();
                     }
@@ -208,7 +211,7 @@ public abstract class Zone extends ZoneObject {
         }
         private int currentCamera = 0;
         private final SynchronizedTaskManager syncTM = new SynchronizedTaskManager();
-        private final CyclicBarrier[] barriers = new CyclicBarrier[5];
+        private final CyclicBarrier[] barriers = new CyclicBarrier[6];
         private ZoneThread[] threads;
 
         /**
@@ -588,7 +591,7 @@ public abstract class Zone extends ZoneObject {
         getData().trimLists();
         cameras.trimToSize();
     }
-    
+
     /**
      * Adds new Cameras to this Zone.
      */
