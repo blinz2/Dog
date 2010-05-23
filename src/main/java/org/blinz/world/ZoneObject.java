@@ -64,7 +64,11 @@ abstract class ZoneObject {
 	return getData().zoneCycles;
     }
 
-    protected final Object getMyZoneData() {
+    /**
+     * Gets the shared data object of the Zone that this is a part of.
+     * @return the shared data object of the Zone that this is a part of.
+     */
+    protected final Object getSharedZoneData() {
 	return getData().data;
     }
 

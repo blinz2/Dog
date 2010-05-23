@@ -59,7 +59,7 @@ final class UserListenerCatalog {
         private int cameraCount = 0;
 
         /**
-         * 
+         * Constructor
          */
         private UserListenerList() {
         }
@@ -251,6 +251,12 @@ final class UserListenerCatalog {
     }
 
     /**
+     * Constructor
+     */
+    UserListenerCatalog() {
+    }
+
+    /**
      * Trims the lists under this object and its subordinates down to size.
      */
     final void trimLists() {
@@ -258,15 +264,6 @@ final class UserListenerCatalog {
         while (list.hasMoreElements()) {
             list.nextElement().trimLists();
         }
-    }
-
-    /**
-     * 
-     * @param user
-     * @return the list of sprites listening to the given User
-     */
-    final UserListenerList get(final User user) {
-        return userListeners.get(user);
     }
 
     /**
@@ -279,7 +276,7 @@ final class UserListenerCatalog {
     final UserListenerList checkOut(final User user) {
         UserListenerList list;
         do {
-            list = get(user);
+            list = userListeners.get(user);
             if (list == null) {
                 list = fetchList(user, 1);
             }
@@ -311,6 +308,7 @@ final class UserListenerCatalog {
 
     /**
      * Checks in UserListenerList for the given User.
+     * For use by Cameras.
      * @param user
      */
     final void checkIn(final User user) {
@@ -366,7 +364,7 @@ final class UserListenerCatalog {
      * @param cameras the number of additional Cameras to access this list.
      */
     private final synchronized UserListenerList fetchList(final User user, final int cameras) {
-        if (!userListeners.contains(user)) {
+        if (!userListeners.containsKey(user)) {
             final UserListenerList list = new UserListenerList();
             list.cameraCount += cameras;
             userListeners.put(user, list);
