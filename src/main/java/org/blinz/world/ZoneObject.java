@@ -22,12 +22,12 @@ package org.blinz.world;
  */
 abstract class ZoneObject {
 
-    private static ZoneData[] dataList = new ZoneData[128];
+    private final static ZoneData[] dataList = new ZoneData[128];
 
     static {
-	dataList[0] = new ZoneData();
-	dataList[0].zoneSize.setSize(dataList[0].sectorWidth(), dataList[0].sectorHeight());
-	dataList[0].init((byte) 0);
+        dataList[0] = new ZoneData();
+        dataList[0].zoneSize.setSize(dataList[0].sectorWidth(), dataList[0].sectorHeight());
+        dataList[0].init((byte) 0);
     }
     byte zoneID = 0;
 
@@ -37,23 +37,44 @@ abstract class ZoneObject {
      * @param sprite
      */
     public final void checkCollisions(final CollidableSprite sprite) {
-	Sector tl = getData().getSectorOf(((BaseSprite) sprite).getX(), ((BaseSprite) sprite).getY());
-	Sector br = getData().getSectorOf(((BaseSprite) sprite).getX() + ((BaseSprite) sprite).getWidth(),
-		((BaseSprite) sprite).getY() + ((BaseSprite) sprite).getHeight());
-	tl.checkCollisionsFor(sprite);
-	if (sprite instanceof UpdatingSprite) {
-	    tl.checkCollisionsFor(sprite);
-	}
-	if (tl != br) {
-	    br.checkCollisionsFor(sprite);
-	    Sector tr = getData().getSectorOf(((BaseSprite) sprite).getX() + ((BaseSprite) sprite).getWidth(),
-		    ((BaseSprite) sprite).getY());
-	    if (tr != br && tl != tr) {
-		getData().getSectorOf(((BaseSprite) sprite).getX(),
-			((BaseSprite) sprite).getY() + ((BaseSprite) sprite).getHeight()).checkCollisionsFor(sprite);
-		tr.checkCollisionsFor(sprite);
-	    }
-	}
+        final Sector tl = getData().getSectorOf(((BaseSprite) sprite).getX(), ((BaseSprite) sprite).getY());
+        final Sector br = getData().getSectorOf(((BaseSprite) sprite).getX() + ((BaseSprite) sprite).getWidth(),
+                ((BaseSprite) sprite).getY() + ((BaseSprite) sprite).getHeight());
+        tl.checkCollisionsFor(sprite);
+
+        if (tl.leftNeighbor != null) {
+            tl.leftNeighbor.checkCollisionsFor(sprite);
+            if (tl.topNeighbor != null) {
+                tl.topNeighbor.leftNeighbor.checkCollisionsFor(sprite);
+            }
+        }
+        if (tl.topNeighbor != null) {
+            tl.topNeighbor.checkCollisionsFor(sprite);
+        }
+
+        if (tl != br) {
+            if (tl.bottomNeighbor.rightNeighbor == br) {
+                //check them all
+                br.checkCollisionsFor(sprite);
+                if (br.leftNeighbor != null) {
+                    br.leftNeighbor.checkCollisionsFor(sprite);
+                }
+                if (tl.rightNeighbor != null) {
+                    tl.rightNeighbor.checkCollisionsFor(sprite);
+                    if (tl.rightNeighbor.topNeighbor != null) {
+                        tl.rightNeighbor.topNeighbor.checkCollisionsFor(sprite);
+                    }
+                }
+            } else if (br == tl.bottomNeighbor) {
+                if (br.leftNeighbor != null) {
+                    br.leftNeighbor.checkCollisionsFor(sprite);
+                }
+            } else {
+                if (br.topNeighbor != null) {
+                    br.topNeighbor.checkCollisionsFor(sprite);
+                }
+            }
+        }
     }
 
     /**
@@ -61,7 +82,7 @@ abstract class ZoneObject {
      * @return a long representing the number of cycles the zone has gone through
      */
     protected final long zoneCycles() {
-	return getData().zoneCycles;
+        return getData().zoneCycles;
     }
 
     /**
@@ -69,7 +90,7 @@ abstract class ZoneObject {
      * @return the shared data object of the Zone that this is a part of.
      */
     protected final Object getSharedZoneData() {
-	return getData().data;
+        return getData().data;
     }
 
     /**
@@ -81,15 +102,15 @@ abstract class ZoneObject {
      * @return ZoneData
      */
     final ZoneData getData() {
-	return dataList[zoneID];
+        return dataList[zoneID];
     }
 
     final static void setZoneData(final int zoneID, final ZoneData zoneData) {
-	dataList[zoneID] = zoneData;
+        dataList[zoneID] = zoneData;
     }
 
     void internalInit() {
-	init();
+        init();
     }
 
     abstract void init();
