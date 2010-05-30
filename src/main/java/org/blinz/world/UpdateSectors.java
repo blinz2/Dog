@@ -1,6 +1,6 @@
 /*
  *  BlinzEngine - A library for large 2D world simultions and games.
- *  Copyright (C) 2009 - 2010  Blinz <gtalent2@gmail.com>
+ *  Copyright (C) 2010  Blinz <gtalent2@gmail.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 3 as
@@ -23,7 +23,7 @@ import org.blinz.util.concurrency.SynchronizedTask;
  * Updates the Sectors and sprites.
  * @author Blinz
  */
-public class UpdateSectors extends SynchronizedTask {
+class UpdateSectors extends SynchronizedTask {
 
     private Sector[] sectors;
 
