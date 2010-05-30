@@ -17,10 +17,10 @@
 package org.blinz.world;
 
 /**
- *
+ * The root class for many objects relating to Zone.
  * @author Blinz
  */
-abstract class ZoneObject {
+public abstract class ZoneObject {
 
     private final static ZoneData[] dataList = new ZoneData[128];
 

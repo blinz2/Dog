@@ -200,8 +200,9 @@ public abstract class Zone extends ZoneObject {
     private TaskExecuter zoneProcessor;
     private static final Vector<Byte> recycledIDs = new Vector<Byte>();
     private static byte idIndex = 0;
-    private TaskList sectorUpdate = new TaskList();
-    private TaskList sectorPostUpdate = new TaskList();
+    private final TaskList sectorUpdate = new TaskList();
+    private final TaskList sectorPostUpdate = new TaskList();
+    private final TaskList updatingObjects = new TaskList();
 
     public Zone() {
         try {
@@ -225,7 +226,7 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     * Pauses the zone.
+     * Pauses the Zone.
      * 
      * Note: This pause is not meant for short pauses, it will take at least 250
      * milliseconds before the Zone resumes execution even if resume() is called
@@ -236,7 +237,7 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     * Unpauses the zone.
+     * Unpauses the Zone.
      */
     public final void unpause() {
         pauseTime = System.currentTimeMillis() - getData().zoneTime;
@@ -277,6 +278,32 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
+     * Adds the given UpdatingObject to this Zone for it to update every cycle with
+     * this Zone.
+     * @param updatingObject the UpdatingObject to be added
+     */
+    public final void addUpdatingObject(final UpdatingObject updatingObject) {
+        updatingObjects.add(new Updater(updatingObject));
+    }
+
+    /**
+     * Removes the given UpdatingObject to this Zone for it to update every cycle with
+     * this Zone.
+     * @param updatingObject the UpdatingObject to be removed
+     * @return true if the given object was present, false otherwise
+     */
+    public final boolean removeUpdatingObject(final UpdatingObject updatingObject) {
+        for (int i = 0; i < updatingObjects.size(); i++) {
+            final Updater updater = (Updater)updatingObjects.get(i);
+            if (updater.getUpdatingObject() == updatingObject) {
+                updatingObjects.remove(updater);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Adds the given sprite to this sprites zone.
      * @param sprite
      */
@@ -309,6 +336,7 @@ public abstract class Zone extends ZoneObject {
             zoneProcessor.addTask(new Pause());
             zoneProcessor.addTask(new ManageTime());
             zoneProcessor.addTask(new UpdateZone());
+            zoneProcessor.addTask(updatingObjects);
             zoneProcessor.addTask(new AddCameras());
             zoneProcessor.addTask(new UserListenerUpdate());
             zoneProcessor.addTask(new Barrier());

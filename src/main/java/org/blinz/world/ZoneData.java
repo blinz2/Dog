@@ -18,6 +18,7 @@ package org.blinz.world;
 
 import org.blinz.util.Size;
 import org.blinz.util.User;
+import org.blinz.util.concurrency.TaskList;
 
 /**
  * ZoneData contains such items as a master list of Sectors, Sector size, zoneTime,
