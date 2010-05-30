@@ -29,7 +29,6 @@ class CameraSprite {
     private Sector sector;
     private BaseSprite sprite;
     private boolean isSelected = false;
-    private short width, height;
 
     /**
      * Constructor
@@ -37,8 +36,8 @@ class CameraSprite {
      * @param sector the sector that the sprite that this represents is in
      */
     CameraSprite(final BaseSprite sprite, final Sector sector) {
-	this.sprite = sprite;
-	setSector(sector);
+        this.sprite = sprite;
+        this.sector = sector;
     }
 
     /**
@@ -46,7 +45,7 @@ class CameraSprite {
      * @param sector the Sector that the sprite this CameraSprite represents belongs to
      */
     final void setSector(final Sector sector) {
-	this.sector = sector;
+        this.sector = sector;
     }
 
     /**
@@ -54,7 +53,7 @@ class CameraSprite {
      * @return the Sector that the sprite this CameraSprite represents belongs to
      */
     final Sector getSector() {
-	return sector;
+        return sector;
     }
 
     /**
@@ -62,7 +61,7 @@ class CameraSprite {
      * @return true if the contained sprite is selectable, false otherwise
      */
     final boolean isSelectable() {
-	return sprite instanceof SelectableSprite;
+        return sprite instanceof SelectableSprite;
     }
 
     /**
@@ -70,7 +69,7 @@ class CameraSprite {
      * @return the sprite this CameraSprite represents.
      */
     final BaseSprite getSprite() {
-	return sprite;
+        return sprite;
     }
 
     /**
@@ -78,7 +77,7 @@ class CameraSprite {
      * @return the x coordinate of the sprite this represents
      */
     final int getX() {
-	return sprite.getX();
+        return sprite.getX();
     }
 
     /**
@@ -86,7 +85,7 @@ class CameraSprite {
      * @return the y coordinate of the sprite this represents
      */
     final int getY() {
-	return sprite.getY();
+        return sprite.getY();
     }
 
     /**
@@ -94,7 +93,7 @@ class CameraSprite {
      * @return the layer of the sprite this represents
      */
     final float getLayer() {
-	return sprite.getLayer();
+        return sprite.getLayer();
     }
 
     /**
@@ -102,7 +101,7 @@ class CameraSprite {
      * @return the width of the sprite this represents
      */
     final int getWidth() {
-	return sprite.getWidth();
+        return sprite.getWidth();
     }
 
     /**
@@ -110,14 +109,14 @@ class CameraSprite {
      * @return the height of the sprite this represents
      */
     final int getHeight() {
-	return sprite.getHeight();
+        return sprite.getHeight();
     }
 
     final void draw(final Graphics graphics, final Bounds bounds) {
-	sprite.draw(graphics, bounds);
-	if (sprite instanceof SelectableSprite && isSelected()) {
-	    ((SelectableSprite) sprite).drawSelectionIndicator(graphics, bounds);
-	}
+        sprite.draw(graphics, bounds);
+        if (sprite instanceof SelectableSprite && isSelected()) {
+            ((SelectableSprite) sprite).drawSelectionIndicator(graphics, bounds);
+        }
     }
 
     /**
@@ -125,10 +124,10 @@ class CameraSprite {
      * @param user the User that selected this sprite
      */
     final void select(final User user) {
-	if (sprite instanceof SelectableSprite) {
-	    ((SelectableSprite) sprite).select(user);
-	    isSelected = true;
-	}
+        if (sprite instanceof SelectableSprite) {
+            ((SelectableSprite) sprite).select(user);
+            isSelected = true;
+        }
     }
 
     /**
@@ -136,10 +135,10 @@ class CameraSprite {
      * @param user the User that deselected this sprite
      */
     final void deselect(final User user) {
-	if (sprite instanceof SelectableSprite) {
-	    ((SelectableSprite) sprite).deselect(user);
-	    isSelected = false;
-	}
+        if (sprite instanceof SelectableSprite) {
+            ((SelectableSprite) sprite).deselect(user);
+            isSelected = false;
+        }
     }
 
     /**
@@ -147,6 +146,6 @@ class CameraSprite {
      * @return true if this CameraSprite is selected by its Camera, false otherwise
      */
     boolean isSelected() {
-	return isSelected;
+        return isSelected;
     }
 }

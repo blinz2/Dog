@@ -70,7 +70,7 @@ final class UnorderedList<E> {
     final E remove(final int i) {
         if (elements.size() > i) {
             synchronized (elements) {
-                final E e = elements.set(i, elements.get(i));
+                final E e = elements.set(i, elements.get(elements.size() - 1));
                 elements.remove(elements.size() - 1);
                 return e;
             }

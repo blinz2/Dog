@@ -20,7 +20,6 @@ import org.blinz.util.User;
 import org.blinz.graphics.Graphics;
 import org.blinz.util.Bounds;
 import org.blinz.input.MouseListener;
-import java.util.Hashtable;
 import java.util.Vector;
 import org.blinz.input.ClickEvent;
 import org.blinz.input.KeyEvent;
@@ -33,12 +32,108 @@ import org.blinz.world.UserListenerCatalog.UserListenerList;
 
 /**
  * Camera acts as an interface between a the user, and the Zone.
- * It delivers all necessary images to the screena and allows input to travel to
- * the Zone.
+ * It delivers all necessary images to the screen and allows input to travel to
+ * the Zone and appropriate sprites.
  * @author Blinz
  */
 public class Camera extends ZoneObject {
 
+    private final class CameraSector {
+
+        private final UnorderedList<CameraSprite> sprites = new UnorderedList<CameraSprite>();
+        private Sector sector;
+
+        /**
+         * Constructor
+         * @param sector the associated Sector
+         */
+        CameraSector(final Sector sector) {
+            this.sector = sector;
+        }
+
+        /**
+         * Adds sprites new to this Sector that this CameraSector represents to
+         * this Camera.
+         */
+        private final void addNewSprites() {
+            final Vector<BaseSprite> list = sector.getAddedSprites();
+            for (int n = 0; n < list.size(); n++) {
+                addSprite(list.get(n));
+            }
+        }
+
+        /**
+         * Declares all of the sprites in this CameraSector orphans.
+         */
+        private final void orphanSprites() {
+            while (!sprites.isEmpty()) {
+                orphanedSprites.add(sprites.get(0));
+                sprites.remove(0).setSector(null);
+            }
+        }
+
+        /**
+         * Finds, removes, and declares the sprites that should no longer represent
+         * this sector.
+         */
+        private final void orphanRemovedSprites() {
+            final Vector<BaseSprite> list = sector.getRemovedSprites();
+            for (int n = 0; n < list.size(); n++) {
+                final BaseSprite sprite = list.get(n);
+                for (int i = 0; i < sprites.size(); i++) {
+                    if (sprites.get(i).getSprite() == sprite) {
+                        orphanedSprites.add(sprites.get(i));
+                        sprites.remove(i).setSector(null);
+                        break;
+                    }
+                }
+            }
+        }
+
+        /**
+         * Adds the given sprite to this CameraSector and to the Camera if necessary.
+         * @param sprite the sprite to be added
+         */
+        private final void addSprite(final BaseSprite sprite) {
+            CameraSprite cs = null;
+            //recover the sprite's orphaned representation if it exists
+            for (int i = 0; i < orphanedSprites.size(); i++) {
+                if (orphanedSprites.get(i).getSprite() == sprite) {
+                    cs = orphanedSprites.remove(i);
+                    cs.setSector(sector);
+                    break;
+                }
+            }
+            if (cs == null) {
+                cs = new CameraSprite(sprite, sector);
+                //add the sprite to sprite list at the proper location
+                synchronized (spriteList) {
+                    if (spriteList.isEmpty()) {
+                        spriteList.add(cs);
+                        return;
+                    }
+                    for (int i = spriteList.size() - 1; i > -1; i--) {
+                        if (spriteList.get(i).getLayer() <= sprite.getLayer()) {
+                            spriteList.insertElementAt(cs, i + 1);
+                            break;
+                        }
+                    }
+                }
+            }
+            //add the sprite to the list representing its Sector
+            sprites.add(cs);
+        }
+
+        /**
+         * Adds the sprites already existing within the Sector.
+         */
+        private final void addSprites() {
+            final UnorderedList<BaseSprite> list = sector.getSprites();
+            for (int n = 0; n < list.size(); n++) {
+                addSprite(list.get(n));
+            }
+        }
+    }
     /**
      * Represents the bounds of this Camera during the last round.
      */
@@ -48,11 +143,9 @@ public class Camera extends ZoneObject {
      * Used to keep track of how click inputs affect the selected sprite.
      */
     private final Vector<Position> selections = new Vector<Position>();
-    private final Vector<Sector> sectors = new Vector<Sector>();
+    private final Vector<CameraSector> sectors = new Vector<CameraSector>();
     private final Vector<CameraSprite> orphanedSprites = new Vector<CameraSprite>();
     private final Vector<CameraSprite> spriteList = new Vector<CameraSprite>();
-    private final Hashtable<Sector, Vector<CameraSprite>> spriteTable =
-            new Hashtable<Sector, Vector<CameraSprite>>();
     private final Bounds bounds = new Bounds();
     private Zone zone;
     private User user;
@@ -63,7 +156,7 @@ public class Camera extends ZoneObject {
     private UserListenerList userListeners;
 
     /**
-     * Constructer for Camera.
+     * Constructor for Camera.
      */
     public Camera() {
         this(new User());
@@ -112,7 +205,6 @@ public class Camera extends ZoneObject {
     public final synchronized void dropZone() {
         if (zone != null) {
             zone.removeCamera(this);
-            spriteTable.clear();
             getData().userListeners.checkIn(user);
             zone = null;
             inputListener = null;
@@ -257,7 +349,7 @@ public class Camera extends ZoneObject {
     }
 
     /**
-     * Called after the Camera recieves a Zone. Does nothing, for implementing
+     * Called after the Camera receives a Zone. Does nothing, for implementing
      * as needed.
      */
     @Override
@@ -275,14 +367,10 @@ public class Camera extends ZoneObject {
         for (int x = x1; x < x2; x += getData().sectorWidth()) {
             for (int y = y1; y < y2; y += getData().sectorHeight()) {
                 final Sector s = getData().getSectorOf(x, y);
-                sectors.add(s);
-                spriteTable.put(s, new Vector<CameraSprite>());
-                final UnorderedList<BaseSprite> list = s.getSprites();
-                for (int i = 0; i < list.size(); i++) {
-                    addSprite(list.get(i), s);
-                }
+                addSector(s);
             }
         }
+        oldBounds.setBounds(bounds);
         init();
     }
 
@@ -302,8 +390,9 @@ public class Camera extends ZoneObject {
     private final void processSpriteSelection() {
         final int end = selections.size() - 1;
         while (!selections.isEmpty()) {
-            final int x = selections.get(end).x;
-            final int y = selections.get(end).y;
+            final Position selection = selections.remove(end);
+            final int x = selection.x;
+            final int y = selection.y;
             final CameraSprite oldSelected = selected;
 
 
@@ -331,54 +420,21 @@ public class Camera extends ZoneObject {
     }
 
     /**
-     * Lists the given sprite as an orphan and removes it from its Sector.
-     * @param sprite the orphaned sprite
-     * @param sector the Sector of the now orphaned sprite
+     * Adds the given Sector to the necessary structures.
+     * @param sector
      */
-    private final void orphanSprite(final BaseSprite sprite, final Sector sector) {
-        final Vector<CameraSprite> list = spriteTable.get(sector);
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getSprite() == sprite) {
-                orphanedSprites.add(list.get(i));
-                list.remove(i).setSector(null);
-                break;
-            }
-        }
+    private final void addSector(final Sector sector) {
+        final CameraSector cs = new CameraSector(sector);
+        cs.addSprites();
+        sectors.add(cs);
     }
 
     /**
-     * Adds the given sprite to this Camera for the given Sector.
-     * @param sprite the sprite to be added
-     * @param sector the Sector of the sprite to be added
+     * Removes the given Sector from the necessary structures.
+     * @param sectorIndex the location of the Sector in the sectors list
      */
-    private final void addSprite(final BaseSprite sprite, final Sector sector) {
-        CameraSprite cs = null;
-        //recover the sprite's orphaned representation if it exists
-        for (int i = 0; i < orphanedSprites.size(); i++) {
-            if (orphanedSprites.get(i).getSprite() == sprite) {
-                cs = orphanedSprites.remove(i);
-                cs.setSector(sector);
-                break;
-            }
-        }
-        if (cs == null) {
-            cs = new CameraSprite(sprite, sector);
-            //add the sprite to sprite list at the proper location
-            synchronized (spriteList) {
-                if (spriteList.isEmpty()) {
-                    spriteList.add(cs);
-                    return;
-                }
-                for (int i = spriteList.size() - 1; i > -1; i--) {
-                    if (spriteList.get(i).getLayer() <= sprite.getLayer()) {
-                        spriteList.insertElementAt(cs, i + 1);
-                        break;
-                    }
-                }
-            }
-        }
-        //add the sprite to the list representing its Sector
-        spriteTable.get(sector).add(cs);
+    private final void removeSector(final int sectorIndex) {
+        sectors.remove(sectorIndex).orphanSprites();
     }
 
     /**
@@ -388,20 +444,12 @@ public class Camera extends ZoneObject {
         //manage sprites for current sectors
         //find and declare orphaned sprites
         for (int i = 0; i < sectors.size(); i++) {
-            final Sector sector = sectors.get(i);
-            final Vector<BaseSprite> list = sector.getRemovedSprites();
-            for (int r = 0; r < list.size(); r++) {
-                orphanSprite(list.get(r), sector);
-            }
+            sectors.get(i).orphanRemovedSprites();
         }
 
         //add new sprites
         for (int i = 0; i < sectors.size(); i++) {
-            final Sector sector = sectors.get(i);
-            final Vector<BaseSprite> list = sectors.get(i).getAddedSprites();
-            for (int r = 0; r < list.size(); r++) {
-                addSprite(list.get(r), sector);
-            }
+            sectors.get(i).addNewSprites();
         }
 
         //update Sectors
@@ -410,18 +458,11 @@ public class Camera extends ZoneObject {
             //update the Sectors
             //remove old Sectors
             for (int i = 0; i < sectors.size(); i++) {
-                if (!sectors.get(i).withinSpriteRange(bounds)) {
-                    //orphan the Sector's sprites
-                    final UnorderedList<BaseSprite> list = sectors.get(i).getSprites();
-                    for (int n = 0; n < list.size(); n++) {
-                        orphanSprite(list.get(n), sectors.get(i));
-                    }
-                    spriteTable.remove(sectors.get(i));
-                    sectors.remove(i);
+                if (!sectors.get(i).sector.withinSpriteRange(bounds)) {
+                    removeSector(i);
                     i--;
                 }
             }
-
             if (bounds.width > 0 && bounds.height > 0) {
                 //add new Sectors
                 final int x1 = sector1().leftNeighbor != null ? sector1().leftNeighbor.getX() : 0;
@@ -433,12 +474,7 @@ public class Camera extends ZoneObject {
                     for (int y = y1; y <= y2; y += getData().sectorHeight()) {
                         final Sector s = getData().getSectorOf(x, y);
                         if (!s.withinSpriteRange(oldBounds)) {
-                            sectors.add(s);
-                            spriteTable.put(s, new Vector<CameraSprite>());
-                            final UnorderedList<BaseSprite> list = s.getSprites();
-                            for (int i = 0; i < list.size(); i++) {
-                                addSprite(list.get(i), s);
-                            }
+                            addSector(s);
                         }
                     }
                 }
@@ -455,7 +491,6 @@ public class Camera extends ZoneObject {
             }
         }
         orphanedSprites.clear();
-
     }
 
     /**
@@ -566,7 +601,8 @@ public class Camera extends ZoneObject {
         }
 
         @Override
-        protected void finalize() {
+        protected void finalize() throws Throwable {
+            super.finalize();
             getData().userListeners.checkIn(user);
         }
     }

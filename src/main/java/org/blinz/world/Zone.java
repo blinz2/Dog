@@ -21,14 +21,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Vector;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 import org.blinz.input.ClickEvent;
 import org.blinz.input.KeyEvent;
 import org.blinz.input.MouseEvent;
 import org.blinz.input.MouseWheelEvent;
 import org.blinz.util.Size;
 import org.blinz.util.Position;
+import org.blinz.util.concurrency.Barrier;
+import org.blinz.util.concurrency.SynchronizedTask;
+import org.blinz.util.concurrency.Task;
+import org.blinz.util.concurrency.TaskExecuter;
+import org.blinz.util.concurrency.TaskList;
 
 /**
  * Represents a realm for sprites to be processed and interact.
@@ -37,256 +40,123 @@ import org.blinz.util.Position;
 public abstract class Zone extends ZoneObject {
 
     /**
-     * Divides the task of processing a Zone up into as many practical units as the
-     * given thread count suggests, then creates and manages the threads used to process
-     * this Zone.
-     * @author Blinz
+     * Task for pausing the Zone if it is paused.
      */
-    final class ZoneProcessor {
+    private class Pause extends Task {
 
-        private class SynchronizedTaskManager {
-
-            private int stage;
-            private final int MANAGE_TIME = 0;
-            private final int ZONE_UPDATE = 1;
-            private final int ADD_CAMERAS = 2;
-            private final int USER_LISTENER_UPDATE = 3;
-
-            final void enter() {
-                while (stage < 4) {
-                    switch (stage()) {
-                        case MANAGE_TIME:
-                            cycleStartTime = System.currentTimeMillis();
-                            getData().zoneTime = (System.currentTimeMillis() - initTime) - pauseTime;
-                            break;
-                        case ZONE_UPDATE:
-                            getData().zoneCycles++;
-                            update();
-                            break;
-                        case ADD_CAMERAS:
-                            addCameras();
-                            break;
-                        case USER_LISTENER_UPDATE:
-                            getData().userListeners.update();
-                            break;
-                    }
+        @Override
+        protected void run() {
+            //pause if Zone is paused
+            while (getData().paused()) {
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+        }
+    }
 
-            private final synchronized int stage() {
-                return stage++;
-            }
+    /**
+     * Manages the time.
+     */
+    private class ManageTime extends SynchronizedTask {
 
-            /**
-             * Should contain only operations with trivial execution time. Resets
-             * this object to run again next iteration.
-             */
-            private final void reset() {
-                stage = 0;
+        @Override
+        protected void run() {
+            cycleStartTime = System.currentTimeMillis();
+            getData().zoneTime = (System.currentTimeMillis() - initTime) - pauseTime;
+        }
+    }
+
+    /**
+     * For updating the cycles executed and the update method implemented by
+     * users of the API.
+     */
+    private class UpdateZone extends SynchronizedTask {
+
+        @Override
+        protected void run() {
+            getData().zoneCycles++;
+            update();
+        }
+    }
+
+    /**
+     * Adds new Cameras to this Zone.
+     */
+    private class AddCameras extends SynchronizedTask {
+
+        @Override
+        protected void run() {
+            addCameras();
+        }
+    }
+
+    /**
+     * Updates the user input for sprites requesting input from specific users.
+     */
+    private class UserListenerUpdate extends SynchronizedTask {
+
+        @Override
+        protected void run() {
+            getData().userListeners.update();
+        }
+    }
+
+    /**
+     * Deletes sprites marked for deletion.
+     */
+    private class DeleteSprites extends Task {
+
+        @Override
+        protected void run() {
+            for (BaseSprite s = getData().spritesToDelete.remove(0);
+                    s != null; s = getData().spritesToDelete.remove(0)) {
+                deleteSprite(s);
             }
         }
+    }
 
-        /**
-         *
-         * @author Blinz
-         */
-        private class ZoneThread extends Thread {
+    /**
+     * Deletes sprites marked for deletion. Must come before PostUpdateSectors.
+     */
+    private class ResetCameraIndex extends SynchronizedTask {
 
-            private Sector[] sectors;
+        @Override
+        protected void run() {
+            currentCamera = 0;
+        }
+    }
 
-            private ZoneThread(final ThreadGroup group) {
-                super(group, group.getName());
+    /**
+     * Deletes sprites marked for deletion. Must come before PostUpdateSectors.
+     */
+    private class UpdateCameras extends SynchronizedTask {
+
+        @Override
+        protected void run() {
+            //Update Cameras
+            for (Camera camera = nextCamera(); camera != null; camera = nextCamera()) {
+                camera.internalUpdate();
             }
+        }
+    }
 
-            @Override
-            public void run() {
-                while (isRunning) {
-                    //pause if Zone is paused
-                    if (getData().paused()) {
-                        try {
-                            Thread.sleep(250);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
+    /**
+     * Deletes sprites marked for deletion.
+     */
+    private class Sleep extends Task {
 
-                    syncTM.enter();
-
-                    //cyclic barrier
-                    try {
-                        barriers[0].await();
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (BrokenBarrierException ex) {
-                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                    syncTM.reset();
-
-                    //update Sectors
-                    if (sectors != null) {
-                        for (int i = 0; i < sectors.length; i++) {
-                            sectors[i].update();
-                        }
-                    }
-
-                    //cyclic barrier
-                    try {
-                        barriers[1].await();
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (BrokenBarrierException ex) {
-                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                    //post update Sectors
-                    if (sectors != null) {
-                        for (int i = 0; i < sectors.length; i++) {
-                            sectors[i].postUpdate();
-                        }
-                    }
-
-                    //cyclic barrier
-                    try {
-                        barriers[2].await();
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (BrokenBarrierException ex) {
-                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                    //delete those sprites that have been marked for deletion
-                    {
-                        for (BaseSprite s = getData().spritesToDelete.remove(0);
-                                s != null; s = getData().spritesToDelete.remove(0)) {
-                            deleteSprite(s);
-                        }
-                    }
-
-                    //cyclic barrier
-                    try {
-                        barriers[3].await();
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (BrokenBarrierException ex) {
-                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                    //Update Cameras
-                    for (Camera camera = nextCamera(); camera != null; camera = nextCamera()) {
-                        camera.internalUpdate();
-                    }
-
-                    //sleep
-                    {
-                        long sleepTime = (cycleStartTime + cycleIntervalTime) - System.currentTimeMillis();
-                        if (sleepTime > 0) {
-                            try {
-                                Thread.sleep(sleepTime);
-                            } catch (InterruptedException ex) {
-                                Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                    }
-
-                    //cyclic barrier
-                    try {
-                        barriers[4].await();
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (BrokenBarrierException ex) {
-                        Logger.getLogger(ZoneThread.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    currentCamera = 0;
+        @Override
+        protected void run() {
+            final long sleepTime = (cycleStartTime + cycleIntervalTime) - System.currentTimeMillis();
+            if (sleepTime > 0) {
+                try {
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }
-
-            /**
-             * Sets the group of Sectors that this group is to contain.
-             * @param sectors
-             */
-            final void setSectors(final Sector[] sectors) {
-                this.sectors = sectors;
-            }
-        }
-        private int currentCamera = 0;
-        private final SynchronizedTaskManager syncTM = new SynchronizedTaskManager();
-        private final CyclicBarrier[] barriers = new CyclicBarrier[6];
-        private ZoneThread[] threads;
-
-        /**
-         *
-         * @param zoneName the name of the Zone this thread group is for
-         * @param threadCount number of threads to be used in this group
-         */
-        ZoneProcessor(final String zoneName, final int threadCount) {
-            ThreadGroup group = new ThreadGroup(zoneName);
-
-            threads = new ZoneThread[threadCount];
-            for (int i = 0; i < threads.length; i++) {
-                threads[i] = new ZoneThread(group);
-            }
-
-            for (int i = 0; i < barriers.length; i++) {
-                barriers[i] = new CyclicBarrier(threadCount);
-            }
-
-            generateSectorGroups(getData().sectors);
-        }
-
-        /**
-         * Starts the thread(s) in this ZoneProcesser and thereby starts this Zone.
-         */
-        final void start() {
-            for (int i = 0; i < threads.length; i++) {
-                threads[i].start();
-            }
-        }
-
-        final void generateSectorGroups(final Sector[][] sectors) {
-            final int sectorsPerThread = (sectors.length * sectors[0].length) / threads.length;
-            final Position index = new Position();
-
-            final ArrayList<Sector> group = new ArrayList<Sector>();
-            int currentThread = 0;
-            while (index.x < sectors.length) {
-                while (index.y < sectors[index.x].length) {
-                    group.add(sectors[index.x][index.y]);
-                    if (group.size() == sectorsPerThread) {
-                        Sector[] s = new Sector[group.size()];
-                        for (int i = 0; i < group.size(); i++) {
-                            s[i] = group.get(i);
-                        }
-                        threads[currentThread].setSectors(s);
-                        group.clear();
-                        currentThread++;
-                    }
-                    index.y++;
-                }
-                index.y = 0;
-                index.x++;
-            }
-            if (group.size() > 0) {
-                ZoneThread t = currentThread < threads.length - 1
-                        ? threads[currentThread + 1] : threads[currentThread];
-                Sector[] s = new Sector[group.size()];
-                for (int i = 0; i < group.size(); i++) {
-                    s[i] = group.get(i);
-                }
-                t.setSectors(s);
-            }
-        }
-
-        /**
-         * Used to help concurrently update the Cameras.
-         * @return the next Camera to be updated
-         * @throws ArrayIndexOutOfBoundsException
-         */
-        private final synchronized Camera nextCamera() throws ArrayIndexOutOfBoundsException {
-            try {
-                return cameras.get(currentCamera++);
-            } catch (ArrayIndexOutOfBoundsException e) {
-                return null;
             }
         }
     }
@@ -310,6 +180,10 @@ public abstract class Zone extends ZoneObject {
             }
         }
     }
+    /**
+     * Used to track the next Camera to be updated.
+     */
+    private int currentCamera = 0;
     private Size size;
     private final Vector<Camera> cameras = new Vector<Camera>();
     private final Vector<Camera> camerasToAdd = new Vector<Camera>();
@@ -323,9 +197,11 @@ public abstract class Zone extends ZoneObject {
     private long cycleStartTime;
     private Thread listTrimmer = new ListTrimmer();
     private boolean isRunning = false;
-    private ZoneProcessor zoneProcessor;
+    private TaskExecuter zoneProcessor;
     private static final Vector<Byte> recycledIDs = new Vector<Byte>();
     private static byte idIndex = 0;
+    private TaskList sectorUpdate = new TaskList();
+    private TaskList sectorPostUpdate = new TaskList();
 
     public Zone() {
         try {
@@ -377,7 +253,7 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     * Returns a new Size object representing the dimensions of this Zone.
+     * Gets a new Size object representing the dimensions of this Zone.
      * @return a new Size object representing the dimensions of this Zone.
      */
     public final Size getSize() {
@@ -385,16 +261,16 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     * Returns int representing the width of this Zone.
-     * @return int representing the width of this Zone
+     * Gets an int representing the width of this Zone.
+     * @return an int representing the width of this Zone
      */
     public final int getWidth() {
         return size.width;
     }
 
     /**
-     * Returns int representing the height of this Zone.
-     * @return int representing the height of this Zone
+     * Gets an int representing the height of this Zone.
+     * @return an int representing the height of this Zone
      */
     public final int getHeight() {
         return size.height;
@@ -423,12 +299,32 @@ public abstract class Zone extends ZoneObject {
      */
     public final synchronized void start(final String name, final int threads) {
         if (!isRunning) {
+            zoneProcessor = new TaskExecuter(name, threads);
+
             getData().setName(name);
             initTime = System.currentTimeMillis();
             isRunning = true;
             init();
-            zoneProcessor = new ZoneProcessor(name, threads);
-            zoneProcessor.generateSectorGroups(getData().sectors);
+
+            zoneProcessor.addTask(new Pause());
+            zoneProcessor.addTask(new ManageTime());
+            zoneProcessor.addTask(new UpdateZone());
+            zoneProcessor.addTask(new AddCameras());
+            zoneProcessor.addTask(new UserListenerUpdate());
+            zoneProcessor.addTask(new Barrier());
+
+            zoneProcessor.addTask(sectorUpdate);
+            zoneProcessor.addTask(new ResetCameraIndex());
+            zoneProcessor.addTask(new Barrier());
+            zoneProcessor.addTask(new UpdateCameras());
+            zoneProcessor.addTask(new Barrier());
+            zoneProcessor.addTask(sectorPostUpdate);
+
+            zoneProcessor.addTask(new Barrier());
+            zoneProcessor.addTask(new DeleteSprites());
+            zoneProcessor.addTask(new Sleep());
+
+            generateSectorGroups(getData().sectors);
             listTrimmer.start();
             zoneProcessor.start();
         }
@@ -439,10 +335,11 @@ public abstract class Zone extends ZoneObject {
      */
     public final void stop() {
         isRunning = false;
+        zoneProcessor.stop();
     }
 
     /**
-     * The given sprite will now recieve input given by the given User.
+     * The given sprite will now receive input given by the given User.
      * @param user
      * @param sprite
      */
@@ -451,7 +348,7 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     * The given sprite will no longer recieve input given by the given User.
+     * The given sprite will no longer receive input given by the given User.
      * @param user
      * @param sprite
      */
@@ -508,7 +405,8 @@ public abstract class Zone extends ZoneObject {
     }
 
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable {
+        super.finalize();
         setZoneData(zoneID, null);
         recycledIDs.add(zoneID);
     }
@@ -569,11 +467,11 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     * Adds the given Camera to this Zone, to moniter the sprites in its area.
+     * Adds the given Camera to this Zone, to monitor the sprites in its area.
      * @param camera
      */
     final void addCamera(final Camera camera) {
-        
+
         camerasToAdd.add(camera);
     }
 
@@ -610,7 +508,7 @@ public abstract class Zone extends ZoneObject {
     private final synchronized byte generateZoneID() throws Exception {
         if (idIndex < 127) {
             return (byte) (++idIndex);
-        } else if (recycledIDs.size() != 0) {
+        } else if (!recycledIDs.isEmpty()) {
             return recycledIDs.remove(0);
         } else {
             throw new Exception("Out of Zone IDs. Max number of active Zones is 128.");
@@ -692,7 +590,55 @@ public abstract class Zone extends ZoneObject {
 
         }
         if (zoneProcessor != null) {
-            zoneProcessor.generateSectorGroups(sectors);
+            generateSectorGroups(sectors);
+        }
+    }
+
+    /**
+     * Used to help concurrently update the Cameras.
+     * @return the next Camera to be updated
+     */
+    private final synchronized Camera nextCamera() {
+        try {
+            return cameras.get(currentCamera++);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
+    private synchronized final void generateSectorGroups(final Sector[][] sectors) {
+        final int sectorsPerThread = (sectors.length * sectors[0].length) / zoneProcessor.getThreadCount();
+        final Position index = new Position();
+
+        final ArrayList<Sector> group = new ArrayList<Sector>();
+        final ArrayList<UpdateSectors> updates = new ArrayList<UpdateSectors>();
+        final ArrayList<PostUpdateSectors> postUpdates = new ArrayList<PostUpdateSectors>();
+        int sectorCount = 0;
+        while (index.x < sectors.length) {
+            while (index.y < sectors[index.x].length) {
+                group.add(sectors[index.x][index.y]);
+                sectorCount++;
+                if (group.size() == sectorsPerThread) {
+                    updates.add(new UpdateSectors(group));
+                    postUpdates.add(new PostUpdateSectors(group));
+                    group.clear();
+                }
+                index.y++;
+            }
+            index.y = 0;
+            index.x++;
+        }
+        if (!group.isEmpty()) {
+            updates.add(new UpdateSectors(group));
+            postUpdates.add(new PostUpdateSectors(group));
+        }
+        sectorUpdate.clear();
+        for (int i = 0; i < updates.size(); i++) {
+            sectorUpdate.add(updates.get(i));
+        }
+        sectorPostUpdate.clear();
+        for (int i = 0; i < postUpdates.size(); i++) {
+            sectorPostUpdate.add(postUpdates.get(i));
         }
     }
 }

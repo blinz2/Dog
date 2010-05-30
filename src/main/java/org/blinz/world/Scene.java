@@ -34,8 +34,8 @@ final class Scene {
     final Position translation = new Position();
     final Size size = new Size();
     private int spriteCount = 0;
-    private Stack<SpriteContainer> containers = new Stack<SpriteContainer>();
-    private ArrayList<SpriteContainer>[] layers = new ArrayList[50];
+    private final Stack<SpriteContainer> containers = new Stack<SpriteContainer>();
+    private final ArrayList<SpriteContainer>[] layers = new ArrayList[50];
     private boolean isLocked = false;
     private long lastCleanUpTime = System.currentTimeMillis();
 
@@ -79,9 +79,9 @@ final class Scene {
      * @param graphics
      */
     final void draw(final Graphics graphics) {
-        Bounds bounds = new Bounds();
+        final Bounds bounds = new Bounds();
 
-        for (ArrayList<SpriteContainer> layer : layers) {
+        for (final ArrayList<SpriteContainer> layer : layers) {
             for (SpriteContainer sprite : layer) {
                 bounds.setPosition(sprite.loc.x - translation.x,
                         sprite.loc.y - translation.y);
@@ -90,9 +90,6 @@ final class Scene {
                 containers.add(sprite);
             }
         }
-
-        bounds = null;
-        bounds = null;
     }
 
     /**
@@ -214,7 +211,7 @@ final class Scene {
         CameraSprite sprite;
         final Position3D loc = new Position3D();
 
-        SpriteContainer(CameraSprite sprite) {
+        SpriteContainer(final CameraSprite sprite) {
             this.sprite = sprite;
             loc.setPosition(sprite.getX(), sprite.getY(), (int)sprite.getLayer());
         }
