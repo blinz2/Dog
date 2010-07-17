@@ -163,8 +163,8 @@ public class Camera extends ZoneObject {
     }
 
     /**
-     * Creates a new Camera with the given User as this Camera's User.
-     * @param user
+     * Constructor
+     * @param user the User associated with this Camera
      */
     public Camera(final User user) {
         this.user = user;

@@ -204,6 +204,9 @@ public abstract class Zone extends ZoneObject {
     private final TaskList sectorPostUpdate = new TaskList();
     private final TaskList updatingObjects = new TaskList();
 
+    /**
+     * Constructor
+     */
     public Zone() {
         try {
             zoneID = generateZoneID();
