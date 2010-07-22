@@ -38,6 +38,9 @@ import org.blinz.world.UserListenerCatalog.UserListenerList;
  */
 public class Camera extends ZoneObject {
 
+    /**
+     * Tracks the Sprites in a given Sector that the Camera occupies.
+     */ 
     private final class CameraSector {
 
         private final UnorderedList<CameraSprite> sprites = new UnorderedList<CameraSprite>();
