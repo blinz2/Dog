@@ -31,6 +31,22 @@ import org.blinz.util.Size;
  */
 public abstract class BaseSprite extends ZoneObject {
 
+   /**
+     * Gets the maximum width for a sprite.
+     * return the maximum width for a sprite
+     */
+    public final int maximumSpriteWidth() {
+        return getData().sectorWidth;
+    }
+
+    /**
+     * Gets the maximum height for a sprite.
+     * return the maximum height for a sprite
+     */
+    public final int maximumSpriteHeight() {
+        return getData().sectorHeight;
+    }
+
     /**
      * Marks the Sprite for removal from its Zone. After removal from its Zone
      * it will be unmarked for removal. If no other reference to it exists it

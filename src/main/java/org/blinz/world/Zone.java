@@ -387,6 +387,22 @@ public abstract class Zone extends ZoneObject {
         getData().removeUserListener(user, sprite);
     }
 
+   /**
+     * Gets the maximum width for a sprite.
+     * return the maximum width for a sprite
+     */
+    public final int maximumSpriteWidth() {
+        return getData().sectorWidth;
+    }
+
+    /**
+     * Gets the maximum height for a sprite.
+     * return the maximum height for a sprite
+     */
+    public final int maximumSpriteHeight() {
+        return getData().sectorHeight;
+    }
+
     /**
      * Sets the width of this Zone to the given value.
      * @param width
