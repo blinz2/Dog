@@ -25,6 +25,25 @@ import org.blinz.graphics.Graphics;
  * @author Blinz
  */
 public interface SelectableSprite {
+    
+    /**
+     * Used to indicate how to handle being selected.
+     */
+    public enum Selection {
+
+        /**
+         * Accept the selection.
+         */
+        ACCEPT, 
+        /**
+         * Deny the selection but continue looking for another sprite to SelectableSprites lower down to select.
+         */
+        REJECT_CONTINUE,
+        /**
+         * Deny the selection and don't look for another sprite to select.
+         */
+        REJECT_STOP;
+    }
 
     /**
      * Called to draw on top of the primary draw method when this sprite is
@@ -36,8 +55,9 @@ public interface SelectableSprite {
     /**
      * Called when the sprite is selected from a ZoneObserver.
      * @param user the User that selected this sprite
+     * @return indication of how to handle the selection
      */
-    public void select(final User user);
+    public Selection select(final User user);
 
     /**
      * Called when the sprite loses selected status.

@@ -28,6 +28,7 @@ import org.blinz.input.MouseEvent;
 import org.blinz.input.MouseWheelEvent;
 import org.blinz.input.MouseWheelListener;
 import org.blinz.util.Position;
+import org.blinz.world.SelectableSprite.Selection;
 import org.blinz.world.UserListenerCatalog.UserListenerList;
 
 /**
@@ -40,7 +41,7 @@ public class Camera extends ZoneObject {
 
     /**
      * Tracks the Sprites in a given Sector that the Camera occupies.
-     */ 
+     */
     private final class CameraSector {
 
         private final UnorderedList<CameraSprite> sprites = new UnorderedList<CameraSprite>();
@@ -391,9 +392,9 @@ public class Camera extends ZoneObject {
      * Processes all sprite selection from this Camera within the last round.
      */
     private final void processSpriteSelection() {
-        final int end = selections.size() - 1;
         while (!selections.isEmpty()) {
-            final Position selection = selections.remove(end);
+
+            final Position selection = selections.remove(selections.size() - 1);
             final int x = selection.x;
             final int y = selection.y;
             final CameraSprite oldSelected = selected;
@@ -403,21 +404,17 @@ public class Camera extends ZoneObject {
             for (int i = spriteList.size() - 1; i > -1; i--) {
                 final BaseSprite s = spriteList.get(i).getSprite();
                 if (Bounds.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight(), x + getX(), y + getY(), 1, 1)) {
-                    if (newSelected == null || newSelected.getLayer() < spriteList.get(i).getLayer()) {
-                        newSelected = spriteList.get(i);
+                    newSelected = spriteList.get(i);
+                    if (newSelected.select(user) == Selection.ACCEPT) {
+                        selected = newSelected;
+                        break;
+                    } else if (newSelected.select(user) == Selection.REJECT_STOP) {
+                        break;
                     }
-                    break;
                 }
             }
-
-            if (newSelected != oldSelected) {
-                selected = newSelected;
-                if (newSelected != null && newSelected.isSelectable()) {
-                    newSelected.select(user);
-                }
-                if (oldSelected != null && oldSelected.isSelectable()) {
-                    oldSelected.deselect(user);
-                }
+            if (oldSelected != null && oldSelected != newSelected) {
+                oldSelected.deselect(user);
             }
         }
     }

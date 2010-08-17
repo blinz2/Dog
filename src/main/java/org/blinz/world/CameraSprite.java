@@ -19,6 +19,7 @@ package org.blinz.world;
 import org.blinz.util.User;
 import org.blinz.graphics.Graphics;
 import org.blinz.util.Bounds;
+import org.blinz.world.SelectableSprite.Selection;
 
 /**
  *
@@ -122,12 +123,17 @@ class CameraSprite {
     /**
      * If the sprite this represents is a SelectibleSprite this calls select.
      * @param user the User that selected this sprite
+     * @return whether or not the sprite accepted selection
      */
-    final void select(final User user) {
+    final SelectableSprite.Selection select(final User user) {
         if (sprite instanceof SelectableSprite) {
-            ((SelectableSprite) sprite).select(user);
-            isSelected = true;
+            final SelectableSprite.Selection s = ((SelectableSprite) sprite).select(user);
+            if (s == Selection.ACCEPT) {
+                isSelected = true;
+            }
+            return s;
         }
+        return Selection.REJECT_CONTINUE;
     }
 
     /**
