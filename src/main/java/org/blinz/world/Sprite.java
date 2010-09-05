@@ -64,7 +64,7 @@ public abstract class Sprite extends BaseSprite {
      */
     @Override
     public final Position3D getPosition() {
-        return new Position3D(x, y);
+        return new Position3D(x, y, layer);
     }
 
     /**
@@ -114,9 +114,6 @@ public abstract class Sprite extends BaseSprite {
     public final void moveLeft(final int distance) {
         setX(x - distance);
     }
-
-    //END OF PUBLIC METHODS/////////////////////////////////////////////////////
-    //PROTECTED METHODS---------------------------------------------------------
 
     @Override
     protected final void updateWidth(final int width) {
