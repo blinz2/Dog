@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.blinz</groupId>
             <artifactId>BlinzCore</artifactId>
-            <version>0.7.7</version>
+            <version>0.7.10</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

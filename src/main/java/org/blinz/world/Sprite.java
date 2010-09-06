@@ -64,7 +64,7 @@ public abstract class Sprite extends BaseSprite {
      */
     @Override
     public final Position3D getPosition() {
-        return new Position3D(x, y, layer);
+        return new Position3D(x, y, (int)layer);
     }
 
     /**
