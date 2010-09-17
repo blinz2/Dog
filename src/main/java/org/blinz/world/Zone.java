@@ -198,7 +198,7 @@ public abstract class Zone extends ZoneObject {
     private Thread listTrimmer = new ListTrimmer();
     private boolean isRunning = false;
     private TaskExecuter zoneProcessor;
-    private static final Vector<Byte> recycledIDs = new Vector<Byte>();
+    private static final Vector<Short> recycledIDs = new Vector<Short>();
     private static byte idIndex = 0;
     private final TaskList sectorUpdate = new TaskList();
     private final TaskList sectorPostUpdate = new TaskList();
@@ -297,7 +297,7 @@ public abstract class Zone extends ZoneObject {
      */
     public final boolean removeUpdatingObject(final UpdatingObject updatingObject) {
         for (int i = 0; i < updatingObjects.size(); i++) {
-            final Updater updater = (Updater)updatingObjects.get(i);
+            final Updater updater = (Updater) updatingObjects.get(i);
             if (updater.getUpdatingObject() == updatingObject) {
                 updatingObjects.remove(updater);
                 return true;
@@ -387,7 +387,7 @@ public abstract class Zone extends ZoneObject {
         getData().removeUserListener(user, sprite);
     }
 
-   /**
+    /**
      * Gets the maximum width for a sprite.
      * return the maximum width for a sprite
      */
@@ -541,7 +541,7 @@ public abstract class Zone extends ZoneObject {
     /**
      * Adds new Cameras to this Zone.
      */
-    private final void addCameras() {
+    private void addCameras() {
         for (int i = 0; i < camerasToAdd.size(); i++) {
             cameras.add(camerasToAdd.get(i));
             getData().registerZoneObject(camerasToAdd.remove(i));
@@ -552,8 +552,8 @@ public abstract class Zone extends ZoneObject {
      * Generates a distinct zone id for a new Zone.
      * @return byte
      */
-    private final synchronized byte generateZoneID() throws Exception {
-        if (idIndex < 127) {
+    private synchronized short generateZoneID() throws Exception {
+        if (idIndex < 32767) {
             return (byte) (++idIndex);
         } else if (!recycledIDs.isEmpty()) {
             return recycledIDs.remove(0);
@@ -567,7 +567,7 @@ public abstract class Zone extends ZoneObject {
      * Deletes the given sprite from this Zone.
      * @param sprite
      */
-    private final void deleteSprite(final BaseSprite sprite) {
+    private void deleteSprite(final BaseSprite sprite) {
         final Sector tl = getData().getSectorOf(sprite.getX(), sprite.getY());
         tl.removeSprite(sprite, null);
         sprite.onDelete();
@@ -576,7 +576,7 @@ public abstract class Zone extends ZoneObject {
     /**
      * Refactors the Sectors to fit the current size of this Zone.
      */
-    private final synchronized void refactorSectors() {
+    private synchronized void refactorSectors() {
         if (size.width == 0 || size.height == 0) {
             return;
         }
@@ -645,7 +645,7 @@ public abstract class Zone extends ZoneObject {
      * Used to help concurrently update the Cameras.
      * @return the next Camera to be updated
      */
-    private final synchronized Camera nextCamera() {
+    private synchronized Camera nextCamera() {
         try {
             return cameras.get(currentCamera++);
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -653,7 +653,7 @@ public abstract class Zone extends ZoneObject {
         }
     }
 
-    private synchronized final void generateSectorGroups(final Sector[][] sectors) {
+    private synchronized void generateSectorGroups(final Sector[][] sectors) {
         final int sectorsPerThread = (sectors.length * sectors[0].length) / zoneProcessor.getThreadCount();
         final Position index = new Position();
 

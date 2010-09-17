@@ -22,14 +22,14 @@ package org.blinz.world;
  */
 public abstract class ZoneObject {
 
-    private final static ZoneData[] dataList = new ZoneData[128];
+    private final static ZoneData[] dataList = new ZoneData[32767];
 
     static {
         dataList[0] = new ZoneData();
         dataList[0].zoneSize.setSize(dataList[0].sectorWidth(), dataList[0].sectorHeight());
         dataList[0].init((byte) 0);
     }
-    byte zoneID = 0;
+    short zoneID = 0;
 
     /**
      * Runs the given CollidableSprite against other CollidableSprites to check
