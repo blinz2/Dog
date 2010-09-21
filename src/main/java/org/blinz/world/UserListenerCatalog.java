@@ -64,34 +64,72 @@ final class UserListenerCatalog {
         private UserListenerList() {
         }
 
+        /**
+         * Adds the given event to be passed on to concerned sprites later in the
+         * cycle.
+         * @param e the event to pass on
+         */
         public final void buttonClick(final ClickEvent e) {
             buttonClicks.add(e);
         }
 
+        /**
+         * Adds the given event to be passed on to concerned sprites later in the
+         * cycle.
+         * @param e the event to pass on
+         */
         public final void buttonPress(final MouseEvent e) {
             buttonPresses.add(e);
         }
 
+        /**
+         * Adds the given event to be passed on to concerned sprites later in the
+         * cycle.
+         * @param e the event to pass on
+         */
         public final void buttonRelease(final MouseEvent e) {
             buttonReleases.add(e);
         }
 
+        /**
+         * Adds the given event to be passed on to concerned sprites later in the
+         * cycle.
+         * @param e the event to pass on
+         */
         public final void keyPressed(final KeyEvent e) {
             keyPresses.add(e);
         }
 
+        /**
+         * Adds the given event to be passed on to concerned sprites later in the
+         * cycle.
+         * @param e the event to pass on
+         */
         public final void keyReleased(final KeyEvent e) {
             keyReleases.add(e);
         }
 
+        /**
+         * Adds the given event to be passed on to concerned sprites later in the
+         * cycle.
+         * @param e the event to pass on
+         */
         public final void keyTyped(final KeyEvent e) {
             keyTypes.add(e);
         }
 
+        /**
+         * Adds the given event to be passed on to concerned sprites later in the
+         * cycle.
+         * @param e the event to pass on
+         */
         public final void wheelScroll(final MouseWheelEvent e) {
             wheelScrolls.add(e);
         }
 
+        /**
+         * Trims the lists in this UserListenerCatalog down to size.
+         */
         final void trimLists() {
             sprites.trimToSize();
             buttonClicks.trimToSize();
@@ -103,6 +141,9 @@ final class UserListenerCatalog {
             wheelScrolls.trimToSize();
         }
 
+        /**
+         * Initializes this UserListenerCatalog.
+         */
         private final void init() {
             inputSprites = paused ? dummyList : sprites;
         }
@@ -122,8 +163,8 @@ final class UserListenerCatalog {
         }
 
         /**
-         *
-         * @return true if this list has no Cameras or sprites, false otherwise.
+         * Indicates whether or no this UserListernerList is still needed.
+         * @return true if this list has no Cameras or sprites and thus is needed, false otherwise
          */
         private final boolean dead() {
             return cameraCount == 0 && inputSprites.isEmpty();
@@ -132,7 +173,7 @@ final class UserListenerCatalog {
         /**
          * Adds the given sprite to this list.
          * For use by UserListenerCatalog.
-         * @param sprite
+         * @param sprite the sprite to be added to this UserListenerList
          */
         private final void add(final BaseSprite sprite) {
             inputSprites.add(sprite);
@@ -141,7 +182,7 @@ final class UserListenerCatalog {
         /**
          * Removes the given sprite from this list.
          * For use by UserListenerCatalog.
-         * @param sprite
+         * @param sprite the sprite to be removed from this UserListenerList
          */
         private final void remove(final BaseSprite sprite) {
             inputSprites.remove(sprite);
@@ -211,6 +252,11 @@ final class UserListenerCatalog {
         private User user;
         private BaseSprite sprite;
 
+        /**
+         * Constructor
+         * @param user the User to associate with the given sprite
+         * @param sprite the sprite to associate with the given User
+         */
         private Pair(final User user, final BaseSprite sprite) {
             this.user = user;
             this.sprite = sprite;
@@ -289,7 +335,7 @@ final class UserListenerCatalog {
      */
     final void pause() {
         paused = true;
-        Enumeration<UserListenerList> list = userListeners.elements();
+        final Enumeration<UserListenerList> list = userListeners.elements();
         while (list.hasMoreElements()) {
             list.nextElement().pause();
         }
@@ -307,12 +353,13 @@ final class UserListenerCatalog {
     }
 
     /**
-     * Checks in UserListenerList for the given User.
+     * Checks in the UserListenerList for the given User, allowing the UserListenerCatalog
+     * to determine whether or not the list is still in use.
      * For use by Cameras.
-     * @param user
+     * @param user the User for whom the UserListenerList is being a checked in
      */
     final void checkIn(final User user) {
-        UserListenerList list = userListeners.get(user);
+        final UserListenerList list = userListeners.get(user);
         list.cameraCount--;
         if (list.dead()) {
             userListeners.remove(user);
@@ -321,24 +368,25 @@ final class UserListenerCatalog {
 
     /**
      * Adds the given sprite to the list for the given User.
-     * @param user
-     * @param sprite
+     * @param user the User of the the Pair to be added
+     * @param sprite the sprite of the Pair to be added
      */
     final void add(final User user, final BaseSprite sprite) {
         toAdd.add(new Pair(user, sprite));
     }
 
     /**
-     * Adds the given sprite to the list for the given User.
-     * @param user
-     * @param sprite
+     * Removes the given sprite to the list for the given User.
+     * @param user the User of the the Pair to be removed
+     * @param sprite the sprite of the Pair to be removed
      */
     final void remove(final User user, final BaseSprite sprite) {
         toRemove.add(new Pair(user, sprite));
     }
 
     /**
-     * @return the next sprite to remove
+     * Gets the next Pair to remove.
+     * @return the next Pair to remove
      */
     private final Pair nextToRemove() {
         if (toRemove.isEmpty()) {
@@ -348,6 +396,7 @@ final class UserListenerCatalog {
     }
 
     /**
+     * Gets the next Pair to add.
      * @return the next sprite to add
      */
     private final Pair nextToAdd() {

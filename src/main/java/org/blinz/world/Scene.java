@@ -26,7 +26,8 @@ import org.blinz.graphics.Graphics;
 import org.blinz.util.Bounds;
 
 /**
- *
+ * An object used to represent what is in a Cameras sight at a given cycle in the
+ * execution of a Zone.
  * @author Blinz
  */
 final class Scene {
@@ -39,12 +40,19 @@ final class Scene {
     private boolean isLocked = false;
     private long lastCleanUpTime = System.currentTimeMillis();
 
+    /**
+     * Constructor
+     */
     Scene() {
         for (int i = 0; i < layers.length; i++) {
             layers[i] = new ArrayList<SpriteContainer>();
         }
     }
 
+    /**
+     * Adds the given CameraSprite to this Scene.
+     * @param sprite the CameraSprite to be added to this Scene
+     */
     final void add(final CameraSprite sprite) {
         if (!contains(sprite, (int) sprite.getLayer())) {
             layers[(int) sprite.getLayer()].add(fetchContainer(sprite));
@@ -52,24 +60,35 @@ final class Scene {
         }
     }
 
+    /**
+     * Adds the CameraSprites in the given list of CameraSprites to this Scene.
+     * @param sprites the list of CameraSprites to be added to this Scene
+     */
     final void addAll(final Vector<CameraSprite> sprites) {
         for (CameraSprite sprite : sprites) {
             add(sprite);
         }
     }
 
+    /**
+     * Indicates whether or not this Scene is currently locked.
+     * @return true if the locking succeeded, false if it didn't
+     */
     final boolean isLocked() {
         return isLocked;
     }
 
     /**
-     * Returns true if the locking succeeded, false if it didn't.
-     * @return boolean
+     * Attempts to lock this Scene.
+     * @return true if the locking succeeded, false if it didn't
      */
     final synchronized boolean lock() {
         return !setLock(true);
     }
 
+    /**
+     * Unlocks this Scene.
+     */
     final void unLock() {
         setLock(false);
     }
@@ -126,15 +145,15 @@ final class Scene {
      * Clears all sprites from this Scene.
      */
     private final void clear() {
-        for (ArrayList list : layers) {
+        for (final ArrayList list : layers) {
             list.clear();
         }
         spriteCount = 0;
     }
 
     /**
-     * Returns a SpriteContainer containing the given CameraSprite.
-     * @param sprite
+     * Gets a SpriteContainer containing the given CameraSprite.
+     * @param sprite the Sprite for which a Container will be returned
      * @return SpriteContainer
      */
     private final SpriteContainer fetchContainer(final CameraSprite sprite) {
@@ -143,7 +162,7 @@ final class Scene {
         } else {
             SpriteContainer sc = containers.pop();
             sc.sprite = sprite;
-            sc.loc.setPosition(sprite.getX(), sprite.getY(), (int)sprite.getLayer());
+            sc.loc.setPosition(sprite.getX(), sprite.getY(), (int) sprite.getLayer());
             return sc;
         }
     }
@@ -151,8 +170,8 @@ final class Scene {
     /**
      * Changes the locked status to that of the given value and returns the old
      * lock status.
-     * @param lock
-     * @return boolean - old lock status prior to this call
+     * @param lock the lock status of this Scene
+     * @return boolean old lock status prior to this call
      */
     private final synchronized boolean setLock(final boolean lock) {
         boolean retval = isLocked;
@@ -161,8 +180,8 @@ final class Scene {
     }
 
     /**
-     * Returns true if this Scene contains the given sprite false otherwise.
-     * @param sprite
+     * Indicates whether or not the given CameraSprite is in this Scene.
+     * @param sprite the CameraSprite to check for
      * @return returns whether or not this Scene contains the given sprite
      */
     private final boolean contains(final CameraSprite sprite, final int layer) {
@@ -208,16 +227,20 @@ final class Scene {
      */
     private final class SpriteContainer {
 
-        CameraSprite sprite;
-        final Position3D loc = new Position3D();
+        private CameraSprite sprite;
+        private final Position3D loc = new Position3D();
 
+        /**
+         * Constructor
+         * @param sprite the Camera Sprite that this will represent
+         */
         SpriteContainer(final CameraSprite sprite) {
             this.sprite = sprite;
-            loc.setPosition(sprite.getX(), sprite.getY(), (int)sprite.getLayer());
+            loc.setPosition(sprite.getX(), sprite.getY(), (int) sprite.getLayer());
         }
 
         /**
-         *
+         * Gets layer of the sprite in this SpriteContainer.
          * @return the layer of the sprite this SpriteContainer represents.
          */
         final float layer() {

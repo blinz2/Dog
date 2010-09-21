@@ -1,6 +1,6 @@
 /*
  *  BlinzEngine - A library for large 2D world simultions and games.
- *  Copyright (C) 2009  Blinz <gtalent2@gmail.com>
+ *  Copyright (C) 2009-2010  Blinz <gtalent2@gmail.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 3 as
@@ -19,7 +19,7 @@ package org.blinz.util;
 import java.util.Vector;
 
 /**
- *
+ * An object used to represent specific users throughout the API.
  * @author Blinz
  */
 public class User {
@@ -59,6 +59,10 @@ public class User {
         this.name = name;
     }
 
+    /**
+     * Gets a valid index for a newly created sprite.
+     * @return a valid index for a newly created sprite
+     */
     private static final synchronized int getIndex() {
         if (oldIDs.isEmpty()) {
             return idIndex++;

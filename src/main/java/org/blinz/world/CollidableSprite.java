@@ -17,10 +17,14 @@
 package org.blinz.world;
 
 /**
- *
+ * An interface used for sprites that need to know if they've collided with other sprites.
  * @author Blinz
  */
 public interface CollidableSprite {
 
+    /**
+     * Method called to notify the sprite that it has collided with another.
+     * @param sprite
+     */
     void collide(BaseSprite sprite);
 }

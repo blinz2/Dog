@@ -20,7 +20,8 @@ import org.blinz.util.Bounds;
 import java.util.Vector;
 
 /**
- *
+ * An object used to represent a portion of a Zone, allowing the Zone to be divided
+ * up for efficient and scalable parallelization and collision detection.
  * @author Blinz
  */
 final class Sector extends ZoneObject {
@@ -36,7 +37,7 @@ final class Sector extends ZoneObject {
     private final Bounds bounds = new Bounds();
 
     /**
-     * Sector constructor.
+     * Constructor
      * @param x x coordinate of this Sector
      * @param y y coordinate of this Sector
      */
@@ -143,7 +144,7 @@ final class Sector extends ZoneObject {
     }
 
     /**
-     * Returns the width of Sectors in this Zone.
+     * Gets the width of Sectors in this Zone.
      * @return width of this Sector
      */
     final int getWidth() {
@@ -151,7 +152,7 @@ final class Sector extends ZoneObject {
     }
 
     /**
-     * Returns the height of Sectors in this Zone.
+     * Gets the height of Sectors in this Zone.
      * @return height of this Sector
      */
     final int getHeight() {
@@ -160,7 +161,7 @@ final class Sector extends ZoneObject {
 
     /**
      * Adds given sprite to this Sector.
-     * @param sprite
+     * @param sprite the sprite to be added to this Sector
      */
     final void addSprite(final BaseSprite sprite) {
         if (sprite instanceof UpdatingSprite) {
@@ -191,10 +192,15 @@ final class Sector extends ZoneObject {
         removedSprites.add(sprite);
     }
 
+    /**
+     * Runs a the given CollidableSprite against other CollidableSprites in this
+     * Sector to find collisions.
+     * @param sprite the CollidableSprite for which to check for collisions
+     */
     final void checkCollisionsFor(final CollidableSprite sprite) {
         synchronized (collidibleSprites) {
             for (int i = 0; i < collidibleSprites.size(); i++) {
-                BaseSprite s1 = (BaseSprite) sprite, s2 = (BaseSprite) collidibleSprites.get(i);
+                final BaseSprite s1 = (BaseSprite) sprite, s2 = (BaseSprite) collidibleSprites.get(i);
                 if ((Math.abs(s1.getLayer() - s2.getLayer()) < 1)
                         && Bounds.intersects(s1.getX(), s1.getY(), s1.getWidth(), s1.getHeight(),
                         s2.getX(), s2.getY(), s2.getWidth(), s2.getHeight())) {
@@ -210,7 +216,7 @@ final class Sector extends ZoneObject {
     /**
      * Removes the given UpdatingSprite now. For use only by the main update process
      * in Zone.
-     * @param sprite
+     * @param sprite the UpdatingSprite to be removed
      */
     synchronized final void deleteUpdatingSprite(final UpdatingSprite sprite) {
         if (!updatingSprites.remove(sprite)) {
@@ -220,8 +226,8 @@ final class Sector extends ZoneObject {
 
     /**
      * Indicates whether or not the given coordinates are within the bounds of this Sector.
-     * @param x
-     * @param y
+     * @param x the x coordinate to check for
+     * @param y the y coordinate to check for
      * @return true if given point is within the bounds of this Sector, false otherwise
      */
     final boolean contains(final int x, final int y) {
@@ -229,9 +235,8 @@ final class Sector extends ZoneObject {
     }
 
     /**
-     * Returns true if the specified bounds intersects with the bounds of this Sector,
-     * false if it does not.
-     * @param bounds
+     * Indicates whether or not the specified bounds intersect this Sector.
+     * @param bounds a Bounds object representing the bounds to check for
      * @return true if the specified coordinates intersect this Sector
      */
     final boolean intersects(final Bounds bounds) {
@@ -239,12 +244,11 @@ final class Sector extends ZoneObject {
     }
 
     /**
-     * Returns true if the specified bounds intersects with the bounds of this Sector,
-     * false if it does not.
-     * @param x
-     * @param y
-     * @param width
-     * @param height
+     * Indicates whether or not the specified bounds intersect this Sector.
+     * @param x the x coordinate of the bounds to check for
+     * @param y the y coordinate of the bounds to check for
+     * @param width the width of the bounds to check for
+     * @param height the height of the bounds to check for
      * @return true if the specified coordinates intersect this Sector
      */
     final boolean intersects(final int x, final int y, final int width, final int height) {
@@ -287,8 +291,9 @@ final class Sector extends ZoneObject {
     private final void manageUpdatingSprites() {
         for (int i = updatingSpritesToRemove.size() - 1; i > -1; i--) {
             final UpdatingSprite s = updatingSpritesToRemove.remove(i);
-            if (!updatingSprites.remove(s))
+            if (!updatingSprites.remove(s)) {
                 updatingSpritesToAdd.remove(s);
+            }
         }
         for (int i = updatingSpritesToAdd.size() - 1; i > -1; i--) {
             updatingSprites.add(updatingSpritesToAdd.remove(i));

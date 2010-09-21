@@ -81,7 +81,7 @@ final class UnorderedList<E> {
 
     /**
      * Removes the given sprite from the list if present.
-     * @param element is removed from the list if present.
+     * @param element is removed from the list if present
      */
     final boolean remove(final E element) {
         synchronized (elements) {
@@ -96,8 +96,8 @@ final class UnorderedList<E> {
     }
 
     /**
-     *
-     * @return the number of elements in this list.
+     * Gets the number of items in the list.
+     * @return the number of elements in this list
      */
     final int size() {
         return elements.size();

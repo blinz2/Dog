@@ -21,7 +21,8 @@ import org.blinz.util.Position3D;
 import org.blinz.util.Size;
 
 /**
- *
+ * A generic implementation of most of BaseSprites features for quick use when
+ * optimization is not possible or not an issue.
  * @author Blinz
  */
 public abstract class Sprite extends BaseSprite {
@@ -30,10 +31,9 @@ public abstract class Sprite extends BaseSprite {
     private float layer = 0;
     private short width = 1, height = 1;
 
-    //PUBLIC METHODS------------------------------------------------------------
     /**
-     *
-     * @return Size object representing the Sprite's size.
+     * Gets the Size of this Sprite.
+     * @return Size object representing the sprite's size
      */
     @Override
     public final Size getSize() {
@@ -41,8 +41,8 @@ public abstract class Sprite extends BaseSprite {
     }
 
     /**
-     * 
-     * @return Width of Sprite.
+     * Gets the width of this Sprite.
+     * @return width of Sprite
      */
     @Override
     public final int getWidth() {
@@ -50,26 +50,26 @@ public abstract class Sprite extends BaseSprite {
     }
 
     /**
-     * 
-     * @return Height of Sprite
+     * Gets the height of this Sprite.
+     * @return height of Sprite
      */
     @Override
     public final int getHeight() {
-        return height; 
+        return height;
     }
 
     /**
-     * 
-     * @return A Location object representing the Sprite's location.
+     * Gets a Position3D object representing this Sprites top left corner and layer.
+     * @return a Position3D object representing the Sprite's location and layer
      */
     @Override
     public final Position3D getPosition() {
-        return new Position3D(x, y, (int)layer);
+        return new Position3D(x, y, (int) layer);
     }
 
     /**
-     * 
-     * @return The x coordinate of the Sprite.
+     * Gets the x coordinate of this Sprite.
+     * @return the x coordinate of this Sprite
      */
     @Override
     public final int getX() {
@@ -77,8 +77,8 @@ public abstract class Sprite extends BaseSprite {
     }
 
     /**
-     * 
-     * @return The y coordinate of the Sprite.
+     * Gets the y coordinate of this Sprite
+     * @return the y coordinate of this Sprite
      */
     @Override
     public final int getY() {
@@ -86,55 +86,101 @@ public abstract class Sprite extends BaseSprite {
     }
 
     /**
-     *
-     * @return The z coordinate of the Sprite.
+     * Gets the layer of this Sprite, which indicates its place the draw order of
+     * the sprites in the Zone.
+     * @return the layer of this Sprite.
      */
     @Override
     public final float getLayer() {
         return layer;
     }
 
+    /**
+     * Gets a Bounds object representing the size and location of this Sprite.
+     * @return a Bounds object representing the size and location of this Sprite
+     */
     @Override
     public Bounds getBounds() {
         return new Bounds(x, y, width, height);
     }
 
+    /**
+     * Moves this sprite down the specified distance.
+     * @param distance the distance this is to move
+     */
     public final void moveDown(final int distance) {
         setY(y + distance);
     }
 
+    /**
+     * Moves this sprite up the specified distance.
+     * @param distance the distance this is to move
+     */
     public final void moveUp(final int distance) {
         setY(y - distance);
     }
 
+    /**
+     * Moves this sprite right the specified distance.
+     * @param distance the distance this is to move
+     */
     public final void moveRight(final int distance) {
         setX(x + distance);
     }
 
+    /**
+     * Moves this sprite left the specified distance.
+     * @param distance the distance this is to move
+     */
     public final void moveLeft(final int distance) {
         setX(x - distance);
     }
 
+    /**
+     * Updates the width of this Sprite.
+     * NOT for manual invocation.
+     * @param width the new width of this Sprite
+     */
     @Override
     protected final void updateWidth(final int width) {
-        this.width = (short)width;
+        this.width = (short) width;
     }
 
+    /**
+     * Updates the height of this Sprite.
+     * NOT for manual invocation.
+     * @param height the new height of this Sprite
+     */
     @Override
     protected final void updateHeight(final int height) {
-        this.height = (short)height;
+        this.height = (short) height;
     }
 
+    /**
+     * Updates the x of this Sprite.
+     * NOT for manual invocation.
+     * @param x the new x coordinate of this Sprite
+     */
     @Override
     protected final void updateX(final int x) {
         this.x = x;
     }
 
+    /**
+     * Updates the y of this Sprite.
+     * NOT for manual invocation.
+     * @param y the new y coordinate of this Sprite
+     */
     @Override
     protected final void updateY(final int y) {
         this.y = y;
     }
 
+    /**
+     * Updates the layer of this Sprite.
+     * NOT for manual invocation.
+     * @param layer the new layer coordinate of this Sprite
+     */
     @Override
     protected final void updateLayer(final float layer) {
         this.layer = layer;

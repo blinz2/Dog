@@ -25,6 +25,9 @@ import org.blinz.util.concurrency.SynchronizedTask;
  */
 public interface UpdatingObject {
 
+    /**
+     * Method invoke by the Zone of which this is a part of once per Zone cycle.
+     */
     public void update();
 }
 

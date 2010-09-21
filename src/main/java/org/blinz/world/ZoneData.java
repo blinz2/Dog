@@ -18,7 +18,6 @@ package org.blinz.world;
 
 import org.blinz.util.Size;
 import org.blinz.util.User;
-import org.blinz.util.concurrency.TaskList;
 
 /**
  * ZoneData contains such items as a master list of Sectors, Sector size, zoneTime,
@@ -95,7 +94,7 @@ class ZoneData {
     }
 
     /**
-     * The given sprite will no longer recieve input given by the given User.
+     * The given sprite will no longer receive input given by the given User.
      * @param user
      * @param sprite
      */
@@ -125,7 +124,7 @@ class ZoneData {
 
     /**
      * 
-     * @return true if the assocaiated Zone is paused, false otherwise
+     * @return true if the associated Zone is paused, false otherwise
      */
     final boolean paused() {
         return paused;

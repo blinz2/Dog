@@ -1,6 +1,6 @@
 /*
  *  BlinzEngine - A library for large 2D world simultions and games.
- *  Copyright (C) 2009  Blinz <gtalent2@gmail.com>
+ *  Copyright (C) 2009-2010  Blinz <gtalent2@gmail.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 3 as
@@ -27,6 +27,7 @@ public class ClickEvent extends MouseEvent {
     private int clickCount;
 
     /**
+     * Constructor
      * @param user the User associated with this InputEvent
      * @param buttonID the button operated
      * @param cursorX the x coordinate of the cursor at the time of the event
@@ -38,7 +39,7 @@ public class ClickEvent extends MouseEvent {
     }
 
     /**
-     * Returns the number of clicks in this event.
+     * Gets the number of clicks in this event.
      * @return the number of clicks behind this event.
      */
     public final int clickCount() {

@@ -22,7 +22,7 @@ import org.blinz.util.Bounds;
 import org.blinz.world.SelectableSprite.Selection;
 
 /**
- *
+ * A wrapper around sprite for Cameras to properly draw them.
  * @author Blinz
  */
 class CameraSprite {
@@ -58,7 +58,7 @@ class CameraSprite {
     }
 
     /**
-     *
+     * Indicates whether or not the sprite this represents is selectable.
      * @return true if the contained sprite is selectable, false otherwise
      */
     final boolean isSelectable() {
@@ -113,6 +113,12 @@ class CameraSprite {
         return sprite.getHeight();
     }
 
+    /**
+     * Draws the sprite this represents, draws the selection indicator too if the
+     * sprite is selected.
+     * @param graphics the Graphics object used to draw this CameraSprite
+     * @param bounds the size and location of this sprite on the screen
+     */
     final void draw(final Graphics graphics, final Bounds bounds) {
         sprite.draw(graphics, bounds);
         if (sprite instanceof SelectableSprite && isSelected()) {

@@ -31,7 +31,7 @@ import org.blinz.util.Size;
  */
 public abstract class BaseSprite extends ZoneObject {
 
-   /**
+    /**
      * Gets the maximum width for a sprite.
      * return the maximum width for a sprite
      */
@@ -69,12 +69,14 @@ public abstract class BaseSprite extends ZoneObject {
     public abstract Size getSize();
 
     /**
-     * @return Sprite's width.
+     * Gets this sprite's width.
+     * @return this sprite's width
      */
     public abstract int getWidth();
 
     /**
-     * @return Sprite's height.
+     * Gets this sprite's height.
+     * @return this sprite's height
      */
     public abstract int getHeight();
 
@@ -85,33 +87,34 @@ public abstract class BaseSprite extends ZoneObject {
     public abstract Position3D getPosition();
 
     /**
-     *
-     * @return Sprite's x coordinate.
+     * Gets this sprite's x coordinate.
+     * @return this sprite's x coordinate
      */
     public abstract int getX();
 
     /**
-     *
-     * @return Sprite's y coordinate.
+     * Gets this sprite's y coordinate.
+     * @return this sprite's y coordinate
      */
     public abstract int getY();
 
     /**
-     *
-     * @return Sprite's z coordinate.
+     * Gets this sprite's layer.
+     * @return this sprite's z coordinate
      */
     public abstract float getLayer();
 
     /**
-     * 
-     * @return an instance of Bounds representing the location and size of this
+     * Gets an instance of Bounds representing the location and size of this
      * sprite.
+     * @return an instance of Bounds representing the location and size of this
+     * sprite
      */
     public abstract Bounds getBounds();
 
     /**
      * Sets the width of this sprite to the given value.
-     * @param width
+     * @param width the new width of this sprite
      */
     public final void setWidth(int width) {
         if (width < 1) {
@@ -129,7 +132,7 @@ public abstract class BaseSprite extends ZoneObject {
 
     /**
      * Sets the height of this sprite to the given value.
-     * @param height
+     * @param height the new height of this sprite
      */
     public final void setHeight(int height) {
         if (height < 1) {
@@ -147,8 +150,8 @@ public abstract class BaseSprite extends ZoneObject {
 
     /**
      * Sets the size of this sprite to the given values.
-     * @param width
-     * @param height
+     * @param width the new width of this sprite
+     * @param height the new height of this sprite
      */
     public final void setSize(int width, int height) {
         //Method excessively large because of frequency of call and need for efficiency
@@ -164,8 +167,7 @@ public abstract class BaseSprite extends ZoneObject {
 
     /**
      * Sets the x location of this sprite to the given value.
-     * @param x the new x coordinate of this sprite        //Method excessively large because of frequency of call and need for efficiency
-    
+     * @param x the new x coordinate of this sprite    
      */
     public final void setX(int x) {
         //Method excessively large because of frequency of call and need for efficiency
@@ -222,7 +224,7 @@ public abstract class BaseSprite extends ZoneObject {
     /**
      * Sets the layer of this sprite to the given value.
      * The layer of this sprite determines the other sprites it can collide with
-     * and the ord in which they will be drawn. The lower the number the deeper
+     * and the order in which they will be drawn. The lower the number the deeper
      * into the Zone the layer is.
      * @param layer
      */
@@ -236,9 +238,10 @@ public abstract class BaseSprite extends ZoneObject {
     }
 
     /**
-     *
-     * @return the amount of time the Zone has been executing, not including the
+     * Gets the amount of time the Zone has been executing, not including the
      * time before it started executing for time it was paused.
+     * @return the amount of time the Zone has been executing, not including the
+     * time before it started executing for time it was paused
      */
     protected final long zoneTime() {
         return getData().zoneTime;
@@ -295,7 +298,7 @@ public abstract class BaseSprite extends ZoneObject {
 
     /**
      * Adds the given sprite to this sprites zone.
-     * @param sprite
+     * @param sprite the sprite tot be added to the Zone
      */
     protected final void addSpriteToZone(final BaseSprite sprite) {
         getData().addSprite(sprite);
@@ -316,31 +319,31 @@ public abstract class BaseSprite extends ZoneObject {
 
     /**
      * Updates the width of this sprite to that given.
-     * @param width
+     * @param width the new width of this sprite
      */
     protected abstract void updateWidth(int width);
 
     /**
      * Updates the height of this sprite to that given.
-     * @param height
+     * @param height the new height of this sprite
      */
     protected abstract void updateHeight(int height);
 
     /**
      * Updates the x of the sprite to that given.
-     * @param x
+     * @param x the new x coordinate of this sprite
      */
     protected abstract void updateX(int x);
 
     /**
      * Updates the y of the sprite to that given.
-     * @param y
+     * @param y the new y coordinate of this sprite
      */
     protected abstract void updateY(int y);
 
     /**
      * Updates the layer of the sprite of that given.
-     * @param layer
+     * @param layer the new layer of this sprite
      */
     protected abstract void updateLayer(float layer);
 }

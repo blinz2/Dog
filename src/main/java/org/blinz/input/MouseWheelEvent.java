@@ -1,6 +1,6 @@
 /*
  *  BlinzEngine - A library for large 2D world simultions and games.
- *  Copyright (C) 2009  Blinz <gtalent2@gmail.com>
+ *  Copyright (C) 2009-2010  Blinz <gtalent2@gmail.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 3 as
@@ -27,7 +27,7 @@ public class MouseWheelEvent extends InputEvent {
     private int ticks, cursorX, cursorY;
 
     /**
-     *
+     * Constructor
      * @param user the user that generated this event
      * @param cursorX the x coordinate of the cursor at the time of this event
      * @param cursorY the y coordinate of the cursor at the time of this event
@@ -41,7 +41,7 @@ public class MouseWheelEvent extends InputEvent {
     }
 
     /**
-     * Replace the number of scroll ticks in this event.
+     * Gets the number of scroll ticks in this event.
      * @return the number of scroll ticks in this event.
      */
     public final int getScrollTicks() {
@@ -49,7 +49,7 @@ public class MouseWheelEvent extends InputEvent {
     }
 
     /**
-     * Returns the x coordinate of the cursor at the time of this event
+     * Gets the x coordinate of the cursor at the time of this event
      * @return the x coordinate of the cursor at the time of this event
      */
     public final int cursorX() {
@@ -57,7 +57,7 @@ public class MouseWheelEvent extends InputEvent {
     }
 
     /**
-     * Returns the y coordinate of the cursor at the time of this event
+     * Gets the y coordinate of the cursor at the time of this event
      * @return the y coordinate of the cursor at the time of this event
      */
     public final int cursorY() {

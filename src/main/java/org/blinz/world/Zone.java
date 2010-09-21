@@ -308,7 +308,7 @@ public abstract class Zone extends ZoneObject {
 
     /**
      * Adds the given sprite to this sprites zone.
-     * @param sprite
+     * @param sprite the sprite to be added to the Zone
      */
     public final void addSprite(final BaseSprite sprite) {
         getData().addSprite(sprite);
@@ -371,8 +371,8 @@ public abstract class Zone extends ZoneObject {
 
     /**
      * The given sprite will now receive input given by the given User.
-     * @param user
-     * @param sprite
+     * @param user the User that the sprite will no longer listen to
+     * @param sprite the Sprite that to stop listening to the specified rumor
      */
     public final void addUserListeningSprite(final User user, final BaseSprite sprite) {
         getData().addUserListener(user, sprite);
@@ -380,8 +380,8 @@ public abstract class Zone extends ZoneObject {
 
     /**
      * The given sprite will no longer receive input given by the given User.
-     * @param user
-     * @param sprite
+     * @param user the User that the sprite will no longer listen to
+     * @param sprite the Sprite that to stop listening to the specified rumor
      */
     public final void removeUserListeningSprite(final User user, final BaseSprite sprite) {
         getData().removeUserListener(user, sprite);
@@ -405,7 +405,7 @@ public abstract class Zone extends ZoneObject {
 
     /**
      * Sets the width of this Zone to the given value.
-     * @param width
+     * @param width the new width of the Zone
      */
     protected final void setWidth(final int width) {
         size.setWidth(width);
@@ -414,7 +414,7 @@ public abstract class Zone extends ZoneObject {
 
     /**
      * Sets the height of this Zone to the given value.
-     * @param height
+     * @param height the new height of the Zone
      */
     protected final void setHeight(final int height) {
         size.setHeight(height);
@@ -423,8 +423,8 @@ public abstract class Zone extends ZoneObject {
 
     /**
      * Sets the width and height of this Zone.
-     * @param width
-     * @param height
+     * @param width the new width of the Zone
+     * @param height the new height of the Zone
      */
     protected final void setSize(final int width, final int height) {
         size.setSize(width, height);
@@ -445,7 +445,7 @@ public abstract class Zone extends ZoneObject {
     /**
      * Passes the given data to the Zone and its sprites so that an extra pointer
      * does not have to be assigned to each sprite to reduce memory consumption.
-     * @param sharedData
+     * @param sharedData the object containing the data to be shared with every object in the Zone
      */
     protected final void setSharedZoneData(final Object sharedData) {
         getData().data = sharedData;
@@ -550,9 +550,9 @@ public abstract class Zone extends ZoneObject {
 
     /**
      * Generates a distinct zone id for a new Zone.
-     * @return byte
+     * @return a distinct Zone ID of a new Zone
      */
-    private synchronized short generateZoneID() throws Exception {
+    private static synchronized short generateZoneID() throws Exception {
         if (idIndex < 32767) {
             return (byte) (++idIndex);
         } else if (!recycledIDs.isEmpty()) {
@@ -653,6 +653,10 @@ public abstract class Zone extends ZoneObject {
         }
     }
 
+    /**
+     * Divides the Sectors into groups for the threads to manage.
+     * @param sectors the lists of Sectors
+     */
     private synchronized void generateSectorGroups(final Sector[][] sectors) {
         final int sectorsPerThread = (sectors.length * sectors[0].length) / zoneProcessor.getThreadCount();
         final Position index = new Position();

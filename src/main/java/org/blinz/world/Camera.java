@@ -259,7 +259,7 @@ public class Camera extends ZoneObject {
 
     /**
      * Sets the width of this Camera to that given.
-     * @param width
+     * @param width the new width of this Camera
      */
     public final void setWidth(final int width) {
         bounds.width = width;
@@ -267,7 +267,7 @@ public class Camera extends ZoneObject {
 
     /**
      * Sets the height of this Camera to that given.
-     * @param height
+     * @param height the new height of this Camera
      */
     public final void setHeight(final int height) {
         bounds.height = height;
@@ -275,7 +275,7 @@ public class Camera extends ZoneObject {
 
     /**
      * Sets the x coordinate of this Camera to the given value.
-     * @param x
+     * @param x the new x coordinate of this Camera
      */
     public final void setX(final int x) {
         bounds.x = x;
@@ -283,7 +283,7 @@ public class Camera extends ZoneObject {
 
     /**
      * Sets the y coordinate of this Camera to the given value.
-     * @param y
+     * @param y the new y coordinate of this Camera
      */
     public final void setY(final int y) {
         bounds.y = y;
@@ -291,8 +291,8 @@ public class Camera extends ZoneObject {
 
     /**
      * Sets the location of this Camera.
-     * @param x
-     * @param y
+     * @param x the new x coordinate of this Camera
+     * @param y the new y coordinate of this Camera
      */
     public final void setPosition(final int x, final int y) {
         setX(x);
@@ -301,7 +301,7 @@ public class Camera extends ZoneObject {
 
     /**
      * Moves this Camera up the specified distance.
-     * @param distance
+     * @param distance the distance that this Camera is to move
      */
     public final void moveUp(final int distance) {
         bounds.y = -distance;
@@ -309,7 +309,7 @@ public class Camera extends ZoneObject {
 
     /**
      * Moves this Camera down the specified distance.
-     * @param distance
+     * @param distance the distance that this Camera is to move
      */
     public final void moveDown(final int distance) {
         bounds.y += distance;
@@ -317,7 +317,7 @@ public class Camera extends ZoneObject {
 
     /**
      * Moves this Camera right the specified distance.
-     * @param distance
+     * @param distance the distance that this Camera is to move
      */
     public final void moveRight(final int distance) {
         bounds.x += distance;
@@ -325,7 +325,7 @@ public class Camera extends ZoneObject {
 
     /**
      * Moves this Camera left the specified distance.
-     * @param distance
+     * @param distance the distance that this Camera is to move
      */
     public final void moveLeft(final int distance) {
         bounds.x -= distance;
@@ -334,7 +334,7 @@ public class Camera extends ZoneObject {
     /**
      * Draws this Camera. A single given Camera should only be drawn by one
      * thread at a time, and thus by only one Screen.
-     * @param graphics
+     * @param graphics the Graphics object with which this is to be drawn
      */
     public synchronized final void draw(final Graphics graphics) {
         Scene s = scene;
@@ -421,7 +421,7 @@ public class Camera extends ZoneObject {
 
     /**
      * Adds the given Sector to the necessary structures.
-     * @param sector
+     * @param sector the Sector to be added
      */
     private final void addSector(final Sector sector) {
         final CameraSector cs = new CameraSector(sector);
@@ -536,7 +536,7 @@ public class Camera extends ZoneObject {
     }
 
     /**
-     * Returns Sector 1 of this Camera, makes sure the indices are safe.
+     * Gets Sector 1 of this Camera, makes sure the indices are safe.
      * @return Sector of the upper left hand corner of this Camera.
      */
     private final Sector sector1() {
@@ -544,15 +544,21 @@ public class Camera extends ZoneObject {
     }
 
     /**
-     * Returns Sector 2 of this Camera, makes sure the indices are safe.
+     * Gets Sector 2 of this Camera, makes sure the indices are safe.
      * @return Sector of the lower right hand corner of this Camera.
      */
     private final Sector sector2() {
         return getData().getSectorOfSafe(bounds.x2(), bounds.y2());
     }
 
+    /**
+     * Class used to read all input for the Camera.
+     */
     private final class InputListener implements MouseListener, MouseWheelListener, KeyListener {
 
+        /**
+         * Constructor
+         */
         private InputListener() {
         }
 

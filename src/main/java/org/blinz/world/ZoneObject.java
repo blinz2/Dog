@@ -27,7 +27,7 @@ public abstract class ZoneObject {
     static {
         dataList[0] = new ZoneData();
         dataList[0].zoneSize.setSize(dataList[0].sectorWidth(), dataList[0].sectorHeight());
-        dataList[0].init((byte) 0);
+        dataList[0].init((short) 0);
     }
     short zoneID = 0;
 
