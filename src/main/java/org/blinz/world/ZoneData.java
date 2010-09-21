@@ -34,7 +34,6 @@ class ZoneData {
     long zoneTime = 0;
     long zoneCycles = 0;
     final UserListenerCatalog userListeners = new UserListenerCatalog();
-    private short id;
     private String zoneName;
     private boolean paused = false;
 
@@ -42,16 +41,15 @@ class ZoneData {
      * Initializes the ZoneData according to what it already stores.
      * @param zoneID
      */
-    final void init(final short zoneID) {
+    final void init() {
         for (int i = 0; i < sectors.length; i++) {
             for (int n = 0; n < sectors[i].length; n++) {
                 sectors[i][n] = new Sector(i * sectorWidth,
                         n * sectorHeight);
-                sectors[i][n].zoneID = zoneID;
+                sectors[i][n].data = this;
                 sectors[i][n].init();
             }
         }
-        id = zoneID;
     }
 
     /**
@@ -214,7 +212,7 @@ class ZoneData {
      * @param object
      */
     final void registerZoneObject(final ZoneObject object) {
-        object.zoneID = id;
+        object.data = this;
         object.internalInit();
     }
 }

@@ -198,8 +198,6 @@ public abstract class Zone extends ZoneObject {
     private Thread listTrimmer = new ListTrimmer();
     private boolean isRunning = false;
     private TaskExecuter zoneProcessor;
-    private static final Vector<Short> recycledIDs = new Vector<Short>();
-    private static byte idIndex = 0;
     private final TaskList sectorUpdate = new TaskList();
     private final TaskList sectorPostUpdate = new TaskList();
     private final TaskList updatingObjects = new TaskList();
@@ -208,14 +206,8 @@ public abstract class Zone extends ZoneObject {
      * Constructor
      */
     public Zone() {
-        try {
-            zoneID = generateZoneID();
-        } catch (Exception ex) {
-            Logger.getLogger(Zone.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        setZoneData(zoneID, new ZoneData());
-        getData().init(zoneID);
+        setZoneData(new ZoneData());
+        getData().init();
         size = getData().zoneSize;
     }
 
@@ -451,13 +443,6 @@ public abstract class Zone extends ZoneObject {
         getData().data = sharedData;
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        setZoneData(zoneID, null);
-        recycledIDs.add(zoneID);
-    }
-
     /**
      * Abstract method for updating the zone to be implemented by the developer.
      * Note: This method is not called while the Zone is paused.
@@ -546,21 +531,6 @@ public abstract class Zone extends ZoneObject {
             cameras.add(camerasToAdd.get(i));
             getData().registerZoneObject(camerasToAdd.remove(i));
         }
-    }
-
-    /**
-     * Generates a distinct zone id for a new Zone.
-     * @return a distinct Zone ID of a new Zone
-     */
-    private static synchronized short generateZoneID() throws Exception {
-        if (idIndex < 32767) {
-            return (byte) (++idIndex);
-        } else if (!recycledIDs.isEmpty()) {
-            return recycledIDs.remove(0);
-        } else {
-            throw new Exception("Out of Zone IDs. Max number of active Zones is 128.");
-        }
-
     }
 
     /**
