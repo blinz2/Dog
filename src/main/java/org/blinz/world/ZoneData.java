@@ -24,7 +24,7 @@ import org.blinz.util.User;
  * and numerous other pieces of useful data.
  * @author Blinz
  */
-class ZoneData {
+final class ZoneData {
 
     Object data;
     final short sectorWidth = 2048, sectorHeight = 2048;
