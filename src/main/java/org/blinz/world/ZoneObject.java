@@ -22,14 +22,8 @@ package org.blinz.world;
  */
 public abstract class ZoneObject {
 
-    private final static ZoneData[] dataList = new ZoneData[32767];
-
-    static {
-        dataList[0] = new ZoneData();
-        dataList[0].zoneSize.setSize(dataList[0].sectorWidth(), dataList[0].sectorHeight());
-        dataList[0].init((short) 0);
-    }
-    short zoneID = 0;
+    private final static ZoneData defaultData = new ZoneData();
+    ZoneData data = defaultData;
 
     /**
      * Runs the given CollidableSprite against other CollidableSprites to check
@@ -102,7 +96,7 @@ public abstract class ZoneObject {
      * @return ZoneData
      */
     final ZoneData getData() {
-        return dataList[zoneID];
+        return data;
     }
 
     /**
@@ -111,8 +105,8 @@ public abstract class ZoneObject {
      * @param zoneID the ID for the Zone
      * @param zoneData the ZoneData object
      */
-    final static void setZoneData(final int zoneID, final ZoneData zoneData) {
-        dataList[zoneID] = zoneData;
+    final void setZoneData(final ZoneData zoneData) {
+        data = zoneData;
     }
 
     /**
