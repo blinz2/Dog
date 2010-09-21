@@ -94,7 +94,7 @@ public abstract class ZoneObject {
     }
 
     /**
-     * Returns the data for the Zone of this ZoneObject.
+     * Gets the data for the Zone of this ZoneObject.
      *
      * ZoneData contains such items as a master list of Sectors, Sector size, zoneTime,
      * and numerous other pieces of useful data.
@@ -105,13 +105,26 @@ public abstract class ZoneObject {
         return dataList[zoneID];
     }
 
+    /**
+     * Sets the ZoneData object for all ZoneObjects in the Zone to access without any further
+     * memory penalties from additional pointers.
+     * @param zoneID the ID for the Zone
+     * @param zoneData the ZoneData object
+     */
     final static void setZoneData(final int zoneID, final ZoneData zoneData) {
         dataList[zoneID] = zoneData;
     }
 
+    /**
+     * Initializes this ZoneObject for use.
+     */
     void internalInit() {
         init();
     }
 
+    /**
+     * An abstract initialization method allowing users of this API to specify
+     * what should be done when the object joins its Zone.
+     */
     abstract void init();
 }

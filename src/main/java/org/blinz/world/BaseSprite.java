@@ -26,7 +26,9 @@ import org.blinz.util.Position3D;
 import org.blinz.util.Size;
 
 /**
- *
+ * The base of all sprite classes. This class should only be used when optimization
+ * or extreme customization is needed. The Sprite class is much easier to use and
+ * will probably fit most situations.
  * @author Blinz
  */
 public abstract class BaseSprite extends ZoneObject {
