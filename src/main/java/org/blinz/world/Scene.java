@@ -36,7 +36,7 @@ final class Scene {
     final Size size = new Size();
     private int spriteCount = 0;
     private final Stack<SpriteContainer> containers = new Stack<SpriteContainer>();
-    private final ArrayList<SpriteContainer>[] layers = new ArrayList[50];
+    private final UnorderedList<SpriteContainer>[] layers = new UnorderedList[50];
     private boolean isLocked = false;
     private long lastCleanUpTime = System.currentTimeMillis();
 
@@ -45,7 +45,7 @@ final class Scene {
      */
     Scene() {
         for (int i = 0; i < layers.length; i++) {
-            layers[i] = new ArrayList<SpriteContainer>();
+            layers[i] = new UnorderedList<SpriteContainer>();
         }
     }
 
@@ -65,7 +65,7 @@ final class Scene {
      * @param sprites the list of CameraSprites to be added to this Scene
      */
     final void addAll(final Vector<CameraSprite> sprites) {
-        for (CameraSprite sprite : sprites) {
+        for (final CameraSprite sprite : sprites) {
             add(sprite);
         }
     }
@@ -100,8 +100,9 @@ final class Scene {
     final void draw(final Graphics graphics) {
         final Bounds bounds = new Bounds();
 
-        for (final ArrayList<SpriteContainer> layer : layers) {
-            for (SpriteContainer sprite : layer) {
+        for (final UnorderedList<SpriteContainer> layer : layers) {
+            for (int i = 0; i < layer.size(); i++) {
+		final SpriteContainer sprite = layer.get(i);
                 bounds.setPosition(sprite.loc.x - translation.x,
                         sprite.loc.y - translation.y);
                 bounds.setSize(sprite.sprite.getWidth(), sprite.sprite.getHeight());
@@ -126,7 +127,8 @@ final class Scene {
             }
             clear();
             lastCleanUpTime = System.currentTimeMillis();
-        } else {
+ 	    trimLists();
+ 	    } else {
             clear();
         }
     }
@@ -136,8 +138,8 @@ final class Scene {
      * the radix in their layer.
      */
     final void sortLayers() {
-        for (ArrayList<SpriteContainer> layer : layers) {
-            sortLayer(layer, 0, layer.size() - 1);
+        for (int i = 0; i < layers.length; i++) {
+            sortLayer(layers[i], 0, layers[i].size() - 1);
         }
     }
 
@@ -145,7 +147,7 @@ final class Scene {
      * Clears all sprites from this Scene.
      */
     private final void clear() {
-        for (final ArrayList list : layers) {
+        for (final UnorderedList list : layers) {
             list.clear();
         }
         spriteCount = 0;
@@ -160,7 +162,7 @@ final class Scene {
         if (containers.empty()) {
             return new SpriteContainer(sprite);
         } else {
-            SpriteContainer sc = containers.pop();
+            final SpriteContainer sc = containers.pop();
             sc.sprite = sprite;
             sc.loc.setPosition(sprite.getX(), sprite.getY(), (int) sprite.getLayer());
             return sc;
@@ -185,8 +187,9 @@ final class Scene {
      * @return returns whether or not this Scene contains the given sprite
      */
     private final boolean contains(final CameraSprite sprite, final int layer) {
-        for (SpriteContainer s : layers[layer]) {
-            if (sprite == s.sprite) {
+        for (int i = 0; i < layers[layer].size(); i++) {
+            final SpriteContainer s = layers[layer].get(i); 
+	    if (sprite == s.sprite) {
                 return true;
             }
         }
@@ -198,7 +201,7 @@ final class Scene {
      * @param low the point on the list where the sorting will begin
      * @param high the point on the list where the sorting will end
      */
-    private final void sortLayer(final ArrayList<SpriteContainer> layer, final int low, final int high) {
+    private final void sortLayer(final UnorderedList<SpriteContainer> layer, final int low, final int high) {
         if (low >= high) {
             return;
         }
@@ -219,6 +222,15 @@ final class Scene {
 
         sortLayer(layer, low, pivotIndex - 1);
         sortLayer(layer, pivotIndex + 1, high);
+    }
+   
+    /**
+     * Trims the size of all lists down to their current size to recover memory.
+     */
+    private final void trimLists() {
+	for (int i = 0; i < layers.length; i++) {
+		layers[i].trimToSize();
+  	}
     }
 
     /**

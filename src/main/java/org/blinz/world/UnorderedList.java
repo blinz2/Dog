@@ -60,6 +60,16 @@ final class UnorderedList<E> {
             elements.add(element);
         }
     }
+    
+    /**
+     * Replaces an item with the one given at the given location.
+     * @param index the index of of the element to replace
+     * @param element the element to replace the previous element with
+     * @return the value being replaced
+     */
+    final E set(final int index, final E element) {
+	return elements.set(index, element);
+    }
 
     /**
      * Removes the sprite at the given location by moving the sprite at the end
