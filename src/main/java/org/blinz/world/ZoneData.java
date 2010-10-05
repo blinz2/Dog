@@ -39,7 +39,6 @@ final class ZoneData {
 
     /**
      * Initializes the ZoneData according to what it already stores.
-     * @param zoneID
      */
     final void init() {
         for (int i = 0; i < sectors.length; i++) {
@@ -129,20 +128,20 @@ final class ZoneData {
     }
 
     /**
-     * Returns the Sector of the specified point in the Zone.
-     * @param x
-     * @param y
+     * Gets the Sector of the specified point in the Zone.
+     * @param x the x coordinate of point in the Sector
+     * @param y the y coordinate of point in the Sector
      * @return Sector of specified point
      */
     final Sector getSectorOf(final int x, final int y) {
-        return sectors[x / sectorWidth][y / sectorHeight];
+        return sectors[x >> 11][y >> 11];
     }
 
     /**
-     * Returns the Sector of the specified point in the Zone, makes sure the indices
+     * Gets the Sector of the specified point in the Zone, makes sure the indices
      * are safe with a slight overhead.
-     * @param x
-     * @param y
+     * @param x the x coordinate of point in the Sector
+     * @param y the y coordinate of point in the Sector
      * @return Sector of specified point
      */
     final Sector getSectorOfSafe(int x, int y) {
@@ -158,27 +157,27 @@ final class ZoneData {
             y = zoneSize.height;
         }
 
-        return sectors[x / sectorWidth][y / sectorHeight];
+        return sectors[x >> 11][y >> 11];
     }
 
     /**
-     * Returns the width of Sectors in this ZoneData's Zone.
-     * @return int
+     * Gets the width of Sectors in this ZoneData's Zone.
+     * @return the width of Sectors in this Zone
      */
     final int sectorWidth() {
         return sectorWidth;
     }
 
     /**
-     * Returns the height of Sectors in this ZoneData's Zone.
-     * @return int
+     * Gets the height of Sectors in this ZoneData's Zone.
+     * @return the height of Sectors in this Zone
      */
     final int sectorHeight() {
         return sectorHeight;
     }
 
     /**
-     * Returns the width of this ZoneData's Zone.
+     * Gets the width of this ZoneData's Zone.
      * @return zone width
      */
     final int getZoneWidth() {
@@ -186,7 +185,7 @@ final class ZoneData {
     }
 
     /**
-     * Returns the height of this ZoneData's Zone.
+     * Gets the height of this ZoneData's Zone.
      * @return zone height
      */
     final int getZoneHeight() {
