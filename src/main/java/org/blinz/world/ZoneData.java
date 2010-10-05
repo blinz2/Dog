@@ -83,8 +83,8 @@ final class ZoneData {
 
     /**
      * The given sprite will now recieve input given by the given User.
-     * @param user
-     * @param sprite
+     * @param user the User to listen for
+     * @param sprite the sprite to listen
      */
     final void addUserListener(final User user, final BaseSprite sprite) {
         userListeners.add(user, sprite);
@@ -92,8 +92,8 @@ final class ZoneData {
 
     /**
      * The given sprite will no longer receive input given by the given User.
-     * @param user
-     * @param sprite
+     * @param user the User to no longer listen for
+     * @param sprite the sprite to no longer listen
      */
     final void removeUserListener(final User user, final BaseSprite sprite) {
         userListeners.remove(user, sprite);
@@ -120,7 +120,7 @@ final class ZoneData {
     }
 
     /**
-     * 
+     * Indicates whether or not the Zone of this ZoneData is closed.
      * @return true if the associated Zone is paused, false otherwise
      */
     final boolean paused() {
@@ -178,7 +178,7 @@ final class ZoneData {
 
     /**
      * Gets the width of this ZoneData's Zone.
-     * @return zone width
+     * @return the width of the Zone 
      */
     final int getZoneWidth() {
         return zoneSize.width;
@@ -186,7 +186,7 @@ final class ZoneData {
 
     /**
      * Gets the height of this ZoneData's Zone.
-     * @return zone height
+     * @return the height of the Zone
      */
     final int getZoneHeight() {
         return zoneSize.height;
