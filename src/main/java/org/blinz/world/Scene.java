@@ -35,8 +35,8 @@ final class Scene {
     final Position translation = new Position();
     final Size size = new Size();
     private int spriteCount = 0;
-    private final Stack<SpriteContainer> containers = new Stack<SpriteContainer>();
-    private final UnorderedList<SpriteContainer>[] layers = new UnorderedList[50];
+    private final Stack<SceneSprite> containers = new Stack<SceneSprite>();
+    private final UnorderedList<SceneSprite>[] layers = new UnorderedList[50];
     private boolean isLocked = false;
     private long lastCleanUpTime = System.currentTimeMillis();
 
@@ -45,7 +45,7 @@ final class Scene {
      */
     Scene() {
         for (int i = 0; i < layers.length; i++) {
-            layers[i] = new UnorderedList<SpriteContainer>();
+            layers[i] = new UnorderedList<SceneSprite>();
         }
     }
 
@@ -55,7 +55,7 @@ final class Scene {
      */
     final void add(final CameraSprite sprite) {
         if (!contains(sprite, (int) sprite.getLayer())) {
-            layers[(int) sprite.getLayer()].add(fetchContainer(sprite));
+            layers[(int) sprite.getLayer()].add(fetchSceneSprite(sprite));
             spriteCount++;
         }
     }
@@ -100,9 +100,9 @@ final class Scene {
     final void draw(final Graphics graphics) {
         final Bounds bounds = new Bounds();
 
-        for (final UnorderedList<SpriteContainer> layer : layers) {
+        for (final UnorderedList<SceneSprite> layer : layers) {
             for (int i = 0; i < layer.size(); i++) {
-		final SpriteContainer sprite = layer.get(i);
+		final SceneSprite sprite = layer.get(i);
                 bounds.setPosition(sprite.loc.x - translation.x,
                         sprite.loc.y - translation.y);
                 bounds.setSize(sprite.sprite.getWidth(), sprite.sprite.getHeight());
@@ -113,12 +113,12 @@ final class Scene {
     }
 
     /**
-     * Preserves the SpriteContainers so that excessive creation of them does not
-     * exceed the rate at which they can be deleted. SpriteContainers are periodically
+     * Preserves the SceneSprites so that excessive creation of them does not
+     * exceed the rate at which they can be deleted. SceneSprites are periodically
      * deleted to keep a memory leak from becoming problematic over a long period
      * of time.
      */
-    final void manageContainers() {
+    final void manageSceneSprites() {
         if (lastCleanUpTime < System.currentTimeMillis() - 10000) {
             if (containers.size() >= spriteCount) {
                 for (int i = 0; i < spriteCount; i++) {
@@ -154,15 +154,15 @@ final class Scene {
     }
 
     /**
-     * Gets a SpriteContainer containing the given CameraSprite.
+     * Gets a SceneSprite containing the given CameraSprite.
      * @param sprite the Sprite for which a Container will be returned
-     * @return SpriteContainer
+     * @return a available SceneSprite representing the given CameraSprite
      */
-    private final SpriteContainer fetchContainer(final CameraSprite sprite) {
+    private final SceneSprite fetchSceneSprite(final CameraSprite sprite) {
         if (containers.empty()) {
-            return new SpriteContainer(sprite);
+            return new SceneSprite(sprite);
         } else {
-            final SpriteContainer sc = containers.pop();
+            final SceneSprite sc = containers.pop();
             sc.sprite = sprite;
             sc.loc.setPosition(sprite.getX(), sprite.getY(), (int) sprite.getLayer());
             return sc;
@@ -188,7 +188,7 @@ final class Scene {
      */
     private final boolean contains(final CameraSprite sprite, final int layer) {
         for (int i = 0; i < layers[layer].size(); i++) {
-            final SpriteContainer s = layers[layer].get(i); 
+            final SceneSprite s = layers[layer].get(i);
 	    if (sprite == s.sprite) {
                 return true;
             }
@@ -201,16 +201,16 @@ final class Scene {
      * @param low the point on the list where the sorting will begin
      * @param high the point on the list where the sorting will end
      */
-    private final void sortLayer(final UnorderedList<SpriteContainer> layer, final int low, final int high) {
+    private final void sortLayer(final UnorderedList<SceneSprite> layer, final int low, final int high) {
         if (low >= high) {
             return;
         }
 
-        final SpriteContainer pivot = layer.get(high);
+        final SceneSprite pivot = layer.get(high);
         int pivotIndex = high;
         for (int i = low; i <= pivotIndex;) {
             if (layer.get(i).layer() > pivot.layer()) {
-                final SpriteContainer current = layer.get(i);
+                final SceneSprite current = layer.get(i);
                 layer.set(pivotIndex, current);
                 layer.set(i, layer.get(pivotIndex - 1));
                 layer.set(pivotIndex - 1, pivot);
@@ -237,7 +237,7 @@ final class Scene {
      * Holds important status information about the sprite it contains at the time
      * of the generation of a Scene.
      */
-    private final class SpriteContainer {
+    private final class SceneSprite {
 
         private CameraSprite sprite;
         private final Position3D loc = new Position3D();
@@ -246,7 +246,7 @@ final class Scene {
          * Constructor
          * @param sprite the Camera Sprite that this will represent
          */
-        SpriteContainer(final CameraSprite sprite) {
+        SceneSprite(final CameraSprite sprite) {
             this.sprite = sprite;
             loc.setPosition(sprite.getX(), sprite.getY(), (int) sprite.getLayer());
         }

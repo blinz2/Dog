@@ -499,7 +499,7 @@ public class Camera extends ZoneObject {
      */
     private final void generateCurrentScene() {
         final Scene upcoming = getScene();
-        upcoming.manageContainers();
+        upcoming.manageSceneSprites();
 
         upcoming.translation.setPosition(getX(), getY());
         upcoming.size.setSize(bounds.width, bounds.height);
