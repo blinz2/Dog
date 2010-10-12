@@ -501,14 +501,12 @@ public class Camera extends ZoneObject {
         final Scene upcoming = getScene();
         upcoming.manageSceneSprites();
 
-        upcoming.translation.setPosition(getX(), getY());
-        upcoming.size.setSize(bounds.width, bounds.height);
-        final Bounds b = new Bounds();
-        b.setPosition(upcoming.translation);
-        b.setSize(upcoming.size);
+        upcoming.setTranslation(getX(), getY());
+        upcoming.setSize(getWidth(), getHeight());
         for (int i = 0; i < spriteList.size(); i++) {
             final CameraSprite s = spriteList.get(i);
-            if (b.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight())) {
+            if (Bounds.intersects(s.getX(), s.getY(), s.getWidth(), s.getHeight(),
+                    upcoming.translationX, upcoming.translationY, upcoming.width, upcoming.height)) {
                 upcoming.add(s);
             }
         }
@@ -531,7 +529,8 @@ public class Camera extends ZoneObject {
                 retval = swap2;
             }
         }
-        retval.size.setSize(getWidth(), getHeight());
+        retval.width = getWidth();
+        retval.height = getHeight();
         return retval;
     }
 

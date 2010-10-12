@@ -17,9 +17,6 @@
 package org.blinz.world;
 
 import java.util.ArrayList;
-import org.blinz.util.Position;
-import org.blinz.util.Position3D;
-import org.blinz.util.Size;
 import java.util.Stack;
 import java.util.Vector;
 import org.blinz.graphics.Graphics;
@@ -32,11 +29,10 @@ import org.blinz.util.Bounds;
  */
 final class Scene {
 
-    final Position translation = new Position();
-    final Size size = new Size();
+    int translationX, translationY, width, height;
     private int spriteCount = 0;
     private final Stack<SceneSprite> containers = new Stack<SceneSprite>();
-    private final UnorderedList<SceneSprite>[] layers = new UnorderedList[50];
+    private final ArrayList<SceneSprite>[] layers = new ArrayList[50];
     private boolean isLocked = false;
     private long lastCleanUpTime = System.currentTimeMillis();
 
@@ -45,8 +41,28 @@ final class Scene {
      */
     Scene() {
         for (int i = 0; i < layers.length; i++) {
-            layers[i] = new UnorderedList<SceneSprite>();
+            layers[i] = new ArrayList<SceneSprite>();
         }
+    }
+
+    /**
+     * Sets the translation of this Scene relative to the location of its sprites.
+     * @param x the x translation
+     * @param y the y translation
+     */
+    final void setTranslation(final int x, final int y) {
+        translationX = x;
+        translationY = y;
+    }
+
+    /**
+     * Sets the size of this Scene.
+     * @param width the new width of this Scene
+     * @param height the new height of this Scene
+     */
+    final void setSize(final int width, final int height) {
+        this.width = width;
+        this.height = height;
     }
 
     /**
@@ -100,11 +116,11 @@ final class Scene {
     final void draw(final Graphics graphics) {
         final Bounds bounds = new Bounds();
 
-        for (final UnorderedList<SceneSprite> layer : layers) {
+        for (final ArrayList<SceneSprite> layer : layers) {
             for (int i = 0; i < layer.size(); i++) {
 		final SceneSprite sprite = layer.get(i);
-                bounds.setPosition(sprite.loc.x - translation.x,
-                        sprite.loc.y - translation.y);
+                bounds.setPosition(sprite.x - translationX,
+                        sprite.y - translationY);
                 bounds.setSize(sprite.sprite.getWidth(), sprite.sprite.getHeight());
                 sprite.sprite.draw(graphics, bounds);
                 containers.add(sprite);
@@ -147,7 +163,7 @@ final class Scene {
      * Clears all sprites from this Scene.
      */
     private final void clear() {
-        for (final UnorderedList list : layers) {
+        for (final ArrayList list : layers) {
             list.clear();
         }
         spriteCount = 0;
@@ -164,7 +180,9 @@ final class Scene {
         } else {
             final SceneSprite sc = containers.pop();
             sc.sprite = sprite;
-            sc.loc.setPosition(sprite.getX(), sprite.getY(), (int) sprite.getLayer());
+            sc.x = sprite.getX();
+            sc.y = sprite.getY();
+            sc.layer = sprite.getLayer();
             return sc;
         }
     }
@@ -201,7 +219,7 @@ final class Scene {
      * @param low the point on the list where the sorting will begin
      * @param high the point on the list where the sorting will end
      */
-    private final void sortLayer(final UnorderedList<SceneSprite> layer, final int low, final int high) {
+    private final void sortLayer(final ArrayList<SceneSprite> layer, final int low, final int high) {
         if (low >= high) {
             return;
         }
@@ -240,15 +258,17 @@ final class Scene {
     private final class SceneSprite {
 
         private CameraSprite sprite;
-        private final Position3D loc = new Position3D();
-
+        private int x, y;
+        private float layer;
         /**
          * Constructor
          * @param sprite the Camera Sprite that this will represent
          */
         SceneSprite(final CameraSprite sprite) {
             this.sprite = sprite;
-            loc.setPosition(sprite.getX(), sprite.getY(), (int) sprite.getLayer());
+            x = sprite.getX();
+            y = sprite.getY();
+            layer = sprite.getLayer();
         }
 
         /**
@@ -256,7 +276,7 @@ final class Scene {
          * @return the layer of the sprite this SpriteContainer represents.
          */
         final float layer() {
-            return loc.z;
+            return layer;
         }
     }
 }
