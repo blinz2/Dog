@@ -60,13 +60,17 @@ final class ZoneData {
     }
 
     /**
-     *
+     * Gets the name of the Zone.
      * @return the name of the Zone this data represents
      */
     final String getName() {
         return zoneName;
     }
 
+    /**
+     * Adds the given spite to the Zone that this ZoneData is for.
+     * @param sprite the sprite to be added to the Zone
+     */
     final void addSprite(final BaseSprite sprite) {
         registerZoneObject(sprite);
         final Sector tl = getSectorOf(sprite.getX(), sprite.getY());
@@ -74,7 +78,7 @@ final class ZoneData {
     }
 
     /**
-     * Returns a reference to the sprites listening to input from users.
+     * Get a reference to the sprites listening to input from users.
      * @return a reference to the sprites listening to input from users.
      */
     final UserListenerCatalog getUserListeners() {
@@ -208,7 +212,7 @@ final class ZoneData {
     /**
      * Registers the given ZoneObject with this ZoneObject's Zone.
      * A ZoneObject can only be a member of one Zone at a time.
-     * @param object
+     * @param object object holding data
      */
     final void registerZoneObject(final ZoneObject object) {
         object.data = this;
