@@ -14,12 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.blinz.world;
+package org.blinz.dog.world;
 
-import org.blinz.util.User;
+import org.blinz.dog.util.User;
 import org.blinz.graphics.Graphics;
 import org.blinz.util.Bounds;
-import org.blinz.world.SelectableSprite.Selection;
+import org.blinz.dog.world.SelectableSprite.Selection;
 
 /**
  * A wrapper around sprite for Cameras to properly draw them.

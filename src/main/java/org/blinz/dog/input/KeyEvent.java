@@ -1,6 +1,6 @@
 /*
  *  BlinzEngine - A library for large 2D world simultions and games.
- *  Copyright (C) 2010  Blinz <gtalent2@gmail.com>
+ *  Copyright (C) 2009-2010  Blinz <gtalent2@gmail.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 3 as
@@ -14,34 +14,33 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.blinz.world;
+package org.blinz.dog.input;
 
-import java.util.ArrayList;
-import org.blinz.util.concurrency.SynchronizedTask;
+import org.blinz.dog.util.User;
 
 /**
- * Invokes the postUpdate method for the associated Sectors.
+ * Used to describe an event from a key to listener objects.
  * @author Blinz
  */
-class PostUpdateSectors extends SynchronizedTask {
+public class KeyEvent extends InputEvent {
 
-    private Sector[] sectors;
+    private int key;
 
     /**
      * Constructor
-     * @param sectors list of the Sectors it is to process.
+     * @param user user that generated this event
+     * @param key key associated with this event
      */
-    PostUpdateSectors(final ArrayList<Sector> sectors) {
-        this.sectors = sectors.toArray(new Sector[sectors.size()]);
+    public KeyEvent(final User user, final int key) {
+        super(user);
+        this.key = key;
     }
 
     /**
-     * Invokes the post update methods for the associated Sectors.
+     * Gets the key associated with this event.
+     * @return the key associated with this event
      */
-    @Override
-    protected final void run() {
-        for (int i = 0; i < sectors.length; i++) {
-            sectors[i].postUpdate();
-        }
+    public final int key() {
+        return key;
     }
 }

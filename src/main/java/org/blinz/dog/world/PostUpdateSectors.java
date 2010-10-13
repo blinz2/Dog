@@ -14,16 +14,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.blinz.world;
+package org.blinz.dog.world;
 
 import java.util.ArrayList;
 import org.blinz.util.concurrency.SynchronizedTask;
 
 /**
- * Updates the Sectors and sprites.
+ * Invokes the postUpdate method for the associated Sectors.
  * @author Blinz
  */
-class UpdateSectors extends SynchronizedTask {
+class PostUpdateSectors extends SynchronizedTask {
 
     private Sector[] sectors;
 
@@ -31,17 +31,17 @@ class UpdateSectors extends SynchronizedTask {
      * Constructor
      * @param sectors list of the Sectors it is to process.
      */
-    UpdateSectors(final ArrayList<Sector> sectors) {
+    PostUpdateSectors(final ArrayList<Sector> sectors) {
         this.sectors = sectors.toArray(new Sector[sectors.size()]);
     }
 
     /**
-     * Invokes the update methods for the associated Sectors.
+     * Invokes the post update methods for the associated Sectors.
      */
     @Override
     protected final void run() {
         for (int i = 0; i < sectors.length; i++) {
-            sectors[i].update();
+            sectors[i].postUpdate();
         }
     }
 }

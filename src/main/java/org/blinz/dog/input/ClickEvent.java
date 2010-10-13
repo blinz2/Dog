@@ -14,54 +14,35 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.blinz.input;
+package org.blinz.dog.input;
 
-import org.blinz.util.User;
+import org.blinz.dog.util.User;
 
 /**
- * An InputEvent generated with a mouse operation.
+ * An InputEvent generated with a mouse click.
  * @author Blinz
  */
-public class MouseEvent extends InputEvent {
+public class ClickEvent extends MouseEvent {
 
-    private int buttonID;
-    private int x, y;
+    private int clickCount;
 
     /**
-     *
+     * Constructor
      * @param user the User associated with this InputEvent
      * @param buttonID the button operated
      * @param cursorX the x coordinate of the cursor at the time of the event
      * @param cursorY the y coordinate of the cursor at the time of the event
      */
-    public MouseEvent(final User user, final int buttonID, final int cursorX, final int cursorY) {
-        super(user);
-        x = cursorX;
-        y = cursorY;
-        this.buttonID = buttonID;
+    public ClickEvent(final User user, final int buttonID, final int cursorX, final int cursorY, final int clickCount) {
+        super(user, buttonID, cursorX, cursorY);
+        this.clickCount = clickCount;
     }
 
     /**
-     * Gets the numerical identification of the mouse button.
-     * @return the button associated with this event.
+     * Gets the number of clicks in this event.
+     * @return the number of clicks behind this event.
      */
-    public final int getButton() {
-        return buttonID;
-    }
-
-    /**
-     * Gets the x coordinate of the cursor at the time of this event
-     * @return the x coordinate of the cursor at the time of this event
-     */
-    public final int cursorX() {
-        return x;
-    }
-
-    /**
-     * Gets the y coordinate of the cursor at the time of this event.
-     * @return the y coordinate of the cursor at the time of this event
-     */
-    public final int cursorY() {
-        return y;
+    public final int clickCount() {
+        return clickCount;
     }
 }

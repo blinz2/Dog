@@ -14,9 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.blinz.input;
+package org.blinz.dog.input;
 
-import org.blinz.util.User;
+import org.blinz.dog.util.User;
 
 /**
  * A super class for events generated for user input.

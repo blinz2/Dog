@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.blinz.world;
+package org.blinz.dog.world;
 
 import org.blinz.util.concurrency.SynchronizedTask;
 
