@@ -14,9 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.blinz.dog.input;
+package net.blinz.dog.input;
 
-import org.blinz.dog.util.User;
+import net.blinz.dog.util.User;
 
 /**
  * An InputEvent generated with a mouse operation.

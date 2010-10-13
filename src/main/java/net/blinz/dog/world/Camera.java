@@ -14,22 +14,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.blinz.dog.world;
+package net.blinz.dog.world;
 
-import org.blinz.dog.util.User;
+import net.blinz.dog.util.User;
 import org.blinz.graphics.Graphics;
 import org.blinz.util.Bounds;
 import org.blinz.input.MouseListener;
 import java.util.Vector;
-import org.blinz.dog.input.ClickEvent;
-import org.blinz.dog.input.KeyEvent;
+import net.blinz.dog.input.ClickEvent;
+import net.blinz.dog.input.KeyEvent;
 import org.blinz.input.KeyListener;
-import org.blinz.dog.input.MouseEvent;
-import org.blinz.dog.input.MouseWheelEvent;
+import net.blinz.dog.input.MouseEvent;
+import net.blinz.dog.input.MouseWheelEvent;
 import org.blinz.input.MouseWheelListener;
 import org.blinz.util.Position;
-import org.blinz.dog.world.SelectableSprite.Selection;
-import org.blinz.dog.world.UserListenerCatalog.UserListenerList;
+import net.blinz.dog.world.SelectableSprite.Selection;
+import net.blinz.dog.world.UserListenerCatalog.UserListenerList;
 
 /**
  * Camera acts as an interface between a the user, and the Zone.

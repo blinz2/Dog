@@ -14,10 +14,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.blinz.dog.world;
+package net.blinz.dog.world;
 
 import org.blinz.util.Bounds;
-import org.blinz.dog.util.User;
+import net.blinz.dog.util.User;
 import org.blinz.graphics.Graphics;
 
 /**

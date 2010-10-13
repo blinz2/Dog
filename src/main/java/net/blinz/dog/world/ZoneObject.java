@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.blinz.dog.world;
+package net.blinz.dog.world;
 
 /**
  * The root class for many objects relating to Zone.

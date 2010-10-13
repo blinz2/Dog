@@ -14,13 +14,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.blinz.dog.world;
+package net.blinz.dog.world;
 
-import org.blinz.dog.input.KeyEvent;
+import net.blinz.dog.input.KeyEvent;
 import org.blinz.graphics.Graphics;
-import org.blinz.dog.input.ClickEvent;
-import org.blinz.dog.input.MouseEvent;
-import org.blinz.dog.input.MouseWheelEvent;
+import net.blinz.dog.input.ClickEvent;
+import net.blinz.dog.input.MouseEvent;
+import net.blinz.dog.input.MouseWheelEvent;
 import org.blinz.util.Bounds;
 import org.blinz.util.Position3D;
 import org.blinz.util.Size;
