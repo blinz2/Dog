@@ -17,17 +17,17 @@
 package net.blinz.dog.world;
 
 import net.blinz.dog.util.User;
-import org.blinz.graphics.Graphics;
-import org.blinz.util.Bounds;
-import org.blinz.input.MouseListener;
 import java.util.Vector;
+import net.blinz.core.graphics.Graphics;
+import net.blinz.core.input.KeyListener;
+import net.blinz.core.input.MouseListener;
+import net.blinz.core.input.MouseWheelListener;
+import net.blinz.core.util.Bounds;
+import net.blinz.core.util.Position;
 import net.blinz.dog.input.ClickEvent;
 import net.blinz.dog.input.KeyEvent;
-import org.blinz.input.KeyListener;
 import net.blinz.dog.input.MouseEvent;
 import net.blinz.dog.input.MouseWheelEvent;
-import org.blinz.input.MouseWheelListener;
-import org.blinz.util.Position;
 import net.blinz.dog.world.SelectableSprite.Selection;
 import net.blinz.dog.world.UserListenerCatalog.UserListenerList;
 

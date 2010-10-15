@@ -16,9 +16,9 @@
  */
 package net.blinz.dog.world;
 
-import org.blinz.util.Bounds;
+import net.blinz.core.graphics.Graphics;
+import net.blinz.core.util.Bounds;
 import net.blinz.dog.util.User;
-import org.blinz.graphics.Graphics;
 
 /**
  * Used to allow ZoneObservers to denote selection when a Sprite is click on.

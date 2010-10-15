@@ -16,7 +16,7 @@
  */
 package net.blinz.dog.world;
 
-import org.blinz.util.Size;
+import net.blinz.core.util.Size;
 import net.blinz.dog.util.User;
 
 /**

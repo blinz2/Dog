@@ -21,17 +21,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Vector;
+import net.blinz.core.util.Position;
+import net.blinz.core.util.Size;
+import net.blinz.core.util.concurrency.Barrier;
+import net.blinz.core.util.concurrency.SynchronizedTask;
+import net.blinz.core.util.concurrency.Task;
+import net.blinz.core.util.concurrency.TaskExecuter;
+import net.blinz.core.util.concurrency.TaskList;
 import net.blinz.dog.input.ClickEvent;
 import net.blinz.dog.input.KeyEvent;
 import net.blinz.dog.input.MouseEvent;
 import net.blinz.dog.input.MouseWheelEvent;
-import org.blinz.util.Size;
-import org.blinz.util.Position;
-import org.blinz.util.concurrency.Barrier;
-import org.blinz.util.concurrency.SynchronizedTask;
-import org.blinz.util.concurrency.Task;
-import org.blinz.util.concurrency.TaskExecuter;
-import org.blinz.util.concurrency.TaskList;
 
 /**
  * Represents a realm for sprites to be processed and interact.

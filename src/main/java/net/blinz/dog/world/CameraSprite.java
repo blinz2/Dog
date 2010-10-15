@@ -16,9 +16,9 @@
  */
 package net.blinz.dog.world;
 
+import net.blinz.core.graphics.Graphics;
+import net.blinz.core.util.Bounds;
 import net.blinz.dog.util.User;
-import org.blinz.graphics.Graphics;
-import org.blinz.util.Bounds;
 import net.blinz.dog.world.SelectableSprite.Selection;
 
 /**

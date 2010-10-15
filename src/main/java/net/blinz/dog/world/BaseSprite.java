@@ -16,14 +16,14 @@
  */
 package net.blinz.dog.world;
 
+import net.blinz.core.graphics.Graphics;
+import net.blinz.core.util.Bounds;
+import net.blinz.core.util.Position3D;
+import net.blinz.core.util.Size;
 import net.blinz.dog.input.KeyEvent;
-import org.blinz.graphics.Graphics;
 import net.blinz.dog.input.ClickEvent;
 import net.blinz.dog.input.MouseEvent;
 import net.blinz.dog.input.MouseWheelEvent;
-import org.blinz.util.Bounds;
-import org.blinz.util.Position3D;
-import org.blinz.util.Size;
 
 /**
  * The base of all sprite classes. This class should only be used when optimization

@@ -16,9 +16,9 @@
  */
 package net.blinz.dog.world;
 
-import org.blinz.util.Bounds;
-import org.blinz.util.Position3D;
-import org.blinz.util.Size;
+import net.blinz.core.util.Bounds;
+import net.blinz.core.util.Position3D;
+import net.blinz.core.util.Size;
 
 /**
  * A generic implementation of most of BaseSprites features for quick use when

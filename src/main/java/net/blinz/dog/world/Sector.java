@@ -16,8 +16,8 @@
  */
 package net.blinz.dog.world;
 
-import org.blinz.util.Bounds;
 import java.util.Vector;
+import net.blinz.core.util.Bounds;
 
 /**
  * An object used to represent a portion of a Zone, allowing the Zone to be divided

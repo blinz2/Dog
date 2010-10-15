@@ -19,8 +19,8 @@ package net.blinz.dog.world;
 import java.util.ArrayList;
 import java.util.Stack;
 import java.util.Vector;
-import org.blinz.graphics.Graphics;
-import org.blinz.util.Bounds;
+import net.blinz.core.graphics.Graphics;
+import net.blinz.core.util.Bounds;
 
 /**
  * An object used to represent what is in a Cameras sight at a given cycle in the
