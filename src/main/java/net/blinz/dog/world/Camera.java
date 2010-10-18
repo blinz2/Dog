@@ -16,7 +16,7 @@
  */
 package net.blinz.dog.world;
 
-import net.blinz.dog.util.User;
+import java.util.HashMap;
 import java.util.Vector;
 import net.blinz.core.graphics.Graphics;
 import net.blinz.core.input.KeyListener;
@@ -28,6 +28,7 @@ import net.blinz.dog.input.ClickEvent;
 import net.blinz.dog.input.KeyEvent;
 import net.blinz.dog.input.MouseEvent;
 import net.blinz.dog.input.MouseWheelEvent;
+import net.blinz.dog.util.User;
 import net.blinz.dog.world.SelectableSprite.Selection;
 import net.blinz.dog.world.UserListenerCatalog.UserListenerList;
 
@@ -71,7 +72,7 @@ public class Camera extends ZoneObject {
          */
         private final void orphanSprites() {
             while (!sprites.isEmpty()) {
-                orphanedSprites.add(sprites.get(0));
+                orphanedSprites.put(sprites.get(0).getSprite(), sprites.get(0));
                 sprites.remove(0).setSector(null);
             }
         }
@@ -86,7 +87,7 @@ public class Camera extends ZoneObject {
                 final BaseSprite sprite = list.get(n);
                 for (int i = 0; i < sprites.size(); i++) {
                     if (sprites.get(i).getSprite() == sprite) {
-                        orphanedSprites.add(sprites.get(i));
+                        orphanedSprites.put(sprites.get(i).getSprite(), sprites.get(i));
                         sprites.remove(i).setSector(null);
                         break;
                     }
@@ -101,14 +102,11 @@ public class Camera extends ZoneObject {
         private final void addSprite(final BaseSprite sprite) {
             CameraSprite cs = null;
             //recover the sprite's orphaned representation if it exists
-            for (int i = 0; i < orphanedSprites.size(); i++) {
-                if (orphanedSprites.get(i).getSprite() == sprite) {
-                    cs = orphanedSprites.remove(i);
-                    cs.setSector(sector);
-                    break;
-                }
-            }
-            if (cs == null) {
+            cs = orphanedSprites.remove(sprite);
+            spriteMap.put(sprite, cs);
+            if (cs != null) {
+                cs.setSector(sector);
+            } else {
                 cs = new CameraSprite(sprite, sector);
                 //add the sprite to sprite list at the proper location
                 synchronized (spriteList) {
@@ -148,7 +146,8 @@ public class Camera extends ZoneObject {
      */
     private final Vector<Position> selections = new Vector<Position>();
     private final Vector<CameraSector> sectors = new Vector<CameraSector>();
-    private final Vector<CameraSprite> orphanedSprites = new Vector<CameraSprite>();
+    private final HashMap<BaseSprite, CameraSprite> orphanedSprites = new HashMap<BaseSprite, CameraSprite>();
+    private final HashMap<BaseSprite, CameraSprite> spriteMap = new HashMap<BaseSprite, CameraSprite>();
     private final Vector<CameraSprite> spriteList = new Vector<CameraSprite>();
     private final Bounds bounds = new Bounds();
     private Zone zone;
@@ -486,7 +485,7 @@ public class Camera extends ZoneObject {
         //remove remaining orphans from spriteList
         for (int i = 0; i < spriteList.size(); i++) {
             if (spriteList.get(i).getSector() == null) {
-                spriteList.remove(i);
+                spriteMap.remove(spriteList.remove(i).getSprite());
                 i--;
             }
         }

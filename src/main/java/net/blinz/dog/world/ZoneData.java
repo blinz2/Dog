@@ -36,6 +36,7 @@ final class ZoneData {
     final UserListenerCatalog userListeners = new UserListenerCatalog();
     private String zoneName;
     private boolean paused = false;
+    private boolean isClient = false, isServer = false;
 
     /**
      * Initializes the ZoneData according to what it already stores.
@@ -49,6 +50,40 @@ final class ZoneData {
                 sectors[i][n].init();
             }
         }
+    }
+
+    /**
+     * Sets whether or no this Zone will perform client specific operations.
+     * @param isClient true if this is a client Zone, false otherwise
+     */
+    final void setClient(final boolean isClient) {
+        this.isClient = isClient;
+    }
+
+    /**
+     * Indicates whether or not this Zone is a client Zone and performs client
+     * specific operations.
+     * @return true if this Zone is a client, false otherwise
+     */
+    final boolean isClient() {
+        return isClient;
+    }
+
+    /**
+     * Sets whether or no this Zone will perform server specific operations.
+     * @param isServer true if this is a server Zone, false otherwise
+     */
+    final void setServer(final boolean isServer) {
+        this.isServer = isServer;
+    }
+
+    /**
+     * Indicates whether or not this Zone is a server Zone and performs server
+     * specific operations.
+     * @return true if this Zone is a server, false otherwise
+     */
+    final boolean isServer() {
+        return isServer;
     }
 
     /**

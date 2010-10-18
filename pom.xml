@@ -4,7 +4,7 @@
     <groupId>net.blinz.dog</groupId>
     <artifactId>Dog</artifactId>
     <packaging>jar</packaging>
-    <version>0.10.0.0-MILESTONE1</version>
+    <version>0.10.0.0-Networking-SNAPSHOT</version>
     <name>Dog</name>
     <url>None</url>
 
@@ -27,9 +27,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.blinz</groupId>
+            <groupId>net.blinz.core</groupId>
             <artifactId>BlinzCore</artifactId>
-            <version>0.8.0-MILESTONE1</version>
+            <version>0.8.0-MILESTONE2</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
