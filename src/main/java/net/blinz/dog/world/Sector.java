@@ -76,8 +76,26 @@ final class Sector extends ZoneObject {
      * Updates the sprites in this Sector.
      */
     final void update() {
-        for (int i = 0; i < updatingSprites.size(); i++) {
-            updatingSprites.get(i).update();
+        if (!getData().isClient() && !getData().isServer()) {
+            for (int i = 0; i < updatingSprites.size(); i++) {
+                updatingSprites.get(i).update();
+            }
+        } else if (getData().isServer()) {
+            for (int i = 0; i < updatingSprites.size(); i++) {
+                updatingSprites.get(i).update();
+                updatingSprites.get(i).serverUpdate();
+            }
+        } else if (getData().isClient()) {
+            for (int i = 0; i < updatingSprites.size(); i++) {
+                updatingSprites.get(i).update();
+                updatingSprites.get(i).clientUpdate();
+            }
+        } else {
+            for (int i = 0; i < updatingSprites.size(); i++) {
+                updatingSprites.get(i).update();
+                updatingSprites.get(i).clientUpdate();
+                updatingSprites.get(i).serverUpdate();
+            }
         }
     }
 
