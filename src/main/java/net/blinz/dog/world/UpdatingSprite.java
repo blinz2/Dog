@@ -24,7 +24,8 @@ package net.blinz.dog.world;
 public interface UpdatingSprite {
 
     /**
-     * Method invoked in Zone execution once per Zone cycle.
+     * Method invoked regardless of Zone status as client or server in Zone
+     * execution once per Zone cycle.
      */
     public void update();
 
