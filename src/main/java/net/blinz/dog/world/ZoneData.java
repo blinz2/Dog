@@ -27,7 +27,8 @@ import net.blinz.dog.util.User;
 final class ZoneData {
 
     Object data;
-    final short sectorWidth = 2048, sectorHeight = 2048;
+    private int sectorSize = 2048;
+    private int sectorLookupShift = (int) (Math.log(sectorSize) / Math.log(2.0));
     Sector[][] sectors = new Sector[1][1];
     final Size zoneSize = new Size();
     final UnorderedList<BaseSprite> spritesToDelete = new UnorderedList<BaseSprite>();
@@ -44,12 +45,30 @@ final class ZoneData {
     final void init() {
         for (int i = 0; i < sectors.length; i++) {
             for (int n = 0; n < sectors[i].length; n++) {
-                sectors[i][n] = new Sector(i * sectorWidth,
-                        n * sectorHeight);
+                sectors[i][n] = new Sector(i * sectorSize,
+                        n * sectorSize);
                 sectors[i][n].data = this;
                 sectors[i][n].init();
             }
         }
+    }
+
+    /**
+     * Gets the size of this Zone's Sectors.
+     * @return the size of this Zone's Sectors
+     */
+    final int getSectorSize() {
+        return sectorSize;
+    }
+
+    /**
+     * Sets the Sector size for the Zone.
+     * The Sector size MUST be a power of 2.
+     * @param size the new size of the Sectors, MUST BE A POWER OF 2
+     */
+    final void setSectorSize(final int size) {
+        sectorSize = size;
+        sectorLookupShift = (int) (Math.log(sectorSize) / Math.log(2.0));
     }
 
     /**
@@ -121,7 +140,7 @@ final class ZoneData {
     }
 
     /**
-     * The given sprite will now recieve input given by the given User.
+     * The given sprite will now receive input given by the given User.
      * @param user the User to listen for
      * @param sprite the sprite to listen
      */
@@ -173,7 +192,7 @@ final class ZoneData {
      * @return Sector of specified point
      */
     final Sector getSectorOf(final int x, final int y) {
-        return sectors[x >> 11][y >> 11];
+        return sectors[x >> sectorLookupShift][y >> sectorLookupShift];
     }
 
     /**
@@ -196,7 +215,7 @@ final class ZoneData {
             y = zoneSize.height;
         }
 
-        return sectors[x >> 11][y >> 11];
+        return sectors[x >> sectorLookupShift][y >> sectorLookupShift];
     }
 
     /**
@@ -204,7 +223,7 @@ final class ZoneData {
      * @return the width of Sectors in this Zone
      */
     final int sectorWidth() {
-        return sectorWidth;
+        return sectorSize;
     }
 
     /**
@@ -212,7 +231,7 @@ final class ZoneData {
      * @return the height of Sectors in this Zone
      */
     final int sectorHeight() {
-        return sectorHeight;
+        return sectorSize;
     }
 
     /**

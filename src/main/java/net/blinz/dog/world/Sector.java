@@ -134,7 +134,7 @@ final class Sector extends ZoneObject {
      * @return the x position of this Sector in the array
      */
     final int getXIndex() {
-        return bounds.getX() / getData().sectorWidth;
+        return bounds.getX() / getData().getSectorSize();
     }
 
     /**
@@ -142,7 +142,7 @@ final class Sector extends ZoneObject {
      * @return the y position of this Sector in the array
      */
     final int getYIndex() {
-        return bounds.getY() / getData().sectorHeight;
+        return bounds.getY() / getData().getSectorSize();
     }
 
     /**
@@ -166,7 +166,7 @@ final class Sector extends ZoneObject {
      * @return width of this Sector
      */
     final int getWidth() {
-        return getData().sectorWidth;
+        return getData().getSectorSize();
     }
 
     /**
@@ -174,7 +174,7 @@ final class Sector extends ZoneObject {
      * @return height of this Sector
      */
     final int getHeight() {
-        return getData().sectorHeight;
+        return getData().getSectorSize();
     }
 
     /**
@@ -195,9 +195,8 @@ final class Sector extends ZoneObject {
     /**
      * Removes the given sprite from this sector.
      * @param sprite the sprite to remove
-     * @param destination the Sector the given sprite is going to
      */
-    final void removeSprite(final BaseSprite sprite, final Sector destination) {
+    final void removeSprite(final BaseSprite sprite) {
         if (sprite instanceof UpdatingSprite) {
             updatingSpritesToRemove.add((UpdatingSprite) sprite);
         }
@@ -277,20 +276,20 @@ final class Sector extends ZoneObject {
      * Finds and assigns the neighbor attributes for this Sector.
      */
     final void findNeighbors() {
-        int ix = bounds.getX() / getData().sectorWidth;
-        int iy = bounds.getY() / getData().sectorHeight;
+        int ix = bounds.getX() / getData().getSectorSize();
+        int iy = bounds.getY() / getData().getSectorSize();
 
         if (ix > 0) {
-            leftNeighbor = getData().sectors[ix - 1][iy];
+            leftNeighbor = getData().getSectorOf(bounds.x - 1, bounds.y);
         }
         if (iy > 0) {
-            topNeighbor = getData().sectors[ix][iy - 1];
+            topNeighbor = getData().getSectorOf(bounds.x, bounds.y - 1);
         }
         if (ix < getData().sectors.length - 1) {
-            rightNeighbor = getData().sectors[ix + 1][iy];
+            rightNeighbor = getData().getSectorOf(bounds.x + 1, bounds.y);
         }
         if (iy < getData().sectors[ix].length - 1) {
-            bottomNeighbor = getData().sectors[ix][iy + 1];
+            bottomNeighbor = getData().getSectorOf(bounds.x, bounds.y + 1);
         }
     }
 

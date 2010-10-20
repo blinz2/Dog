@@ -212,7 +212,7 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     * Returns the name of this Zone. "Zone" by default. This name will also be
+     * Gets the name of this Zone. "Zone" by default. This name will also be
      * assigned to threads processing this Zone when created.
      * @return the name of this Zone, "Zone" by default
      */
@@ -384,7 +384,7 @@ public abstract class Zone extends ZoneObject {
      * return the maximum width for a sprite
      */
     public final int maximumSpriteWidth() {
-        return getData().sectorWidth;
+        return getData().getSectorSize();
     }
 
     /**
@@ -392,7 +392,7 @@ public abstract class Zone extends ZoneObject {
      * return the maximum height for a sprite
      */
     public final int maximumSpriteHeight() {
-        return getData().sectorHeight;
+        return getData().getSectorSize();
     }
 
     /**
@@ -539,7 +539,7 @@ public abstract class Zone extends ZoneObject {
      */
     private void deleteSprite(final BaseSprite sprite) {
         final Sector tl = getData().getSectorOf(sprite.getX(), sprite.getY());
-        tl.removeSprite(sprite, null);
+        tl.removeSprite(sprite);
         sprite.onDelete();
     }
 
@@ -551,15 +551,15 @@ public abstract class Zone extends ZoneObject {
             return;
         }
 
-        if (size.width / getData().sectorWidth + 1 <= getData().sectors.length
-                || size.height / getData().sectorHeight + 1 <= getData().sectors[0].length) {
+        if (size.width / getData().getSectorSize() + 1 <= getData().sectors.length
+                || size.height / getData().getSectorSize() + 1 <= getData().sectors[0].length) {
             return;
         }
 
         ArrayList<Sector> newSectors = new ArrayList<Sector>();
 
         Sector[][] sectors =
-                new Sector[size.width / getData().sectorWidth + 1][size.height / getData().sectorWidth + 1];
+                new Sector[size.width / getData().getSectorSize() + 1][size.height / getData().getSectorSize() + 1];
         for (int i = 0; i < sectors.length; i++) {
             for (int n = 0; n < sectors[i].length; n++) {
                 if (i >= getData().sectors.length || n >= getData().sectors[i].length) {
@@ -580,8 +580,8 @@ public abstract class Zone extends ZoneObject {
         for (int i = 0; i
                 < sectors.length; i++) {
             for (int n = 0; n < sectors[i].length; n++) {
-                int ix = sectors[i][n].getX() / getData().sectorWidth;
-                int iy = sectors[i][n].getY() / getData().sectorHeight;
+                int ix = sectors[i][n].getX() / getData().getSectorSize();
+                int iy = sectors[i][n].getY() / getData().getSectorSize();
 
                 if (ix > 0) {
                     sectors[i][n].leftNeighbor = getData().sectors[ix - 1][iy];

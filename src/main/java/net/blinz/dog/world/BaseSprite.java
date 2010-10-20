@@ -38,7 +38,7 @@ public abstract class BaseSprite extends ZoneObject {
      * return the maximum width for a sprite
      */
     public final int maximumSpriteWidth() {
-        return getData().sectorWidth;
+        return getData().getSectorSize();
     }
 
     /**
@@ -46,7 +46,7 @@ public abstract class BaseSprite extends ZoneObject {
      * return the maximum height for a sprite
      */
     public final int maximumSpriteHeight() {
-        return getData().sectorHeight;
+        return getData().getSectorSize();
     }
 
     /**
@@ -184,7 +184,7 @@ public abstract class BaseSprite extends ZoneObject {
         final Sector otl = zoneData.getSectorOf(getX(), getY());
         final Sector ntl = zoneData.getSectorOf(x, getY());
         if (otl != ntl) {
-            otl.removeSprite(this, ntl);
+            otl.removeSprite(this);
             ntl.addSprite(this);
         }
         updateX(x);
@@ -207,7 +207,7 @@ public abstract class BaseSprite extends ZoneObject {
         final Sector otl = getData().getSectorOf(getX(), getY());
         final Sector ntl = getData().getSectorOf(getX(), y);
         if (otl != ntl) {
-            otl.removeSprite(this, ntl);
+            otl.removeSprite(this);
             ntl.addSprite(this);
         }
         updateY(y);
@@ -247,6 +247,13 @@ public abstract class BaseSprite extends ZoneObject {
      */
     protected final long zoneTime() {
         return getData().zoneTime;
+    }
+
+    /**
+     * 
+     * @param message
+     */
+    protected void recieveMessage(final String message) {
     }
 
     /**
