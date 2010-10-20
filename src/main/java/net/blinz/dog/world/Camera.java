@@ -446,7 +446,6 @@ public class Camera extends ZoneObject {
             //remove old Sectors
             for (int i = 0; i < sectors.size(); i++) {
                 if (!sectors.get(i).sector.withinSpriteRange(bounds)) {
-                    System.out.println("Removing Sector " + sectors.get(i).sector);
                     removeSector(i);
                     i--;
                 }
