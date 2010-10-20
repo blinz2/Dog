@@ -503,7 +503,6 @@ public abstract class Zone extends ZoneObject {
      * @param camera
      */
     final void addCamera(final Camera camera) {
-
         camerasToAdd.add(camera);
     }
 

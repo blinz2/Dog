@@ -362,18 +362,6 @@ public class Camera extends ZoneObject {
     @Override
     final void internalInit() {
         userListeners = getData().userListeners.checkOut(user);
-        //add relevant Sectors
-        final int x1 = sector1().leftNeighbor != null ? sector1().leftNeighbor.getX() : 0;
-        final int y1 = sector1().topNeighbor != null ? sector1().topNeighbor.getY() : 0;
-        final int x2 = bounds.x2();
-        final int y2 = bounds.y2();
-        for (int x = x1; x < x2; x += getData().sectorWidth()) {
-            for (int y = y1; y < y2; y += getData().sectorHeight()) {
-                final Sector s = getData().getSectorOf(x, y);
-                addSector(s);
-            }
-        }
-        oldBounds.setBounds(bounds);
         init();
     }
 
@@ -458,6 +446,7 @@ public class Camera extends ZoneObject {
             //remove old Sectors
             for (int i = 0; i < sectors.size(); i++) {
                 if (!sectors.get(i).sector.withinSpriteRange(bounds)) {
+                    System.out.println("Removing Sector " + sectors.get(i).sector);
                     removeSector(i);
                     i--;
                 }
