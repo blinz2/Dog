@@ -22,10 +22,10 @@ import net.blinz.dog.util.User;
 import net.blinz.dog.world.SelectableSprite.Selection;
 
 /**
- * A wrapper around sprite for Cameras to properly draw them.
+ * A wrapper around sprite for Cameras to properly manage them.
  * @author Blinz
  */
-class CameraSprite {
+final class CameraSprite {
 
     private Sector sector;
     private BaseSprite sprite;
