@@ -14,30 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.blinz.dog.world;
+package net.blinz.dog.zone;
 
 /**
- * An interface to be implemented by sprites that need to be constantly updated
- * every cycle.
+ * An interface used for sprites that need to know if they've collided with other sprites.
  * @author Blinz
  */
-public interface UpdatingSprite {
+public interface CollidableSprite {
 
     /**
-     * Method invoked regardless of Zone status as client or server in Zone
-     * execution once per Zone cycle.
+     * Method called to notify the sprite that it has collided with another.
+     * @param sprite
      */
-    public void update();
-
-    /**
-     * Method for client specific Zones that is invoked in Zone execution once
-     * per Zone cycle in client Zones.
-     */
-    public void clientUpdate();
-
-    /**
-     * Method for server specific Zones that is invoked in Zone execution once
-     * per Zone cycle in server Zones.
-     */
-    public void serverUpdate();
+    void collide(BaseSprite sprite);
 }

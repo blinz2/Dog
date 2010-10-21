@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.blinz.dog.world;
+package net.blinz.dog.zone;
 
 import java.util.ArrayList;
 import java.util.Vector;
@@ -29,8 +29,8 @@ import net.blinz.dog.input.KeyEvent;
 import net.blinz.dog.input.MouseEvent;
 import net.blinz.dog.input.MouseWheelEvent;
 import net.blinz.dog.util.User;
-import net.blinz.dog.world.SelectableSprite.Selection;
-import net.blinz.dog.world.UserListenerCatalog.UserListenerList;
+import net.blinz.dog.zone.SelectableSprite.Selection;
+import net.blinz.dog.zone.UserListenerCatalog.UserListenerList;
 
 /**
  * Camera acts as an interface between a the user, and the Zone.
