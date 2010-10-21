@@ -132,12 +132,12 @@ public abstract class Zone extends ZoneObject {
     /**
      * Deletes sprites marked for deletion. Must come before PostUpdateSectors.
      */
-    private class UpdateCameras extends SynchronizedTask {
+    private class UpdateCameras extends Task {
 
         @Override
         protected void run() {
             //Update Cameras
-            for (Camera camera = nextCamera(); camera != null; camera = nextCamera()) {
+            for (BaseCamera camera = nextCamera(); camera != null; camera = nextCamera()) {
                 camera.internalUpdate();
             }
         }
@@ -185,8 +185,8 @@ public abstract class Zone extends ZoneObject {
      */
     private int currentCamera = 0;
     private Size size;
-    private final Vector<Camera> cameras = new Vector<Camera>();
-    private final Vector<Camera> camerasToAdd = new Vector<Camera>();
+    private final Vector<BaseCamera> cameras = new Vector<BaseCamera>();
+    private final Vector<BaseCamera> camerasToAdd = new Vector<BaseCamera>();
     private String name = "Zone";
     private long initTime;
     private long pauseTime = 0;
@@ -502,7 +502,7 @@ public abstract class Zone extends ZoneObject {
      * Adds the given Camera to this Zone, to monitor the sprites in its area.
      * @param camera
      */
-    final void addCamera(final Camera camera) {
+    final void addCamera(final BaseCamera camera) {
         camerasToAdd.add(camera);
     }
 
@@ -510,7 +510,7 @@ public abstract class Zone extends ZoneObject {
      * Removes the given Camera from this Zone.
      * @param camera
      */
-    final void removeCamera(final Camera camera) {
+    final void removeCamera(final BaseCamera camera) {
         cameras.remove(camera);
     }
 
@@ -614,7 +614,7 @@ public abstract class Zone extends ZoneObject {
      * Used to help concurrently update the Cameras.
      * @return the next Camera to be updated
      */
-    private synchronized Camera nextCamera() {
+    private synchronized BaseCamera nextCamera() {
         try {
             return cameras.get(currentCamera++);
         } catch (ArrayIndexOutOfBoundsException e) {
