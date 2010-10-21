@@ -26,14 +26,35 @@ import net.blinz.dog.util.User;
  */
 final class ZoneData {
 
+    /**
+     * A reference to data that users of the API can share amongst all their ZoneObjects.
+     */
     Object data;
     private int sectorSize = 2048;
     private int sectorLookupShift = (int) (Math.log(sectorSize) / Math.log(2.0));
+    /**
+     * The Sector table used to look up Sectors.
+     */
     Sector[][] sectors = new Sector[1][1];
+    /**
+     * The size of the Zone.
+     */
     final Size zoneSize = new Size();
+    /**
+     * List of sprites that need to be removed from the Zone.
+     */
     final UnorderedList<BaseSprite> spritesToDelete = new UnorderedList<BaseSprite>();
+    /**
+     * How many milliseconds that have passed since the start time of the Zone.
+     */
     long zoneTime = 0;
+    /**
+     * How many iterations the Zone loop has been through.
+     */
     long zoneCycles = 0;
+    /**
+     * A list of the User to sprite input associations in the Zone.
+     */
     final UserListenerCatalog userListeners = new UserListenerCatalog();
     private String zoneName;
     private boolean paused = false;

@@ -157,7 +157,7 @@ class CameraSprite {
      * Indicates whether or not this sprite is selected by its Camera.
      * @return true if this CameraSprite is selected by its Camera, false otherwise
      */
-    boolean isSelected() {
+    final boolean isSelected() {
         return isSelected;
     }
 }
