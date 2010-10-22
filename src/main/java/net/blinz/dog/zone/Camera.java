@@ -200,7 +200,7 @@ public class Camera extends BaseCamera {
     final void removeOrphanedSprites(final ArrayList<CameraSprite> orphans) {
         //remove remaining orphans from spriteList
         for (int i = 0; i < spriteList.size(); i++) {
-            if (spriteList.get(i).getSector() == null) {
+            if (spriteList.get(i).isOrphaned()) {
                 spriteList.remove(i);
                 i--;
             }

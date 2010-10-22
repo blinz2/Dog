@@ -61,7 +61,7 @@ public abstract class BaseCamera extends ZoneObject {
         private final void orphanSprites() {
             while (!sprites.isEmpty()) {
                 orphanMap.put(sprites.get(0).getSprite(), sprites.get(0));
-                sprites.remove(0).setSector(null);
+                sprites.remove(0).setOrphaned(true);
             }
         }
 
@@ -76,7 +76,7 @@ public abstract class BaseCamera extends ZoneObject {
                 for (int i = 0; i < sprites.size(); i++) {
                     if (sprites.get(i).getSprite() == sprite) {
                         orphanMap.put(sprites.get(i).getSprite(), sprites.get(i));
-                        sprites.remove(i).setSector(null);
+                        sprites.remove(i).setOrphaned(true);
                         break;
                     }
                 }
@@ -92,9 +92,9 @@ public abstract class BaseCamera extends ZoneObject {
             //recover the sprite's orphaned representation if it exists
             cs = orphanMap.remove(sprite);
             if (cs != null) {
-                cs.setSector(sector);
+                cs.setOrphaned(false);
             } else {
-                cs = new CameraSprite(sprite, sector);
+                cs = new CameraSprite(sprite);
                 me.addSprite(cs);
             }
             //add the sprite to the list representing its Sector

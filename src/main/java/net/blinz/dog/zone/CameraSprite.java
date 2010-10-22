@@ -27,7 +27,7 @@ import net.blinz.dog.zone.SelectableSprite.Selection;
  */
 final class CameraSprite {
 
-    private Sector sector;
+    private boolean orphan;
     private BaseSprite sprite;
     private boolean isSelected = false;
 
@@ -36,25 +36,24 @@ final class CameraSprite {
      * @param sprite the sprite that this CameraSprite represents
      * @param sector the sector that the sprite that this represents is in
      */
-    CameraSprite(final BaseSprite sprite, final Sector sector) {
+    CameraSprite(final BaseSprite sprite) {
         this.sprite = sprite;
-        this.sector = sector;
     }
 
     /**
-     * Sets the Sector that the sprite this CameraSprite represents belongs to.
-     * @param sector the Sector that the sprite this CameraSprite represents belongs to
+     * Sets whether or not this CameraSprite is orphaned.
+     * @param orphan the orphaned status fo this CameraSprite
      */
-    final void setSector(final Sector sector) {
-        this.sector = sector;
+    final void setOrphaned(final boolean orphan) {
+        this.orphan = orphan;
     }
 
     /**
-     * Gets the Sector that the sprite this CameraSprite represents belongs to.
-     * @return the Sector that the sprite this CameraSprite represents belongs to
+     * Indicates whether or not this CameraSprite is an orphan and should be removed.
+     * @return true if this CameraSprite is an orphan, false otherwise
      */
-    final Sector getSector() {
-        return sector;
+    final boolean isOrphaned() {
+        return orphan;
     }
 
     /**
