@@ -1,41 +1,47 @@
 /*
  * Dog - A project for making highly scalable non-clustered game and simulation environments.
- * Copyright (C) 2010 BlinzProject <gtalent2@gmail.com>
- *
+ * Copyright (C) 2009-2010 BlinzProject <gtalent2@gmail.com>
+ * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.blinz.dog.world;
+package net.blinz.dog.zone;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import net.blinz.core.util.concurrency.SynchronizedTask;
 
 /**
- * A Camera for monitoring server Zones.
+ * Invokes the postUpdate method for the associated Sectors.
  * @author Blinz
  */
-class ServerCamera extends BaseCamera {
+class PostUpdateSectors extends SynchronizedTask {
 
-    private final HashMap<BaseSprite, CameraSprite> spriteMap = new HashMap<BaseSprite, CameraSprite>();
+    private Sector[] sectors;
 
-    @Override
-    final void addSprite(CameraSprite sprite) {
-        spriteMap.put(sprite.getSprite(), sprite);
+    /**
+     * Constructor
+     * @param sectors list of the Sectors it is to process.
+     */
+    PostUpdateSectors(final ArrayList<Sector> sectors) {
+        this.sectors = sectors.toArray(new Sector[sectors.size()]);
     }
 
+    /**
+     * Invokes the post update methods for the associated Sectors.
+     */
     @Override
-    void removeOrphanedSprites(final ArrayList<CameraSprite> orphans) {
-        for (int i = 0; i < orphans.size(); i++) {
-            spriteMap.remove(orphans.get(i).getSprite());
+    protected final void run() {
+        for (int i = 0; i < sectors.length; i++) {
+            sectors[i].postUpdate();
         }
     }
 }

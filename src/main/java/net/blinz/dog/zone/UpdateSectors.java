@@ -14,17 +14,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.blinz.dog.world;
+package net.blinz.dog.zone;
+
+import java.util.ArrayList;
+import net.blinz.core.util.concurrency.SynchronizedTask;
 
 /**
- * An interface used for sprites that need to know if they've collided with other sprites.
+ * Updates the Sectors and sprites.
  * @author Blinz
  */
-public interface CollidableSprite {
+class UpdateSectors extends SynchronizedTask {
+
+    private Sector[] sectors;
 
     /**
-     * Method called to notify the sprite that it has collided with another.
-     * @param sprite
+     * Constructor
+     * @param sectors list of the Sectors it is to process.
      */
-    void collide(BaseSprite sprite);
+    UpdateSectors(final ArrayList<Sector> sectors) {
+        this.sectors = sectors.toArray(new Sector[sectors.size()]);
+    }
+
+    /**
+     * Invokes the update methods for the associated Sectors.
+     */
+    @Override
+    protected final void run() {
+        for (int i = 0; i < sectors.length; i++) {
+            sectors[i].update();
+        }
+    }
 }
