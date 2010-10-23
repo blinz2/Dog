@@ -47,7 +47,7 @@ public class Screen extends Canvas {
 
     @Override
     protected void draw(final Graphics g) {
-        computeBounds();
+        adjustBounds();
     }
 
     /**
@@ -59,9 +59,9 @@ public class Screen extends Canvas {
     }
 
     /**
-     * Calculates the bounds of this Screen according to its screen type.
+     * Adjusts the bounds of this Screen according to its screen type.
      */
-    private final void computeBounds() {
+    protected final void adjustBounds() {
         switch (screenType) {
             case FULL_SCREEN:
                 setBounds(0, 0, Display.getPaneWidth(), Display.getPaneHeight());
