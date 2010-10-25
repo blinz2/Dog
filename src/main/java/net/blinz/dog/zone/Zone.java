@@ -16,7 +16,6 @@
  */
 package net.blinz.dog.zone;
 
-import net.blinz.dog.util.User;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
