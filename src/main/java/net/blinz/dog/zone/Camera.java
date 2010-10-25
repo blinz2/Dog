@@ -53,59 +53,66 @@ public class Camera extends BaseCamera {
 
         @Override
         public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
-            if (userListeners != null) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
                 final ClickEvent e = new ClickEvent(getUser(), buttonNumber,
                         cursorX + getX(), cursorY + getY(), clickCount);
-                userListeners.buttonClick(e);
+                ul.buttonClick(e);
                 selections.add(new Position(cursorX, cursorY));
             }
         }
 
         @Override
         public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
-            if (userListeners != null) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
                 final MouseEvent e = new MouseEvent(getUser(), buttonNumber, cursorX + getX(), cursorY + getY());
-                userListeners.buttonPress(e);
+                ul.buttonPress(e);
             }
         }
 
         @Override
         public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
-            if (userListeners != null) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
                 final MouseEvent e = new MouseEvent(getUser(), buttonNumber, cursorX + getX(), cursorY + getY());
-                userListeners.buttonRelease(e);
+                ul.buttonRelease(e);
             }
         }
 
         @Override
         public void wheelScroll(int number, int cursorX, int cursorY) {
-            if (userListeners != null) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
                 final MouseWheelEvent e = new MouseWheelEvent(getUser(), number, cursorX + getX(), cursorY + getY());
-                userListeners.wheelScroll(e);
+                ul.wheelScroll(e);
             }
         }
 
         @Override
         public void keyPressed(int key) {
-            if (userListeners != null) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
                 final KeyEvent e = new KeyEvent(getUser(), key);
-                userListeners.keyPressed(e);
+                ul.keyPressed(e);
             }
         }
 
         @Override
         public void keyReleased(int key) {
-            if (userListeners != null) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
                 final KeyEvent e = new KeyEvent(getUser(), key);
-                userListeners.keyReleased(e);
+                ul.keyReleased(e);
             }
         }
 
         @Override
         public void keyTyped(int key) {
-            if (userListeners != null) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
                 final KeyEvent e = new KeyEvent(getUser(), key);
-                userListeners.keyTyped(e);
+                ul.keyTyped(e);
             }
         }
 

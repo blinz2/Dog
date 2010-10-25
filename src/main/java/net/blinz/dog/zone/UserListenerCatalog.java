@@ -130,7 +130,7 @@ final class UserListenerCatalog {
         /**
          * Trims the lists in this UserListenerCatalog down to size.
          */
-        final void trimLists() {
+        private final void trimLists() {
             sprites.trimToSize();
             buttonClicks.trimToSize();
             buttonPresses.trimToSize();
