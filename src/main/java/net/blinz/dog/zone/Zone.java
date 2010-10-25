@@ -366,7 +366,7 @@ public abstract class Zone extends ZoneObject {
      * @param user the User that the sprite will no longer listen to
      * @param sprite the Sprite that to stop listening to the specified rumor
      */
-    public final void addUserListeningSprite(final User user, final BaseSprite sprite) {
+    public final void setUserListeningSprite(final User user, final BaseSprite sprite) {
         getData().addUserListener(user, sprite);
     }
 
