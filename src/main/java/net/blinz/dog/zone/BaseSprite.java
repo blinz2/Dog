@@ -24,6 +24,7 @@ import net.blinz.dog.input.KeyEvent;
 import net.blinz.dog.input.ClickEvent;
 import net.blinz.dog.input.MouseEvent;
 import net.blinz.dog.input.MouseWheelEvent;
+import net.blinz.dog.util.User;
 
 /**
  * The base of all sprite classes. This class should only be used when optimization
@@ -56,6 +57,22 @@ public abstract class BaseSprite extends ZoneObject {
      */
     public final void delete() {
         getData().spritesToDelete.add(this);
+    }
+
+    /**
+     * This sprite will now listen for input from the given User.
+     * @param user the User to listen to
+     */
+    public final void startListeningTo(final User user) {
+        getData().userListeners.add(user, this);
+    }
+
+    /**
+     * This sprite will stop listening to the given User.
+     * @param user the User to stop listening to
+     */
+    public final void stopListeningTo(final User user) {
+        getData().userListeners.remove(user, this);
     }
 
     /**

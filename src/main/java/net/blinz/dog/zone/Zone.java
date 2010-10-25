@@ -360,25 +360,7 @@ public abstract class Zone extends ZoneObject {
         isRunning = false;
         zoneProcessor.stop();
     }
-
-    /**
-     * The given sprite will now receive input given by the given User.
-     * @param user the User that the sprite will no longer listen to
-     * @param sprite the Sprite that to stop listening to the specified rumor
-     */
-    public final void setUserListeningSprite(final User user, final BaseSprite sprite) {
-        getData().addUserListener(user, sprite);
-    }
-
-    /**
-     * The given sprite will no longer receive input given by the given User.
-     * @param user the User that the sprite will no longer listen to
-     * @param sprite the Sprite that to stop listening to the specified rumor
-     */
-    public final void removeUserListeningSprite(final User user, final BaseSprite sprite) {
-        getData().removeUserListener(user, sprite);
-    }
-
+    
     /**
      * Gets the maximum width for a sprite.
      * return the maximum width for a sprite
