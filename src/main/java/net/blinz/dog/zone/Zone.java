@@ -36,7 +36,7 @@ import net.blinz.dog.input.MouseWheelEvent;
  * Represents a realm for sprites to be processed and interact.
  * @author Blinz
  */
-public abstract class Zone extends ZoneObject {
+public class Zone extends ZoneObject {
 
     /**
      * Task for pausing the Zone if it is paused.
@@ -112,7 +112,7 @@ public abstract class Zone extends ZoneObject {
         protected void run() {
             for (BaseSprite s = getData().spritesToDelete.remove(0);
                     s != null; s = getData().spritesToDelete.remove(0)) {
-                deleteSprite(s);
+                removeSprite(s);
             }
         }
     }
@@ -205,7 +205,7 @@ public abstract class Zone extends ZoneObject {
      * Constructor
      */
     public Zone() {
-        setZoneData(new ZoneData());
+        setZoneData(new ZoneData(this));
         getData().init();
         size = getData().zoneSize;
     }
@@ -359,7 +359,53 @@ public abstract class Zone extends ZoneObject {
         isRunning = false;
         zoneProcessor.stop();
     }
-    
+
+    /**
+     * Runs the given CollidableSprite against other CollidableSprites to check
+     * for collisions.
+     * @param sprite
+     */
+    public final void checkCollisions(final CollidableSprite sprite) {
+        final Sector tl = getData().getSectorOf(((BaseSprite) sprite).getX(), ((BaseSprite) sprite).getY());
+        final Sector br = getData().getSectorOf(((BaseSprite) sprite).getX() + ((BaseSprite) sprite).getWidth(),
+                ((BaseSprite) sprite).getY() + ((BaseSprite) sprite).getHeight());
+        tl.checkCollisionsFor(sprite);
+
+        if (tl.leftNeighbor != null) {
+            tl.leftNeighbor.checkCollisionsFor(sprite);
+            if (tl.topNeighbor != null) {
+                tl.topNeighbor.leftNeighbor.checkCollisionsFor(sprite);
+            }
+        }
+        if (tl.topNeighbor != null) {
+            tl.topNeighbor.checkCollisionsFor(sprite);
+        }
+
+        if (tl != br) {
+            if (tl.bottomNeighbor.rightNeighbor == br) {
+                //check them all
+                br.checkCollisionsFor(sprite);
+                if (br.leftNeighbor != null) {
+                    br.leftNeighbor.checkCollisionsFor(sprite);
+                }
+                if (tl.rightNeighbor != null) {
+                    tl.rightNeighbor.checkCollisionsFor(sprite);
+                    if (tl.rightNeighbor.topNeighbor != null) {
+                        tl.rightNeighbor.topNeighbor.checkCollisionsFor(sprite);
+                    }
+                }
+            } else if (br == tl.bottomNeighbor) {
+                if (br.leftNeighbor != null) {
+                    br.leftNeighbor.checkCollisionsFor(sprite);
+                }
+            } else {
+                if (br.topNeighbor != null) {
+                    br.topNeighbor.checkCollisionsFor(sprite);
+                }
+            }
+        }
+    }
+
     /**
      * Gets the maximum width for a sprite.
      * return the maximum width for a sprite
@@ -412,8 +458,12 @@ public abstract class Zone extends ZoneObject {
         return getData().zoneTime;
     }
 
+    /**
+     * Method empty, for implementing as needed. Called when the Zone starts.
+     */
     @Override
-    protected abstract void init();
+    protected void init() {
+    }
 
     /**
      * Passes the given data to the Zone and its sprites so that an extra pointer
@@ -428,7 +478,8 @@ public abstract class Zone extends ZoneObject {
      * Abstract method for updating the zone to be implemented by the developer.
      * Note: This method is not called while the Zone is paused.
      */
-    protected abstract void update();
+    protected void update() {
+    }
 
     /**
      * A stub method for listening to clicks. Implement as needed.
@@ -480,7 +531,7 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     * Adds the given Camera to this Zone, to monitor the sprites in its area.
+     * Adds the given camera to this Zone, to monitor the sprites in its area.
      * @param camera
      */
     final void addCamera(final BaseCamera camera) {
@@ -488,8 +539,8 @@ public abstract class Zone extends ZoneObject {
     }
 
     /**
-     * Removes the given Camera from this Zone.
-     * @param camera
+     * Removes the given camera from this Zone.
+     * @param camera the camera to remove
      */
     final void removeCamera(final BaseCamera camera) {
         cameras.remove(camera);
@@ -506,7 +557,7 @@ public abstract class Zone extends ZoneObject {
     /**
      * Adds new Cameras to this Zone.
      */
-    private void addCameras() {
+    private final void addCameras() {
         for (int i = 0; i < camerasToAdd.size(); i++) {
             cameras.add(camerasToAdd.get(i));
             getData().registerZoneObject(camerasToAdd.remove(i));
@@ -515,18 +566,19 @@ public abstract class Zone extends ZoneObject {
 
     /**
      * Deletes the given sprite from this Zone.
-     * @param sprite
+     * @param sprite the sprite to remove from the Zone
      */
-    private void deleteSprite(final BaseSprite sprite) {
+    private final void removeSprite(final BaseSprite sprite) {
         final Sector tl = getData().getSectorOf(sprite.getX(), sprite.getY());
         tl.removeSprite(sprite);
         sprite.onDelete();
+        sprite.dropZone(this);
     }
 
     /**
      * Refactors the Sectors to fit the current size of this Zone.
      */
-    private synchronized void refactorSectors() {
+    private final synchronized void refactorSectors() {
         if (size.width == 0 || size.height == 0) {
             return;
         }
@@ -595,7 +647,7 @@ public abstract class Zone extends ZoneObject {
      * Used to help concurrently update the Cameras.
      * @return the next Camera to be updated
      */
-    private synchronized BaseCamera nextCamera() {
+    private final synchronized BaseCamera nextCamera() {
         try {
             return cameras.get(currentCamera++);
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -607,7 +659,7 @@ public abstract class Zone extends ZoneObject {
      * Divides the Sectors into groups for the threads to manage.
      * @param sectors the lists of Sectors
      */
-    private synchronized void generateSectorGroups(final Sector[][] sectors) {
+    private final synchronized void generateSectorGroups(final Sector[][] sectors) {
         final int sectorsPerThread = (sectors.length * sectors[0].length) / zoneProcessor.getThreadCount();
         final Position index = new Position();
 

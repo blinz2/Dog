@@ -176,13 +176,14 @@ public class Camera extends BaseCamera {
     /**
      * Drops the current zone, the Camera will have no Zone to moniter after
      * this method is called.
+     * @param zone the Zone that this currently follows and you intend to drop
      */
     @Override
-    public final synchronized void dropZone() {
-        if (getZone() != null) {
+    final synchronized void dropZone(final Zone zone) {
+        if (getZone() == zone) {
             getData().userListeners.checkIn(getUser());
             inputListener = null;
-            super.dropZone();
+            super.dropZone(zone);
         }
     }
 

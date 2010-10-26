@@ -22,53 +22,16 @@ package net.blinz.dog.zone;
  */
 public abstract class ZoneObject {
 
-    private final static ZoneData defaultData = new ZoneData();
+    private final static Zone defaultZone = new Zone();
+    private final static ZoneData defaultData = defaultZone.getData();
     ZoneData data = defaultData;
 
     /**
-     * Runs the given CollidableSprite against other CollidableSprites to check
-     * for collisions.
-     * @param sprite
+     * Gets the Zone that this ZoneObject is associated with.
+     * @return the Zone that this ZoneObject is associated with
      */
-    public final void checkCollisions(final CollidableSprite sprite) {
-        final Sector tl = getData().getSectorOf(((BaseSprite) sprite).getX(), ((BaseSprite) sprite).getY());
-        final Sector br = getData().getSectorOf(((BaseSprite) sprite).getX() + ((BaseSprite) sprite).getWidth(),
-                ((BaseSprite) sprite).getY() + ((BaseSprite) sprite).getHeight());
-        tl.checkCollisionsFor(sprite);
-
-        if (tl.leftNeighbor != null) {
-            tl.leftNeighbor.checkCollisionsFor(sprite);
-            if (tl.topNeighbor != null) {
-                tl.topNeighbor.leftNeighbor.checkCollisionsFor(sprite);
-            }
-        }
-        if (tl.topNeighbor != null) {
-            tl.topNeighbor.checkCollisionsFor(sprite);
-        }
-
-        if (tl != br) {
-            if (tl.bottomNeighbor.rightNeighbor == br) {
-                //check them all
-                br.checkCollisionsFor(sprite);
-                if (br.leftNeighbor != null) {
-                    br.leftNeighbor.checkCollisionsFor(sprite);
-                }
-                if (tl.rightNeighbor != null) {
-                    tl.rightNeighbor.checkCollisionsFor(sprite);
-                    if (tl.rightNeighbor.topNeighbor != null) {
-                        tl.rightNeighbor.topNeighbor.checkCollisionsFor(sprite);
-                    }
-                }
-            } else if (br == tl.bottomNeighbor) {
-                if (br.leftNeighbor != null) {
-                    br.leftNeighbor.checkCollisionsFor(sprite);
-                }
-            } else {
-                if (br.topNeighbor != null) {
-                    br.topNeighbor.checkCollisionsFor(sprite);
-                }
-            }
-        }
+    public final Zone getZone() {
+        return data.getZone();
     }
 
     /**
@@ -107,6 +70,16 @@ public abstract class ZoneObject {
      */
     final void setZoneData(final ZoneData zoneData) {
         data = zoneData;
+    }
+
+    /**
+     * Drops its association with its Zone.
+     * @param zone the Zone to drop
+     */
+    void dropZone(final Zone zone) {
+        if (data.getZone() == zone) {
+            data = null;
+        }
     }
 
     /**

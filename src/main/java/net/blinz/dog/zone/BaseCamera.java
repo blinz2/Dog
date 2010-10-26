@@ -123,7 +123,6 @@ public abstract class BaseCamera extends ZoneObject {
     private final HashMap<BaseSprite, CameraSprite> orphanMap = new HashMap<BaseSprite, CameraSprite>();
     private final ArrayList<CameraSprite> orphanList = new ArrayList<CameraSprite>();
     private final Bounds bounds = new Bounds();
-    private Zone zone;
     private User user;
 
     /**
@@ -152,31 +151,11 @@ public abstract class BaseCamera extends ZoneObject {
     /**
      * Sets the zone of this Camera. In addition to setting the Zone it also
      * removes the old Zone.
-     * @param zone
+     * @param zone the Zone for this to start following
      */
     public final synchronized void setZone(final Zone zone) {
-        dropZone();
-        this.zone = zone;
+        dropZone(getZone());
         zone.addCamera(this);
-    }
-
-    /**
-     * Drops the current zone, the Camera will have no Zone to moniter after
-     * this method is called.
-     */
-    public synchronized void dropZone() {
-        if (zone != null) {
-            zone.removeCamera(this);
-            zone = null;
-        }
-    }
-
-    /**
-     * Gets the Zone that this camera monitors.
-     * @return the Zone that this camera monitors
-     */
-    public final Zone getZone() {
-        return zone;
     }
 
     /**
@@ -296,6 +275,14 @@ public abstract class BaseCamera extends ZoneObject {
     }
 
     /**
+     * Drops the current zone, the Camera will have no Zone to moniter after
+     * this method is called.
+     */
+    public final void dropZone() {
+        dropZone(getZone());
+    }
+
+    /**
      * Called after each cycle of this Camera's Zone. Does nothing, for implementing
      * as needed.
      */
@@ -308,6 +295,19 @@ public abstract class BaseCamera extends ZoneObject {
      */
     @Override
     protected void init() {
+    }
+
+    /**
+     * Drops the current zone, the Camera will have no Zone to moniter after
+     * this method is called.
+     * @param zone the Zone that this currently follows and you intend to drop
+     */
+    @Override
+    synchronized void dropZone(final Zone zone) {
+        if (getZone() == zone) {
+            getZone().removeCamera(this);
+            super.dropZone(zone);
+        }
     }
 
     @Override

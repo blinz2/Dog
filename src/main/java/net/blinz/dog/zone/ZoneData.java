@@ -57,8 +57,17 @@ final class ZoneData {
      */
     final UserListenerCatalog userListeners = new UserListenerCatalog();
     private String zoneName;
+    private Zone zone;
     private boolean paused = false;
     private boolean isClient = false, isServer = false;
+
+    /**
+     * Constructor
+     * @param zone the Zone that this ZoneData is associated with
+     */
+    public ZoneData(final Zone zone) {
+        this.zone = zone;
+    }
 
     /**
      * Initializes the ZoneData according to what it already stores.
@@ -72,6 +81,14 @@ final class ZoneData {
                 sectors[i][n].init();
             }
         }
+    }
+
+    /**
+     * Gets the Zone associated with this ZoneData.
+     * @return the Zone associated with this ZoneData
+     */
+    final Zone getZone() {
+        return zone;
     }
 
     /**
