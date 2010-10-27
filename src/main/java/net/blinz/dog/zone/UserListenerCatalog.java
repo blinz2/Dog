@@ -360,6 +360,9 @@ final class UserListenerCatalog {
      */
     final void checkIn(final User user) {
         final UserListenerList list = userListeners.get(user);
+        if (list == null) {
+            return;
+        }
         list.cameraCount--;
         if (list.dead()) {
             userListeners.remove(user);

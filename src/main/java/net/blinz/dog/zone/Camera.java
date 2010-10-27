@@ -180,7 +180,7 @@ public class Camera extends BaseCamera {
      */
     @Override
     final synchronized void dropZone(final Zone zone) {
-        if (getZone() == zone) {
+        if (getZone() == zone && zone != null) {
             getData().userListeners.checkIn(getUser());
             inputListener = null;
             super.dropZone(zone);

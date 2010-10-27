@@ -123,7 +123,7 @@ public abstract class BaseCamera extends ZoneObject {
     private final HashMap<BaseSprite, CameraSprite> orphanMap = new HashMap<BaseSprite, CameraSprite>();
     private final ArrayList<CameraSprite> orphanList = new ArrayList<CameraSprite>();
     private final Bounds bounds = new Bounds();
-    private User user;
+    private User user = new User("Default");
 
     /**
      * Constructor for Camera.
@@ -304,7 +304,7 @@ public abstract class BaseCamera extends ZoneObject {
      */
     @Override
     synchronized void dropZone(final Zone zone) {
-        if (getZone() == zone) {
+        if (getZone() == zone && zone != null) {
             getZone().removeCamera(this);
             super.dropZone(zone);
         }
