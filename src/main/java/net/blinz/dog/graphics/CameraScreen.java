@@ -18,6 +18,7 @@ package net.blinz.dog.graphics;
 
 import net.blinz.dog.zone.Camera;
 import net.blinz.core.graphics.Graphics;
+import net.blinz.dog.util.User;
 
 /**
  * A Screen class dedicated to drawing a Cameras.
@@ -25,7 +26,30 @@ import net.blinz.core.graphics.Graphics;
  */
 public final class CameraScreen extends Screen {
 
-    private Camera camera = new Camera();
+    private Camera camera;
+
+    /**
+     * Constructor
+     */
+    public CameraScreen() {
+        this(new Camera());
+    }
+
+    /**
+     * Constructor
+     * @param user the User associated with the Camera
+     */
+    public CameraScreen(final User user) {
+        this(new Camera(user));
+    }
+
+    /**
+     * Constructor
+     * @param camera the Camera for this to display
+     */
+    public CameraScreen(final Camera camera) {
+        this.camera = camera;
+    }
 
     /**
      * Sets the Camera that this CameraScreen will draw.

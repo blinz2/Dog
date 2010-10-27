@@ -21,11 +21,7 @@ import java.util.Vector;
 import net.blinz.core.graphics.Graphics;
 import net.blinz.core.util.Bounds;
 import net.blinz.dog.util.User;
-import net.blinz.dog.zone.BaseCamera;
-import net.blinz.dog.zone.BaseSprite;
-import net.blinz.dog.zone.CameraSprite;
 import net.blinz.dog.zone.SelectableSprite.SelectionResponse;
-import net.blinz.dog.zone.SelectionEvent;
 
 /**
  * Camera acts as an interface between a the user, and the Zone.
