@@ -23,9 +23,18 @@ import java.util.HashMap;
  * A Camera for monitoring server Zones.
  * @author Blinz
  */
-class ServerCamera extends BaseCamera {
+public final class ServerCamera extends BaseCamera {
 
     private final HashMap<BaseSprite, CameraSprite> spriteMap = new HashMap<BaseSprite, CameraSprite>();
+    private Socket socket;
+
+    /**
+     * Constructor
+     * @param socket the socket with which this ServerCamera will communicate with its client
+     */
+    public ServerCamera(final Socket socket) {
+	    this.socket = socket;
+    }
 
     @Override
     final void addSprite(CameraSprite sprite) {
