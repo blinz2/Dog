@@ -16,6 +16,7 @@
  */
 package net.blinz.dog.zone;
 
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 
