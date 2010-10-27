@@ -21,6 +21,7 @@ import java.util.Stack;
 import java.util.Vector;
 import net.blinz.core.graphics.Graphics;
 import net.blinz.core.util.Bounds;
+import net.blinz.dog.zone.CameraSprite;
 
 /**
  * An object used to represent what is in a Cameras sight at a given cycle in the

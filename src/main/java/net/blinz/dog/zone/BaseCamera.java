@@ -19,14 +19,105 @@ package net.blinz.dog.zone;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
+import net.blinz.core.input.KeyListener;
+import net.blinz.core.input.MouseListener;
+import net.blinz.core.input.MouseWheelListener;
 import net.blinz.core.util.Bounds;
+import net.blinz.dog.input.ClickEvent;
+import net.blinz.dog.input.KeyEvent;
+import net.blinz.dog.input.MouseEvent;
+import net.blinz.dog.input.MouseWheelEvent;
 import net.blinz.dog.util.User;
+import net.blinz.dog.zone.UserListenerCatalog.UserListenerList;
 
 /**
  * A base class for Camera and ServerCamera.
  * @author Blinz
  */
 public abstract class BaseCamera extends ZoneObject {
+
+    /**
+     * Class used to read all input for the Camera.
+     */
+    private final class InputListener implements MouseListener, MouseWheelListener, KeyListener {
+
+        /**
+         * Constructor
+         */
+        private InputListener() {
+        }
+
+        @Override
+        public void buttonClick(int buttonNumber, int clickCount, int cursorX, int cursorY) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
+                final ClickEvent e = new ClickEvent(getUser(), buttonNumber,
+                        cursorX + getX(), cursorY + getY(), clickCount);
+                ul.buttonClick(e);
+                select(new SelectionEvent(user, buttonNumber, clickCount, cursorX, cursorY));
+            }
+        }
+
+        @Override
+        public void buttonPress(int buttonNumber, int cursorX, int cursorY) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
+                final MouseEvent e = new MouseEvent(getUser(), buttonNumber, cursorX + getX(), cursorY + getY());
+                ul.buttonPress(e);
+            }
+        }
+
+        @Override
+        public void buttonRelease(int buttonNumber, int cursorX, int cursorY) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
+                final MouseEvent e = new MouseEvent(getUser(), buttonNumber, cursorX + getX(), cursorY + getY());
+                ul.buttonRelease(e);
+            }
+        }
+
+        @Override
+        public void wheelScroll(int number, int cursorX, int cursorY) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
+                final MouseWheelEvent e = new MouseWheelEvent(getUser(), number, cursorX + getX(), cursorY + getY());
+                ul.wheelScroll(e);
+            }
+        }
+
+        @Override
+        public void keyPressed(int key) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
+                final KeyEvent e = new KeyEvent(getUser(), key);
+                ul.keyPressed(e);
+            }
+        }
+
+        @Override
+        public void keyReleased(int key) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
+                final KeyEvent e = new KeyEvent(getUser(), key);
+                ul.keyReleased(e);
+            }
+        }
+
+        @Override
+        public void keyTyped(int key) {
+            final UserListenerList ul = userListeners;
+            if (ul != null) {
+                final KeyEvent e = new KeyEvent(getUser(), key);
+                ul.keyTyped(e);
+            }
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            getData().userListeners.checkIn(getUser());
+            super.finalize();
+        }
+    }
 
     /**
      * Tracks the Sprites in a given Sector that the Camera occupies.
@@ -119,11 +210,16 @@ public abstract class BaseCamera extends ZoneObject {
      * Represents the bounds of this Camera during the last round.
      */
     private final Bounds oldBounds = new Bounds();
+    private UserListenerList userListeners;
+    private InputListener inputListener;
+    /**
+     * Used to keep track of how click inputs affect the selected sprite.
+     */
     private final Vector<CameraSector> sectors = new Vector<CameraSector>();
     private final HashMap<BaseSprite, CameraSprite> orphanMap = new HashMap<BaseSprite, CameraSprite>();
     private final ArrayList<CameraSprite> orphanList = new ArrayList<CameraSprite>();
     private final Bounds bounds = new Bounds();
-    private User user = new User("Default");
+    private User user = new User();
 
     /**
      * Constructor for Camera.
@@ -283,6 +379,16 @@ public abstract class BaseCamera extends ZoneObject {
     }
 
     /**
+     * Gets the input listener Used to direct input by the User owning this
+     * Camera to sprites. Add this to the input context that the Camera will
+     * listen to.
+     * @return an Mouse, MouseWheel, Key listener object
+     */
+    public final synchronized Object getInputListener() {
+        return inputListener == null ? inputListener = new InputListener() : inputListener;
+    }
+
+    /**
      * Called after each cycle of this Camera's Zone. Does nothing, for implementing
      * as needed.
      */
@@ -297,6 +403,9 @@ public abstract class BaseCamera extends ZoneObject {
     protected void init() {
     }
 
+    protected void select(final SelectionEvent selection) {
+    }
+
     /**
      * Drops the current zone, the Camera will have no Zone to moniter after
      * this method is called.
@@ -305,6 +414,8 @@ public abstract class BaseCamera extends ZoneObject {
     @Override
     synchronized void dropZone(final Zone zone) {
         if (getZone() == zone && zone != null) {
+            getData().userListeners.checkIn(getUser());
+            inputListener = null;
             getZone().removeCamera(this);
             super.dropZone(zone);
         }
@@ -312,6 +423,7 @@ public abstract class BaseCamera extends ZoneObject {
 
     @Override
     void internalInit() {
+        userListeners = getData().userListeners.checkOut(getUser());
         init();
     }
 

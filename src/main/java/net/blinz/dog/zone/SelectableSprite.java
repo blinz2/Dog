@@ -29,7 +29,7 @@ public interface SelectableSprite {
     /**
      * Used to indicate how to handle being selected.
      */
-    public enum Selection {
+    public enum SelectionResponse {
 
         /**
          * Accept the selection.
@@ -57,7 +57,7 @@ public interface SelectableSprite {
      * @param user the User that selected this sprite
      * @return indication of how to handle the selection
      */
-    public Selection select(final User user);
+    public SelectionResponse select(final User user);
 
     /**
      * Called when the sprite loses selected status.

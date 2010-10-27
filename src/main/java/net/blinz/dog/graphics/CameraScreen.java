@@ -16,8 +16,8 @@
  */
 package net.blinz.dog.graphics;
 
-import net.blinz.core.graphics.Graphics;
 import net.blinz.dog.zone.Camera;
+import net.blinz.core.graphics.Graphics;
 
 /**
  * A Screen class dedicated to drawing a Cameras.

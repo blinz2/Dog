@@ -19,7 +19,7 @@ package net.blinz.dog.zone;
 import net.blinz.core.graphics.Graphics;
 import net.blinz.core.util.Bounds;
 import net.blinz.dog.util.User;
-import net.blinz.dog.zone.SelectableSprite.Selection;
+import net.blinz.dog.zone.SelectableSprite.SelectionResponse;
 
 /**
  * A wrapper around sprite for Cameras to properly manage them.
@@ -130,15 +130,15 @@ final class CameraSprite {
      * @param user the User that selected this sprite
      * @return whether or not the sprite accepted selection
      */
-    final SelectableSprite.Selection select(final User user) {
+    final SelectableSprite.SelectionResponse select(final User user) {
         if (sprite instanceof SelectableSprite) {
-            final SelectableSprite.Selection s = ((SelectableSprite) sprite).select(user);
-            if (s == Selection.ACCEPT) {
+            final SelectableSprite.SelectionResponse s = ((SelectableSprite) sprite).select(user);
+            if (s == SelectionResponse.ACCEPT) {
                 isSelected = true;
             }
             return s;
         }
-        return Selection.REJECT_CONTINUE;
+        return SelectionResponse.REJECT_CONTINUE;
     }
 
     /**
