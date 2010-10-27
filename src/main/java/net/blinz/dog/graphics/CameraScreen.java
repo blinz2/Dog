@@ -48,6 +48,7 @@ public final class CameraScreen extends Screen {
         super.draw(g);
         final Camera c = camera;
         if (c != null) {
+            c.setSize(getWidth(), getHeight());
             c.draw(g);
         }
     }
