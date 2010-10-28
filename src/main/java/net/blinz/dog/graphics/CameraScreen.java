@@ -55,8 +55,12 @@ public final class CameraScreen extends Screen {
      * Sets the Camera that this CameraScreen will draw.
      * @param camera the Camera for this CameraScreen to draw.
      */
-    public final void setCamera(final Camera camera) {
+    public final synchronized void setCamera(final Camera camera) {
+        if (this.camera != null) {
+            removeInputListener(camera.getInputListener());
+        }
         this.camera = camera;
+        addInputListener(camera.getInputListener());
     }
 
     /**
