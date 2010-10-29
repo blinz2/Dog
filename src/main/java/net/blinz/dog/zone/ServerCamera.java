@@ -24,7 +24,7 @@ import java.util.HashMap;
  * A Camera for monitoring server Zones.
  * @author Blinz
  */
-public final class ServerCamera extends BaseCamera {
+public class ServerCamera extends BaseCamera {
 
     private final HashMap<BaseSprite, CameraSprite> spriteMap = new HashMap<BaseSprite, CameraSprite>();
     private Socket socket;
@@ -38,14 +38,21 @@ public final class ServerCamera extends BaseCamera {
     }
 
     @Override
-    final void addSprite(CameraSprite sprite) {
+    final void addSprite(final CameraSprite sprite) {
         spriteMap.put(sprite.getSprite(), sprite);
     }
 
     @Override
-    void removeOrphanedSprites(final ArrayList<CameraSprite> orphans) {
+    final void removeOrphanedSprites(final ArrayList<CameraSprite> orphans) {
         for (int i = 0; i < orphans.size(); i++) {
             spriteMap.remove(orphans.get(i).getSprite());
         }
+    }
+    
+    /**
+     * Passes the given message to the appropriate sprite.
+     * @param message the message, including the sprite that it will be sent to.
+     */
+    private final void passMessageToSprite(final String message) {
     }
 }
