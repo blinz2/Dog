@@ -4,7 +4,7 @@
     <groupId>net.blinz.dog</groupId>
     <artifactId>Dog</artifactId>
     <packaging>jar</packaging>
-    <version>0.10.0.0-Networking-SNAPSHOT2</version>
+    <version>0.10.0.0-SNAPSHOT</version>
     <name>Dog</name>
     <url>None</url>
 
