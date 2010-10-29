@@ -340,9 +340,6 @@ public abstract class BaseSprite extends ZoneObject {
 
     protected abstract void draw(final Graphics g, final Bounds bounds);
 
-    @Override
-    protected abstract void init();
-
     /**
      * Updates the width of this sprite to that given.
      * @param width the new width of this sprite

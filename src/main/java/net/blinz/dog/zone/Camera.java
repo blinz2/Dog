@@ -53,6 +53,10 @@ public class Camera extends BaseCamera {
         super(user);
     }
 
+    @Override
+    public void init() {
+    }
+
     /**
      * Draws this Camera. A single given Camera should only be drawn by one
      * thread at a time, and thus by only one Screen.

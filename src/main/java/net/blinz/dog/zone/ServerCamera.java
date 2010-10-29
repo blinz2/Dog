@@ -34,7 +34,11 @@ public class ServerCamera extends BaseCamera {
      * @param socket the socket with which this ServerCamera will communicate with its client
      */
     public ServerCamera(final Socket socket) {
-	    this.socket = socket;
+        this.socket = socket;
+    }
+
+    @Override
+    public void init() {
     }
 
     @Override
@@ -48,7 +52,7 @@ public class ServerCamera extends BaseCamera {
             spriteMap.remove(orphans.get(i).getSprite());
         }
     }
-    
+
     /**
      * Passes the given message to the appropriate sprite.
      * @param message the message, including the sprite that it will be sent to.

@@ -45,7 +45,7 @@ class ClientZone extends Zone {
     }
 
     @Override
-    protected void init() {
+    public void init() {
     }
 
     @Override

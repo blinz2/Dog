@@ -423,6 +423,13 @@ public class Zone extends ZoneObject {
     }
 
     /**
+     * Method empty, for implementing as needed. Called when the Zone starts.
+     */
+    @Override
+    public void init() {
+    }
+
+    /**
      * Sets the width of this Zone to the given value.
      * @param width the new width of the Zone
      */
@@ -456,13 +463,6 @@ public class Zone extends ZoneObject {
      */
     protected final long time() {
         return getData().zoneTime;
-    }
-
-    /**
-     * Method empty, for implementing as needed. Called when the Zone starts.
-     */
-    @Override
-    protected void init() {
     }
 
     /**

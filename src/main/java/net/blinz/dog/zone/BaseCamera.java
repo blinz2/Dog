@@ -36,6 +36,14 @@ import net.blinz.dog.zone.UserListenerCatalog.UserListenerList;
  */
 public abstract class BaseCamera extends ZoneObject {
 
+    private final static class Init extends InitStep<BaseCamera> {
+
+        @Override
+        protected void run(BaseCamera object) {
+            object.userListeners = object.getData().userListeners.checkOut(object.getUser());
+        }
+    }
+
     /**
      * Class used to read all input for the Camera.
      */
@@ -221,6 +229,10 @@ public abstract class BaseCamera extends ZoneObject {
     private final Bounds bounds = new Bounds();
     private User user = new User();
 
+    static {
+        addInitStep(BaseCamera.class, new Init());
+    }
+
     /**
      * Constructor for Camera.
      */
@@ -395,14 +407,6 @@ public abstract class BaseCamera extends ZoneObject {
     protected void update() {
     }
 
-    /**
-     * Called after the Camera receives a Zone. Does nothing, for implementing
-     * as needed.
-     */
-    @Override
-    protected void init() {
-    }
-
     protected void select(final SelectionEvent selection) {
     }
 
@@ -419,12 +423,6 @@ public abstract class BaseCamera extends ZoneObject {
             getZone().removeCamera(this);
             super.dropZone(zone);
         }
-    }
-
-    @Override
-    void internalInit() {
-        userListeners = getData().userListeners.checkOut(getUser());
-        init();
     }
 
     /**

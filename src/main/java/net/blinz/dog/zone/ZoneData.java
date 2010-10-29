@@ -308,6 +308,6 @@ final class ZoneData {
      */
     final void registerZoneObject(final ZoneObject object) {
         object.data = this;
-        object.internalInit();
+        ZoneObject.runInitializations(object);
     }
 }

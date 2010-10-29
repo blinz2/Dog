@@ -51,7 +51,7 @@ final class Sector extends ZoneObject {
     }
 
     @Override
-    void init() {
+    public void init() {
         bounds.setSize(getData().sectorWidth(), getData().sectorHeight());
         findNeighbors();
     }
