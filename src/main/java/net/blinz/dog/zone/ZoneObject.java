@@ -16,12 +16,58 @@
  */
 package net.blinz.dog.zone;
 
+import java.util.HashMap;
+import java.util.ArrayList;
+
 /**
  * The root class for many objects relating to Zone.
  * @author Blinz
  */
 public abstract class ZoneObject {
 
+    /**
+     * Used to help handle multiple initialization steps for ZoneObjects.
+     */
+    abstract class InitStep {
+
+        private int orderPlacement = 0;
+
+        /**
+         * Gets the place in the order of InitSteps that this will be executed.
+         * @return the place in the order of InitSteps that this will be executed
+         */
+        final int getOrderPlacement() {
+            return orderPlacement;
+        }
+
+        /**
+         * Sets the place in the order of InitSteps that this will be executed.
+         * @param orderPlacement the place in the order of InitSteps that this will be executed
+         */
+        final void setOrderPlacement(final int orderPlacement) {
+            this.orderPlacement = orderPlacement;
+        }
+
+        /**
+         * Runs this InitStep.
+         */
+        abstract void run();
+    }
+
+    /**
+     * Used to call the primary initialization method of class.
+     */
+    final class MainInit extends InitStep {
+
+        @Override
+        void run() {
+            internalInit();
+        }
+    }
+    /**
+     * Used to track the initialization steps for different classes.
+     */
+    private final HashMap<String, ArrayList<InitStep>> initTable = new HashMap<String, ArrayList<InitStep>>();
     private final static Zone defaultZone = new Zone();
     private final static ZoneData defaultData = defaultZone.getData();
     ZoneData data = defaultData;
