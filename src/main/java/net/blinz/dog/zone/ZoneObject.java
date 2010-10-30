@@ -56,7 +56,6 @@ public abstract class ZoneObject {
      */
     private final static class InitProfile {
 
-        private Class cl;
         private final ArrayList<InitStep> steps = new ArrayList<InitStep>();
 
         /**
