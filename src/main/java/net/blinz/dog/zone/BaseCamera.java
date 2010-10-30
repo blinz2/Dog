@@ -39,7 +39,7 @@ public abstract class BaseCamera extends ZoneObject {
     private final static class Init extends InitStep<BaseCamera> {
 
         @Override
-        protected void run(BaseCamera object) {
+        public void run(BaseCamera object) {
             object.userListeners = object.getData().userListeners.checkOut(object.getUser());
         }
     }

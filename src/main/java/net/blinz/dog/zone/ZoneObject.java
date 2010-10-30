@@ -16,10 +16,11 @@
  */
 package net.blinz.dog.zone;
 
-import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.blinz.core.util.HierarchicalStepProcessor;
+import net.blinz.core.util.Step;
+import net.blinz.core.util.TopLevelMethod;
 
 /**
  * The root class for many objects relating to Zone.
@@ -31,57 +32,20 @@ public abstract class ZoneObject {
      * Used to help handle multiple initialization steps for ZoneObjects.
      * @author Blinz
      */
-    public static abstract class InitStep<E extends ZoneObject> {
-
-        /**
-         * Runs this InitStep.
-         * @param object the object to run initialization on
-         */
-        protected abstract void run(E object);
+    public static abstract class InitStep<E extends ZoneObject> extends Step<E> {
     }
 
     /**
      * Used to call the primary initialization method of class.
      */
-    final static class MainInit extends InitStep {
+    final static class MainInit extends InitStep<ZoneObject> {
 
         @Override
-        protected void run(final ZoneObject e) {
+        public void run(final ZoneObject e) {
             e.init();
         }
     }
-
-    /**
-     * An object detailing how to initialize a given object class.
-     */
-    private final static class InitProfile {
-
-        private final ArrayList<InitStep> steps = new ArrayList<InitStep>();
-
-        /**
-         * Adds the given InitStep to this InitProfile.
-         * @param step the InitStep to be added
-         */
-        private void addStep(final InitStep step) {
-            steps.add(step);
-        }
-
-        /**
-         * Runs the InitSteps listed for the class of the given ZoneObject.
-         * @param object the ZoneObject to be initialized
-         */
-        private final void init(final ZoneObject object) {
-            for (int i = 0; i < steps.size(); i++) {
-                steps.get(i).run(object);
-            }
-        }
-    }
-    /**
-     * Used to track the initialization steps for different classes.
-     */
-    private final static HashMap<Class, ArrayList<InitStep>> initTable = new HashMap<Class, ArrayList<InitStep>>();
-    private final static HashMap<Class, InitProfile> initProfiles = new HashMap<Class, InitProfile>();
-    private final static MainInit main = new MainInit();
+    private final static HierarchicalStepProcessor init = new HierarchicalStepProcessor();
     private final static Zone defaultZone = new Zone();
     private final static ZoneData defaultData = defaultZone.getData();
     /**
@@ -90,7 +54,19 @@ public abstract class ZoneObject {
     ZoneData data = defaultData;
 
     static {
-        initTable.put(ZoneObject.class, new ArrayList<InitStep>());
+        try {
+            init.addTopLevelMethod(new TopLevelMethod<ZoneObject>(ZoneObject.class.getDeclaredMethod("init")) {
+
+                @Override
+                public void run(ZoneObject object) {
+                    object.init();
+                }
+            });
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(ZoneObject.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(ZoneObject.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -99,20 +75,7 @@ public abstract class ZoneObject {
      * @param step the InitStep to add
      */
     public final static void addInitStep(final Class clss, final InitStep step) {
-        ArrayList<InitStep> steps = initTable.get(clss);
-        if (steps == null) {
-            steps = new ArrayList<InitStep>();
-            synchronized (initTable) {
-                if (!initTable.containsKey(clss)) {
-                    initTable.put(clss, steps);
-                } else {
-                    steps = initTable.get(clss);
-                }
-            }
-        }
-        synchronized (steps) {
-            steps.add(step);
-        }
+        init.addStep(clss, step);
     }
 
     /**
@@ -182,50 +145,6 @@ public abstract class ZoneObject {
      * @param object the ZoneObject to initialize
      */
     final static void runInitializations(final ZoneObject object) {
-        final Class cl = object.getClass();
-        InitProfile profile = initProfiles.get(cl);
-        if (profile == null) {
-            generateInitProfile(profile = new InitProfile(), cl, false);
-            synchronized (initProfiles) {
-                if (!initProfiles.containsKey(cl)) {
-                    initProfiles.put(cl, profile);
-                } else {
-                    profile = initProfiles.get(cl);
-                }
-            }
-        }
-        profile.init(object);
-    }
-
-    /**
-     * Calls the initialization methods for the given ZoneObject.
-     * @param profile the profile to generate
-     * @param level the level in the class hierarchy that this method is on
-     * @param mainFound whether or not the main init method has been found yet
-     */
-    private final static void generateInitProfile(final InitProfile profile, final Class level, boolean mainFound) {
-        if (level == ZoneObject.class.getSuperclass()) {
-            return;
-        }
-
-        generateInitProfile(profile, level.getSuperclass(), mainFound);
-
-        final ArrayList<InitStep> steps = initTable.get(level);
-        if (steps != null) {
-            for (int i = 0; i < steps.size(); i++) {
-                profile.addStep(steps.get(i));
-            }
-        }
-
-        if (!mainFound) {
-            try {
-                level.getDeclaredMethod("init");
-                profile.addStep(main);
-                mainFound = true;
-            } catch (NoSuchMethodException ex) {
-            } catch (SecurityException ex) {
-                Logger.getLogger(ZoneObject.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        init.getProfile(object.getClass());
     }
 }
