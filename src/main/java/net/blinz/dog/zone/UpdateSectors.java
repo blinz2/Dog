@@ -17,7 +17,7 @@
 package net.blinz.dog.zone;
 
 import java.util.ArrayList;
-import net.blinz.core.util.concurrency.SynchronizedTask;
+import net.blinz.dog.util.SynchronizedTask;
 
 /**
  * Updates the Sectors and sprites.

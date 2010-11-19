@@ -22,15 +22,15 @@ import java.util.ArrayList;
 import java.util.Vector;
 import net.blinz.core.util.Position;
 import net.blinz.core.util.Size;
-import net.blinz.core.util.concurrency.Barrier;
-import net.blinz.core.util.concurrency.SynchronizedTask;
-import net.blinz.core.util.concurrency.Task;
-import net.blinz.core.util.concurrency.TaskExecuter;
-import net.blinz.core.util.concurrency.TaskList;
 import net.blinz.dog.input.ClickEvent;
 import net.blinz.dog.input.KeyEvent;
 import net.blinz.dog.input.MouseEvent;
 import net.blinz.dog.input.MouseWheelEvent;
+import net.blinz.dog.util.Barrier;
+import net.blinz.dog.util.SynchronizedTask;
+import net.blinz.dog.util.Task;
+import net.blinz.dog.util.TaskExecuter;
+import net.blinz.dog.util.TaskList;
 
 /**
  * Represents a realm for sprites to be processed and interact.

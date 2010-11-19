@@ -16,7 +16,7 @@
  */
 package net.blinz.dog.zone;
 
-import net.blinz.core.util.concurrency.SynchronizedTask;
+import net.blinz.dog.util.SynchronizedTask;
 
 /**
  * An interface for adding objects to Zones to be updated once each cycle with

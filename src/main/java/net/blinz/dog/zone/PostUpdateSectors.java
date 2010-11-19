@@ -17,7 +17,7 @@
 package net.blinz.dog.zone;
 
 import java.util.ArrayList;
-import net.blinz.core.util.concurrency.SynchronizedTask;
+import net.blinz.dog.util.SynchronizedTask;
 
 /**
  * Invokes the postUpdate method for the associated Sectors.

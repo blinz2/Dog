@@ -18,9 +18,9 @@ package net.blinz.dog.zone;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.blinz.core.util.HierarchicalStepProcessor;
-import net.blinz.core.util.Step;
-import net.blinz.core.util.TopLevelMethod;
+import net.blinz.dog.util.HierarchicalStepProcessor;
+import net.blinz.dog.util.Step;
+import net.blinz.dog.util.TopLevelMethod;
 
 /**
  * The root class for many objects relating to Zone.
