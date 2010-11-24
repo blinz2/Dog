@@ -76,6 +76,7 @@ public final class HierarchicalStepProcessor<E> {
      * Adds the given SteppingProfile to this HierarchicalStepProcessor.
      * @param clss the Class to associate with the given Profile
      * @param profile the SteppingProfile to add
+     * @return the given profile if it was added, the existing profile if there was on
      */
     public final SteppingProfile<E> addProfile(final Class clss, final SteppingProfile<E> profile) {
         synchronized (initProfiles) {
