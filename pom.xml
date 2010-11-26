@@ -29,7 +29,7 @@
         <dependency>
             <groupId>net.blinz.core</groupId>
             <artifactId>BlinzCore</artifactId>
-            <version>0.8.0-MILESTONE3</version>
+            <version>0.8.0-MILESTONE4</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
